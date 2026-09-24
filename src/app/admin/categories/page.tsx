@@ -1,0 +1,297 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
+import { Plus, Edit2, Trash2, FolderTree, X } from 'lucide-react';
+import { ICategory } from '@/types';
+import { useToast } from '@/context/ToastContext';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
+
+export default function AdminCategoriesPage() {
+  const [categories, setCategories] = useState<ICategory[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<ICategory | null>(null);
+  const { success, error } = useToast();
+
+  const [formData, setFormData] = useState({
+    name: '',
+    slug: '',
+    description: '',
+    image: '',
+    order: '0',
+  });
+
+  const fetchCategories = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch('/api/categories');
+      const data = await res.json();
+      if (data.success) {
+        setCategories(data.categories);
+      }
+    } catch (err) {
+      error('Failed to load categories');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const openAddModal = () => {
+    setEditingCategory(null);
+    setFormData({ name: '', slug: '', description: '', image: '', order: '0' });
+    setModalOpen(true);
+  };
+
+  const openEditModal = (cat: ICategory) => {
+    setEditingCategory(cat);
+    setFormData({
+      name: cat.name,
+      slug: cat.slug,
+      description: cat.description || '',
+      image: cat.image || '',
+      order: cat.order?.toString() || '0',
+    });
+    setModalOpen(true);
+  };
+
+  const handleDelete = async (id: string, name: string) => {
+    if (!confirm(`Are you sure you want to delete category "${name}"?`)) return;
+
+    try {
+      const res = await fetch(`/api/categories/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        success('Category deleted successfully');
+        setCategories((p) => p.filter((c) => c._id !== id));
+      } else {
+        error(data.message || 'Failed to delete category');
+      }
+    } catch (err) {
+      error('An error occurred');
+    }
+  };
+
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.name) return;
+
+    try {
+      const url = editingCategory ? `/api/categories/${editingCategory._id}` : '/api/categories';
+      const method = editingCategory ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formData,
+          order: Number(formData.order),
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        success(editingCategory ? 'Category updated' : 'Category created');
+        setModalOpen(false);
+        fetchCategories();
+      } else {
+        error(data.message || 'Operation failed');
+      }
+    } catch (err) {
+      error('An error occurred');
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-6 max-w-7xl mx-auto">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <span className="text-xs font-bold text-brand-600 uppercase tracking-widest">
+            Hierarchy & Classification
+          </span>
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mt-1">
+            Category Management ({categories.length})
+          </h1>
+        </div>
+
+        <button
+          onClick={openAddModal}
+          className="bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold py-2.5 px-4 rounded-xl flex items-center gap-1.5 shadow-sm transition-colors self-start sm:self-auto"
+        >
+          <Plus className="w-4 h-4" />
+          <span>Add New Category</span>
+        </button>
+      </div>
+
+      {/* Categories Grid */}
+      <div className="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
+        {loading ? (
+          <div className="py-20 flex justify-center">
+            <LoadingSpinner size="lg" />
+          </div>
+        ) : categories.length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead>
+                <tr className="border-b border-slate-200 bg-slate-50/70 text-slate-500 font-bold uppercase">
+                  <th className="py-3.5 px-4">Category</th>
+                  <th className="py-3.5 px-4">Slug</th>
+                  <th className="py-3.5 px-4">Description</th>
+                  <th className="py-3.5 px-4">Products</th>
+                  <th className="py-3.5 px-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {categories.map((cat) => (
+                  <tr key={cat._id} className="hover:bg-slate-50/50">
+                    <td className="py-3.5 px-4">
+                      <div className="flex items-center gap-3">
+                        <div className="relative w-10 h-10 rounded-xl bg-slate-100 overflow-hidden border border-slate-200 shrink-0">
+                          {cat.image ? (
+                            <Image src={cat.image} alt={cat.name} fill className="object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-slate-400">
+                              <FolderTree className="w-4 h-4" />
+                            </div>
+                          )}
+                        </div>
+                        <span className="font-bold text-slate-900">{cat.name}</span>
+                      </div>
+                    </td>
+
+                    <td className="py-3.5 px-4 text-slate-500 font-mono text-[11px]">{cat.slug}</td>
+
+                    <td className="py-3.5 px-4 text-slate-600 max-w-xs truncate">
+                      {cat.description || 'No description'}
+                    </td>
+
+                    <td className="py-3.5 px-4">
+                      <span className="bg-slate-100 font-bold px-2 py-0.5 rounded-md text-slate-700">
+                        {cat.productCount || 0} items
+                      </span>
+                    </td>
+
+                    <td className="py-3.5 px-4 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => openEditModal(cat)}
+                          className="p-1.5 text-slate-500 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(cat._id, cat.name)}
+                          className="p-1.5 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="p-12 text-center text-slate-400 text-xs">No categories found.</div>
+        )}
+      </div>
+
+      {/* Modal */}
+      {modalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in">
+          <div className="relative bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-100 flex flex-col gap-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <h3 className="text-base font-black text-slate-900">
+                {editingCategory ? 'Edit Category' : 'Create Category'}
+              </h3>
+              <button
+                onClick={() => setModalOpen(false)}
+                className="p-1 text-slate-400 hover:text-slate-600"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleFormSubmit} className="flex flex-col gap-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Category Name *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.name}
+                  onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))}
+                  placeholder="e.g. Gravel Bikes"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Slug (Optional)
+                </label>
+                <input
+                  type="text"
+                  value={formData.slug}
+                  onChange={(e) => setFormData((p) => ({ ...p, slug: e.target.value }))}
+                  placeholder="e.g. gravel-bikes"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Banner Image URL
+                </label>
+                <input
+                  type="url"
+                  value={formData.image}
+                  onChange={(e) => setFormData((p) => ({ ...p, image: e.target.value }))}
+                  placeholder="https://images.unsplash.com/..."
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Short Description
+                </label>
+                <textarea
+                  rows={2}
+                  value={formData.description}
+                  onChange={(e) => setFormData((p) => ({ ...p, description: e.target.value }))}
+                  placeholder="Category description..."
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-xs font-medium resize-none"
+                />
+              </div>
+
+              <div className="flex justify-end gap-3 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setModalOpen(false)}
+                  className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 text-xs font-bold text-white bg-brand-600 hover:bg-brand-500 rounded-xl shadow-sm"
+                >
+                  {editingCategory ? 'Update' : 'Create'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

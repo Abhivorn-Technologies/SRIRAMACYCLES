@@ -1,0 +1,53 @@
+export const APP_NAME = 'Sri Rama Cycle & Auto Spare Parts';
+export const APP_SHORT_NAME = 'Sri Rama Cycles';
+export const APP_TAGLINE = 'Premium Bicycles, Auto Spare Parts & Pro Service';
+export const APP_DESCRIPTION =
+  'Sri Rama Cycle and Auto Spare Parts (Kazipet, Hanumakonda) - Leading store for premium road cycles, mountain bikes, electric cycles, auto spare parts, and expert service.';
+
+export const CURRENCY_SYMBOL = '₹';
+export const FREE_SHIPPING_THRESHOLD = 999;
+export const STANDARD_SHIPPING_COST = 149;
+export const TAX_RATE = 0; // Prices are inclusive of GST
+
+export const NAV_LINKS = [
+  { label: 'Home', href: '/' },
+  { label: 'Shop All', href: '/shop' },
+  { label: 'Road Bikes', href: '/shop?category=road-bikes' },
+  { label: 'Mountain Bikes', href: '/shop?category=mountain-bikes' },
+  { label: 'Electric Bikes', href: '/shop?category=electric-bikes' },
+  { label: 'Accessories & Spares', href: '/shop?category=cycling-accessories' },
+  { label: 'Track Order', href: '/track-order' },
+  { label: 'About Us', href: '/about' },
+  { label: 'Contact Us', href: '/contact' },
+];
+
+export const ORDER_STATUSES = [
+  'Placed',
+  'Confirmed',
+  'Processing',
+  'Packed',
+  'Shipped',
+  'Out for Delivery',
+  'Delivered',
+  'Cancelled',
+] as const;
+
+export const PAYMENT_METHODS = [
+  { id: 'COD', name: 'Cash on Delivery', description: 'Pay cash upon doorstep arrival' },
+  { id: 'UPI', name: 'UPI & QR Payment', description: 'Instant Google Pay, PhonePe, Paytm' },
+  { id: 'CARD', name: 'Credit / Debit Card', description: 'Visa, MasterCard, RuPay' },
+  { id: 'NETBANKING', name: 'Net Banking', description: 'All major Indian banking partners' },
+];
+
+export const STORE_CONTACT = {
+  businessName: 'SRI RAMA CYCLE AND AUTO SPARE PARTS',
+  proprietor: 'Ravula. Rakesh Kumar',
+  phone: '+91 72076 53194',
+  rawPhone: '7207653194',
+  whatsapp: '+91 72076 53194',
+  whatsappLink: 'https://wa.me/917207653194',
+  supportEmail: 'support@sriramacycles.com',
+  address: 'SSS COMPLEX B-3, Mainroad, Kazipet, Hanumakonda (Dist) - 506003, Telangana, India',
+  shortAddress: 'SSS COMPLEX B-3, Mainroad, Kazipet, Hanumakonda - 506003',
+  hours: 'Mon - Sun: 9:00 AM - 9:30 PM IST',
+};

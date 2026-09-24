@@ -1,0 +1,57 @@
+# Dependencies
+node_modules/
+/.pnp
+.pnp.js
+
+# Testing
+/coverage
+
+# Next.js Build Output
+.next/
+out/
+build/
+dist/
+
+# Environment Variables (Strictly Private - Never commit secrets!)
+.env
+.env*.local
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Preserve the example environment template
+!.env.example
+
+# Debug and System Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+*.log
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+[Dd]esktop.ini
+
+# IDE & Editor Files
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Vercel Deployment
+.vercel/
+
+# SSL / Keys
+*.pem
+*.key
