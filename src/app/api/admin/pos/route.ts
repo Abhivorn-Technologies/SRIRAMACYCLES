@@ -6,6 +6,8 @@ import Product from '@/models/Product';
 import User from '@/models/User';
 import { extractAuthUser } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 // GET /api/admin/pos - Get recent POS transactions & today's counter sales
 export async function GET(req: NextRequest) {
   try {

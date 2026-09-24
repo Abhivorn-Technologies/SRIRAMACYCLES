@@ -6,6 +6,8 @@ import { extractAuthUser } from '@/lib/auth';
 import { slugify } from '@/lib/utils';
 import { SAMPLE_PRODUCTS } from '@/lib/sample-data';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);

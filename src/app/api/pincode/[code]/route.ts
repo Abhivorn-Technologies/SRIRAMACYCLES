@@ -15,6 +15,8 @@ const COMMON_PINCODES: Record<string, { city: string; state: string }> = {
   '110001': { city: 'New Delhi', state: 'Delhi' },
 };
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(
   request: NextRequest,
   { params }: { params: { code: string } }

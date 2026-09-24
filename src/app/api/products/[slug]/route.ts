@@ -6,6 +6,8 @@ import Review from '@/models/Review';
 import { extractAuthUser } from '@/lib/auth';
 import { SAMPLE_PRODUCTS } from '@/lib/sample-data';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(
   req: NextRequest,
   { params }: { params: { slug: string } }

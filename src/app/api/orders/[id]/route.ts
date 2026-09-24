@@ -3,6 +3,8 @@ import connectToDatabase from '@/lib/mongodb';
 import Order from '@/models/Order';
 import { extractAuthUser } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(
   req: NextRequest,
   { params }: { params: { id: string } }

@@ -3,6 +3,8 @@ import connectToDatabase from '@/lib/mongodb';
 import Banner from '@/models/Banner';
 import { extractAuthUser } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
   try {
     await connectToDatabase();

@@ -4,6 +4,8 @@ import User from '@/models/User';
 import Order from '@/models/Order';
 import { extractAuthUser } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
   try {
     const auth = extractAuthUser(req);

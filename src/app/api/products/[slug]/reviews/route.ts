@@ -4,6 +4,8 @@ import Product from '@/models/Product';
 import Review from '@/models/Review';
 import { extractAuthUser } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(
   req: NextRequest,
   { params }: { params: { slug: string } }

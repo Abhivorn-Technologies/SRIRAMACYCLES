@@ -3,6 +3,8 @@ import connectToDatabase from '@/lib/mongodb';
 import Coupon from '@/models/Coupon';
 import { extractAuthUser } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
