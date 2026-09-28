@@ -8,13 +8,14 @@ export async function GET() {
   try {
     await dbConnect();
     const now = new Date();
-    const coupons = await Coupon.find({
-      isActive: true,
-      $or: [{ expiryDate: { $exists: false } }, { expiryDate: { $gt: now } }],
-    })
-      .select('code description discountType discountValue minOrderAmount')
-      .sort({ discountValue: -1 })
-      .limit(6);
+    const allActive = await Coupon.find({ isActive: true })
+      .select('code description discountType discountValue minOrderAmount expiryDate')
+      .sort({ createdAt: -1 })
+      .lean();
+
+    const coupons = allActive
+      .filter((c: any) => !c.expiryDate || new Date(c.expiryDate) > now)
+      .slice(0, 10);
 
     return NextResponse.json({
       success: true,
