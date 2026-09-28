@@ -12,6 +12,7 @@ import {
   RotateCcw,
   Tag,
   CheckCircle2,
+  Sparkles,
 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { formatPrice } from '@/lib/utils';
@@ -34,6 +35,20 @@ export default function CartPage() {
   } = useCart();
 
   const [couponInput, setCouponInput] = useState('');
+  const [activeOffers, setActiveOffers] = useState<Array<{ code: string; discountType: string; discountValue: number }>>([]);
+
+  React.useEffect(() => {
+    const fetchOffers = async () => {
+      try {
+        const res = await fetch('/api/coupons/active');
+        const data = await res.json();
+        if (data.success && data.coupons) {
+          setActiveOffers(data.coupons);
+        }
+      } catch (err) {}
+    };
+    fetchOffers();
+  }, []);
 
   const handleApplyCoupon = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -261,20 +276,43 @@ export default function CartPage() {
                     </button>
                   </div>
                 ) : (
-                  <form onSubmit={handleApplyCoupon} className="flex gap-2">
-                    <input
-                      type="text"
-                      placeholder="Enter coupon code"
-                      value={couponInput}
-                      onChange={(e) => setCouponInput(e.target.value)}
-                      className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs uppercase font-medium focus:outline-none focus:ring-2 focus:ring-brand-500/20"
-                    />
-                    <button
-                      type="submit"
-                      className="bg-slate-900 hover:bg-brand-600 text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors"
-                    >
-                      Apply
-                    </button>
+                  <form onSubmit={handleApplyCoupon} className="flex flex-col gap-2">
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        placeholder="Enter coupon code"
+                        value={couponInput}
+                        onChange={(e) => setCouponInput(e.target.value)}
+                        className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs uppercase font-medium focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                      />
+                      <button
+                        type="submit"
+                        className="bg-slate-900 hover:bg-brand-600 text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors"
+                      >
+                        Apply
+                      </button>
+                    </div>
+
+                    {/* Available Offers Created from Admin */}
+                    {activeOffers.length > 0 && (
+                      <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Available Offers:</span>
+                        {activeOffers.map((offer) => (
+                          <button
+                            key={offer.code}
+                            type="button"
+                            onClick={() => applyCoupon(offer.code)}
+                            className="inline-flex items-center gap-1 text-[10px] font-bold bg-brand-50 border border-brand-200/80 text-brand-700 hover:bg-brand-100 hover:border-brand-300 px-2 py-0.5 rounded-lg transition-colors"
+                          >
+                            <Sparkles className="w-2.5 h-2.5 text-brand-600" />
+                            <span>{offer.code}</span>
+                            <span className="text-slate-500 font-normal">
+                              ({offer.discountType === 'percentage' ? `${offer.discountValue}% OFF` : `₹${offer.discountValue} OFF`})
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </form>
                 )}
               </div>

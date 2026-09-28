@@ -46,14 +46,14 @@ async function handleSeed(req: Request) {
         name: 'Road Bikes',
         slug: 'road-bikes',
         description: 'Aerodynamic speed machines with ultra-light carbon & alloy frames.',
-        image: 'https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=800&q=80',
+        image: '/images/categories/road-bikes.jpg',
         order: 1,
       },
       {
         name: 'Mountain Bikes',
         slug: 'mountain-bikes',
         description: 'Heavy-duty suspension, rugged grip tires, and hydraulic discs.',
-        image: 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=800&q=80',
+        image: '/images/categories/mountain-bikes.jpg',
         order: 2,
       },
       {
