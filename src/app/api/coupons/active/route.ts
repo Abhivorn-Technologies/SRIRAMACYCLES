@@ -14,8 +14,13 @@ export async function GET() {
       .lean();
 
     const coupons = allActive
-      .filter((c: any) => !c.expiryDate || new Date(c.expiryDate) > now)
-      .slice(0, 10);
+      .filter((c: any) => {
+        if (!c.expiryDate) return true;
+        const expTime = new Date(c.expiryDate).getTime();
+        if (isNaN(expTime)) return true;
+        return expTime > now.getTime();
+      })
+      .slice(0, 15);
 
     return NextResponse.json({
       success: true,
