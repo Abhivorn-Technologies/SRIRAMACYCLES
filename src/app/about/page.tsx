@@ -11,7 +11,7 @@ export default function AboutPage() {
         {/* Hero header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
           <span className="text-xs font-bold text-brand-600 uppercase tracking-widest">
-            Kazipet & Hanumakonda Heritage
+            Since 1976 • Kazipet & Hanumakonda Heritage
           </span>
           <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight mt-2 leading-tight">
             {STORE_CONTACT.businessName}
@@ -71,8 +71,8 @@ export default function AboutPage() {
             <p className="text-xs text-slate-400 mt-1 font-semibold">Genuine Spare Parts</p>
           </div>
           <div className="text-center">
-            <span className="text-3xl sm:text-4xl font-black text-amber-400">Lifetime</span>
-            <p className="text-xs text-slate-400 mt-1 font-semibold">Frame Support Guarantee</p>
+            <span className="text-3xl sm:text-4xl font-black text-amber-400">1 Year</span>
+            <p className="text-xs text-slate-400 mt-1 font-semibold">Frame Warranty Guarantee</p>
           </div>
           <div className="text-center">
             <span className="text-3xl sm:text-4xl font-black text-purple-400">#1</span>

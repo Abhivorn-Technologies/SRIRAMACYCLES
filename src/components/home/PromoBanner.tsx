@@ -20,8 +20,8 @@ export default function PromoBanner() {
           </div>
 
           <div className="relative z-10 p-8 sm:p-12 lg:p-14 max-w-xl flex flex-col items-start gap-4">
-            <div className="inline-flex items-center gap-2 bg-rose-500/20 border border-rose-400/30 text-rose-300 text-xs font-bold px-3.5 py-1.5 rounded-full">
-              <Tag className="w-3.5 h-3.5 text-rose-400" />
+            <div className="inline-flex items-center gap-2 bg-accent-600/20 border border-accent-500/30 text-accent-300 text-xs font-bold px-3.5 py-1.5 rounded-full">
+              <Tag className="w-3.5 h-3.5 text-accent-400" />
               <span>Special Seasonal Offer</span>
             </div>
 

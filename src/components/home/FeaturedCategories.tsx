@@ -17,7 +17,7 @@ export default function FeaturedCategories({ categories }: IFeaturedCategoriesPr
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
           <div>
-            <span className="text-xs font-bold text-brand-600 uppercase tracking-widest">
+            <span className="text-xs font-bold text-accent-600 uppercase tracking-widest">
               Engineered For Every Terrain
             </span>
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-slate-900 mt-1">
@@ -26,7 +26,7 @@ export default function FeaturedCategories({ categories }: IFeaturedCategoriesPr
           </div>
           <Link
             href="/shop"
-            className="inline-flex items-center gap-2 text-sm font-bold text-brand-600 hover:text-brand-800 transition-colors group"
+            className="inline-flex items-center gap-2 text-sm font-bold text-accent-600 hover:text-accent-700 transition-colors group"
           >
             <span>View All Categories</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

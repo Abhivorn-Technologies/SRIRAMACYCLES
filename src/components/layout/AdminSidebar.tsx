@@ -73,7 +73,7 @@ export default function AdminSidebar({
             {!isCollapsed && (
               <div className="flex flex-col min-w-0 overflow-hidden">
                 <span className="text-[11px] font-black text-slate-900 uppercase tracking-tight leading-tight truncate max-w-[140px]">
-                  Sri Rama Cycles
+                  Sri Rama Cycle & Auto Spare Parts
                 </span>
                 <span className="text-[9px] text-brand-700 font-bold uppercase tracking-wider truncate">
                   Admin Console

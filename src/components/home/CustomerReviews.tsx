@@ -22,10 +22,10 @@ const REVIEWS = [
   {
     name: 'Vikram Menon',
     city: 'Hyderabad',
-    bike: 'Srirama Volt-X Electric Hybrid',
+    bike: 'Srirama Phantom Pro Dual Disc Brake Cycle',
     rating: 5,
     comment:
-      'My daily 18km office commute is now zero sweat and 100% fun! The pedal assist is silky smooth and the battery easily lasts 3 days per charge. Srirama Cycles is the real deal.',
+      'My daily commute is smooth and extremely safe! The dual hydraulic disc brakes give instant confidence in rainy traffic. Srirama Cycles provides top quality builds and excellent service.',
   },
 ];
 

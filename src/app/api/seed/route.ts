@@ -6,19 +6,24 @@ import User from '@/models/User';
 import Banner from '@/models/Banner';
 import { hashPassword } from '@/lib/auth';
 
-export async function POST() {
+export async function GET(req: Request) {
+  return handleSeed(req);
+}
+
+export async function POST(req: Request) {
+  return handleSeed(req);
+}
+
+async function handleSeed(req: Request) {
   try {
     await connectToDatabase();
+    const { searchParams } = new URL(req.url);
+    const force = searchParams.get('force') === 'true';
 
-    // Check if products exist
-    const count = await Product.countDocuments();
-    if (count > 0) {
-      return NextResponse.json({
-        success: true,
-        message: 'Database already has data. Seeding skipped.',
-        count,
-      });
-    }
+    // Reset categories & products if force=true or to ensure updated category schema
+    await Category.deleteMany({});
+    await Product.deleteMany({});
+    await Banner.deleteMany({});
 
     // 1. Seed Admin
     const hashedPassword = await hashPassword('Admin@123456');
@@ -52,32 +57,46 @@ export async function POST() {
         order: 2,
       },
       {
-        name: 'Hybrid & City Bikes',
-        slug: 'hybrid-city-bikes',
-        description: 'Comfortable upright ergonomics built for modern urban commutes.',
-        image: 'https://images.unsplash.com/photo-1507035895480-2b3156c31fc8?w=800&q=80',
+        name: 'Ladies Cycle',
+        slug: 'ladies-bicycles',
+        description: 'Ergonomic step-through frames, comfortable posture, and stylish city basket designs.',
+        image: '/images/categories/ladies-bicycles.jpg',
         order: 3,
       },
       {
-        name: 'Electric Bikes',
-        slug: 'electric-bikes',
-        description: 'Smart pedal-assist bikes with removable lithium power packs.',
-        image: 'https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=800&q=80',
+        name: 'Disc Brake Cycles',
+        slug: 'disc-brake-cycles',
+        description: 'Precision mechanical & hydraulic disc braking systems for all-weather stopping power.',
+        image: '/images/categories/disc-brake-cycles.jpg',
         order: 4,
       },
       {
-        name: 'Kids & Junior Bikes',
-        slug: 'kids-bikes',
-        description: 'Safe, lightweight, ergonomic bicycles designed for young riders.',
-        image: 'https://images.unsplash.com/photo-1511994298241-608e28f14fde?w=800&q=80',
+        name: 'Standard Cycles',
+        slug: 'standard-cycles',
+        description: 'Heavy-duty classic single-speed & multi-speed utility cycles built for lifetime durability.',
+        image: '/images/categories/standard-cycles.jpg',
         order: 5,
       },
       {
-        name: 'Cycling Accessories & Gear',
-        slug: 'cycling-accessories',
-        description: 'Aerodynamic helmets, high-lumen safety LED lights, and pro repair tools.',
-        image: 'https://images.unsplash.com/photo-1559348349-86f1f65817fe?w=800&q=80',
+        name: 'Junior Bikes',
+        slug: 'junior-bikes',
+        description: 'Lightweight, ergonomic 20" to 24" bicycles designed for growing youths.',
+        image: 'https://images.unsplash.com/photo-1511994298241-608e28f14fde?w=800&q=80',
         order: 6,
+      },
+      {
+        name: 'Kids Cycle',
+        slug: 'kids-bikes',
+        description: 'Safe, durable starter cycles with training wheels for young children.',
+        image: 'https://images.unsplash.com/photo-1511994298241-608e28f14fde?w=800&q=80',
+        order: 7,
+      },
+      {
+        name: 'All Spare Items Available',
+        slug: 'cycling-accessories',
+        description: '100% genuine auto spare parts, cycling helmets, lights, and tools.',
+        image: 'https://images.unsplash.com/photo-1559348349-86f1f65817fe?w=800&q=80',
+        order: 8,
       },
     ];
 
@@ -162,59 +181,58 @@ export async function POST() {
         tags: ['mtb', 'mountain bike', 'suspension', 'hydraulic'],
       },
       {
-        name: 'Srirama Volt-X Smart Electric Hybrid Bike',
-        slug: 'srirama-volt-x-smart-electric-hybrid-bike',
-        brand: 'Srirama E-Motion',
-        category: catMap['electric-bikes']._id,
-        categorySlug: 'electric-bikes',
-        categoryName: 'Electric Bikes',
-        price: 49999,
-        salePrice: 42999,
+        name: 'Srirama Elegance 26" Ladies City Comfort Bicycle',
+        slug: 'srirama-elegance-26-ladies-city-comfort-bicycle',
+        brand: 'Srirama Ladies',
+        category: catMap['ladies-bicycles']._id,
+        categorySlug: 'ladies-bicycles',
+        categoryName: 'Ladies Bicycles',
+        price: 18999,
+        salePrice: 14999,
         stock: 15,
-        sku: 'SRC-EB-003',
-        images: [
-          'https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=1000&q=80',
-        ],
-        shortDescription:
-          '250W High-Torque BLDC Hub Motor with detachable 36V 10.4Ah Samsung Lithium battery.',
-        description:
-          'The ultimate daily city commuter. Delivers effortless pedalling with 5 levels of smart assist, backlit LCD display, and 60km pedal assist range.',
-        specifications: [
-          { key: 'Motor', value: '250W High Efficiency Brushless Hub Motor' },
-          { key: 'Battery', value: '36V 10.4Ah Detachable Samsung Cell Li-ion' },
-          { key: 'Range', value: '45-65 km on Pedal Assist' },
-          { key: 'Top Speed', value: '25 km/h' },
-        ],
-        variants: [{ size: 'Standard (Unisex)', stock: 15 }],
-        isFeatured: true,
-        isNewArrival: true,
-        ratings: 4.9,
-        numReviews: 18,
-        tags: ['electric', 'ebike', 'commuter'],
-      },
-      {
-        name: 'Srirama Urban Glide City Commuter 700C',
-        slug: 'srirama-urban-glide-city-commuter-700c',
-        brand: 'Srirama City',
-        category: catMap['hybrid-city-bikes']._id,
-        categorySlug: 'hybrid-city-bikes',
-        categoryName: 'Hybrid & City Bikes',
-        price: 24999,
-        salePrice: 19999,
-        stock: 20,
-        sku: 'SRC-HY-004',
+        sku: 'SRC-LD-003',
         images: [
           'https://images.unsplash.com/photo-1507035895480-2b3156c31fc8?w=1000&q=80',
         ],
         shortDescription:
-          'Ultra-light 6061 alloy commuter with Shimano Altus 21-speed gears and dual disc brakes.',
+          'Low step-through alloy frame, cushioned spring saddle, front wicker basket, and Shimano 7-speed gearing.',
         description:
-          'Designed for navigating bustling Indian city streets with ease. Equipped with puncture-resistant 700x35C tires and ergonomic memory foam saddle.',
+          'Designed specifically for women riders seeking comfort, elegance, and effortless city commuting. Features upright handlebars and dress guard.',
         specifications: [
-          { key: 'Frame', value: 'Lightweight 6061 Alloy' },
-          { key: 'Shifters', value: 'Shimano EF500 3x7 Speed EZ Fire' },
-          { key: 'Brakes', value: 'Dual Mechanical Disc 160mm' },
-          { key: 'Weight', value: '11.8 kg' },
+          { key: 'Frame', value: 'Step-Through Aluminum Alloy 6061' },
+          { key: 'Gears', value: 'Shimano Tourney 7-Speed' },
+          { key: 'Basket', value: 'Front Mounted Heavy-Duty Basket Included' },
+        ],
+        variants: [{ size: '26" Wheel (Standard)', stock: 15 }],
+        isFeatured: true,
+        isNewArrival: true,
+        ratings: 4.9,
+        numReviews: 28,
+        tags: ['ladies', 'women', 'basket', 'comfort'],
+      },
+      {
+        name: 'Srirama Phantom Pro 27.5" Dual Disc Brake Cycle',
+        slug: 'srirama-phantom-pro-275-dual-disc-brake-cycle',
+        brand: 'Srirama Pro',
+        category: catMap['disc-brake-cycles']._id,
+        categorySlug: 'disc-brake-cycles',
+        categoryName: 'Disc Brake Cycles',
+        price: 26999,
+        salePrice: 21999,
+        stock: 20,
+        sku: 'SRC-DB-004',
+        images: [
+          'https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=1000&q=80',
+        ],
+        shortDescription:
+          'Precision dual hydraulic disc brakes (160mm rotors), 21-speed EZ-Fire shifters, and zoom front suspension fork.',
+        description:
+          'Built for maximum stopping safety on wet or dry roads. Features high-tensile alloy frame and double-wall alloy rims.',
+        specifications: [
+          { key: 'Frame', value: 'Lightweight 6061 Double-Butted Alloy' },
+          { key: 'Brakes', value: 'Logan Hydraulic Dual Disc (160mm Rotors)' },
+          { key: 'Shifters', value: 'Shimano EF500 21-Speed' },
+          { key: 'Weight', value: '13.5 kg' },
         ],
         variants: [
           { size: '18" Frame', stock: 12 },
@@ -255,6 +273,33 @@ export async function POST() {
         ratings: 4.9,
         numReviews: 64,
         tags: ['helmet', 'safety', 'gear'],
+      },
+      {
+        name: 'Srirama Heavy-Duty Classic 28" Standard Roadster Cycle',
+        slug: 'srirama-heavy-duty-classic-28-standard-roadster-cycle',
+        brand: 'Srirama Classic',
+        category: catMap['standard-cycles']._id,
+        categorySlug: 'standard-cycles',
+        categoryName: 'Standard Cycles',
+        price: 9999,
+        salePrice: 7999,
+        stock: 25,
+        sku: 'SRC-STD-008',
+        images: ['https://images.unsplash.com/photo-1576435728678-68d0fbf94e91?w=1000&q=80'],
+        shortDescription:
+          'Heavy-gauge tubular steel frame, full chain cover, heavy rear carrier, and traditional rod brakes.',
+        description:
+          'The legendary Indian roadster built for utility and ultimate durability. Engineered with reinforced steel, wide leather sprung saddle, and heavy luggage carrier.',
+        specifications: [
+          { key: 'Frame', value: 'Heavy Duty Reinforced Tubular Steel' },
+          { key: 'Brakes', value: 'Traditional Steel Rod Brakes' },
+        ],
+        variants: [{ size: '28" Frame (Standard)', stock: 25 }],
+        isFeatured: true,
+        isBestSeller: true,
+        ratings: 4.9,
+        numReviews: 87,
+        tags: ['standard', 'roadster', 'utility', 'heavy duty'],
       },
     ];
 

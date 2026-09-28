@@ -11,9 +11,9 @@ import {
 const FEATURES = [
   {
     icon: ShieldCheck,
-    title: 'Lifetime Frame Warranty',
+    title: '1 Year Frame Warranty',
     description:
-      'We stand behind every weld, carbon weave, and alloy structure with unmatched lifetime frame guarantees.',
+      'We stand behind every weld, carbon weave, and alloy structure with official 1-year store warranty coverage.',
     color: 'text-brand-600 bg-brand-50 border-brand-200',
   },
   {
@@ -21,35 +21,35 @@ const FEATURES = [
     title: '95% Assembled & Ready',
     description:
       'Every cycle arrives 95% assembled in heavy-duty impact boxes with complimentary high-grade hex multitool.',
-    color: 'text-emerald-600 bg-emerald-50 border-emerald-200',
+    color: 'text-accent-600 bg-accent-50 border-accent-200',
   },
   {
     icon: Truck,
-    title: 'Free Express Doorstep Delivery',
+    title: 'Doorstep Delivery (Charges Applicable)',
     description:
-      'Swift nationwide insured transport. Real-time GPS order tracking straight from our central warehouse.',
-    color: 'text-teal-600 bg-teal-50 border-teal-200',
+      'Swift and safe insured transport straight to your doorstep. Delivery charges applicable based on location.',
+    color: 'text-brand-600 bg-brand-50 border-brand-200',
   },
   {
     icon: Award,
     title: '100% Genuine Components',
     description:
       'Factory authentic Shimano, SRAM, RockShox, Tektro, and Kenda parts sourced directly from global makers.',
-    color: 'text-amber-600 bg-amber-50 border-amber-200',
+    color: 'text-accent-600 bg-accent-50 border-accent-200',
   },
   {
     icon: CreditCard,
     title: 'Flexible & Secure Payment',
     description:
       'Multiple payment avenues: UPI QR, Credit/Debit cards, Net Banking, and zero-risk Cash on Delivery.',
-    color: 'text-purple-600 bg-purple-50 border-purple-200',
+    color: 'text-brand-600 bg-brand-50 border-brand-200',
   },
   {
     icon: Headphones,
     title: 'Master Technician Support',
     description:
       'Dedicated cycling specialists ready to assist with sizing, gear tuning, and maintenance advice 7 days a week.',
-    color: 'text-rose-600 bg-rose-50 border-rose-200',
+    color: 'text-accent-600 bg-accent-50 border-accent-200',
   },
 ];
 

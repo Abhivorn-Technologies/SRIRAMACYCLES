@@ -31,8 +31,8 @@ export default function Footer() {
               <Truck className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="font-bold text-xs sm:text-sm text-slate-900">Free & Fast Delivery</h4>
-              <p className="text-[11px] text-slate-500">On all cycles & orders above ₹999</p>
+              <h4 className="font-bold text-xs sm:text-sm text-slate-900">Doorstep Delivery</h4>
+              <p className="text-[11px] text-slate-500">Charges applicable on orders</p>
             </div>
           </div>
 
@@ -73,15 +73,15 @@ export default function Footer() {
           {/* Brand & Store Info Column */}
           <div className="lg:col-span-5 flex flex-col gap-4">
             <Link href="/" className="flex items-center gap-2.5 w-fit">
-              <div className="w-10 h-10 rounded-xl bg-brand-600 flex items-center justify-center text-white shadow-sm">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-700 to-accent-600 flex items-center justify-center text-white shadow-sm">
                 <Bike className="w-6 h-6" />
               </div>
               <div className="flex flex-col">
                 <span className="text-base sm:text-lg font-black tracking-tight text-slate-950 uppercase leading-none">
-                  SRI RAMA <span className="text-brand-600 font-extrabold">CYCLES</span>
+                  SRI RAMA <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-accent-600 font-extrabold">CYCLE & AUTO SPARE PARTS</span>
                 </span>
-                <span className="text-[9px] tracking-wider text-slate-500 uppercase font-bold mt-0.5">
-                  Cycle & Auto Spare Parts
+                <span className="text-[10px] tracking-wider text-slate-500 uppercase font-bold mt-1">
+                  Since 1976
                 </span>
               </div>
             </Link>
@@ -92,42 +92,32 @@ export default function Footer() {
 
             <div className="flex flex-col gap-2.5 text-xs text-slate-600 mt-1">
               <div className="flex items-start gap-2.5">
-                <MapPin className="w-4 h-4 text-brand-600 shrink-0 mt-0.5" />
+                <MapPin className="w-4 h-4 text-accent-600 shrink-0 mt-0.5" />
                 <span className="leading-snug">{STORE_CONTACT.address}</span>
               </div>
 
               <div className="flex items-center gap-2.5">
-                <Phone className="w-4 h-4 text-brand-600 shrink-0" />
+                <Phone className="w-4 h-4 text-accent-600 shrink-0" />
                 <a
                   href={`tel:${STORE_CONTACT.rawPhone}`}
-                  className="font-bold text-slate-900 hover:text-brand-600 transition-colors"
+                  className="font-bold text-slate-900 hover:text-accent-600 transition-colors"
                 >
                   {STORE_CONTACT.phone}
                 </a>
               </div>
 
               <div className="flex items-center gap-2.5">
-                <Mail className="w-4 h-4 text-brand-600 shrink-0" />
+                <Mail className="w-4 h-4 text-accent-600 shrink-0" />
                 <span className="text-slate-600">{STORE_CONTACT.supportEmail}</span>
               </div>
 
-              <div className="flex items-center gap-2.5">
-                <Clock className="w-4 h-4 text-brand-600 shrink-0" />
-                <span className="text-slate-600">{STORE_CONTACT.hours}</span>
+              <div className="flex items-start gap-2.5">
+                <Clock className="w-4 h-4 text-accent-600 shrink-0 mt-0.5" />
+                <div className="flex flex-col text-slate-600 leading-tight gap-1">
+                  <span>Mon – Sat: 9:00 AM – 8:30 PM</span>
+                  <span className="text-emerald-700 font-semibold">Sunday: 9:00 AM – 1:00 PM only</span>
+                </div>
               </div>
-            </div>
-
-            {/* Direct WhatsApp Contact Pill */}
-            <div className="pt-2">
-              <a
-                href={STORE_CONTACT.whatsappLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-2.5 px-4 rounded-xl shadow-xs transition-colors"
-              >
-                <MessageCircle className="w-4 h-4" />
-                <span>Chat with us on WhatsApp ({STORE_CONTACT.rawPhone})</span>
-              </a>
             </div>
           </div>
 
@@ -148,23 +138,33 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/shop?category=hybrid-city-bikes" className="hover:text-brand-600 transition-colors">
-                  Hybrid & City Commuters
+                <Link href="/shop?category=ladies-bicycles" className="hover:text-brand-600 transition-colors">
+                  Ladies Cycle
                 </Link>
               </li>
               <li>
-                <Link href="/shop?category=electric-bikes" className="hover:text-brand-600 transition-colors">
-                  Electric Cycles (E-Bikes)
+                <Link href="/shop?category=junior-bikes" className="hover:text-brand-600 transition-colors">
+                  Junior Bikes
                 </Link>
               </li>
               <li>
                 <Link href="/shop?category=kids-bikes" className="hover:text-brand-600 transition-colors">
-                  Kids & Junior Bikes
+                  Kids Cycle
                 </Link>
               </li>
               <li>
-                <Link href="/shop?category=cycling-accessories" className="hover:text-brand-600 transition-colors font-semibold text-brand-700">
-                  Auto Spare Parts & Gear
+                <Link href="/shop?category=disc-brake-cycles" className="hover:text-brand-600 transition-colors">
+                  Disc Brake Cycles
+                </Link>
+              </li>
+              <li>
+                <Link href="/shop?category=standard-cycles" className="hover:text-brand-600 transition-colors">
+                  Standard Cycles
+                </Link>
+              </li>
+              <li>
+                <Link href="/shop?category=cycling-accessories" className="hover:text-brand-600 transition-colors font-bold text-brand-700">
+                  All Spare Items Available
                 </Link>
               </li>
             </ul>
@@ -217,34 +217,32 @@ export default function Footer() {
             <p className="text-xs text-slate-500 leading-relaxed">
               Visit our Kazipet store or reach out on social media for new models and spares.
             </p>
-            <div className="flex items-center gap-2 pt-1">
+            <div className="flex items-center gap-2.5 pt-1">
+              <a
+                href={STORE_CONTACT.whatsappLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-9 h-9 rounded-xl bg-white hover:bg-emerald-600 text-slate-700 hover:text-white flex items-center justify-center transition-colors border border-slate-200/90 shadow-2xs group"
+                aria-label="WhatsApp"
+                title="Chat on WhatsApp"
+              >
+                <MessageCircle className="w-4.5 h-4.5 text-emerald-600 group-hover:text-white transition-colors" />
+              </a>
               <a
                 href="#"
-                className="w-8 h-8 rounded-lg bg-white hover:bg-brand-600 text-slate-600 hover:text-white flex items-center justify-center transition-colors border border-slate-200 shadow-2xs"
+                className="w-9 h-9 rounded-xl bg-white hover:bg-gradient-to-tr hover:from-amber-500 hover:to-purple-600 text-slate-700 hover:text-white flex items-center justify-center transition-colors border border-slate-200/90 shadow-2xs group"
                 aria-label="Instagram"
+                title="Instagram"
               >
-                <Instagram className="w-4 h-4" />
+                <Instagram className="w-4.5 h-4.5 transition-colors" />
               </a>
               <a
                 href="#"
-                className="w-8 h-8 rounded-lg bg-white hover:bg-brand-600 text-slate-600 hover:text-white flex items-center justify-center transition-colors border border-slate-200 shadow-2xs"
-                aria-label="Facebook"
-              >
-                <Facebook className="w-4 h-4" />
-              </a>
-              <a
-                href="#"
-                className="w-8 h-8 rounded-lg bg-white hover:bg-brand-600 text-slate-600 hover:text-white flex items-center justify-center transition-colors border border-slate-200 shadow-2xs"
-                aria-label="Twitter"
-              >
-                <Twitter className="w-4 h-4" />
-              </a>
-              <a
-                href="#"
-                className="w-8 h-8 rounded-lg bg-white hover:bg-brand-600 text-slate-600 hover:text-white flex items-center justify-center transition-colors border border-slate-200 shadow-2xs"
+                className="w-9 h-9 rounded-xl bg-white hover:bg-rose-600 text-slate-700 hover:text-white flex items-center justify-center transition-colors border border-slate-200/90 shadow-2xs group"
                 aria-label="YouTube"
+                title="YouTube"
               >
-                <Youtube className="w-4 h-4" />
+                <Youtube className="w-4.5 h-4.5 transition-colors" />
               </a>
             </div>
           </div>
@@ -257,11 +255,25 @@ export default function Footer() {
             <strong className="text-slate-800 font-bold">{STORE_CONTACT.businessName}</strong>, Kazipet, Hanumakonda. All rights reserved.
           </p>
 
-          <div className="flex items-center gap-2 bg-white px-4 py-1.5 rounded-full border border-slate-200/90 shadow-2xs">
+          <div className="flex flex-wrap items-center justify-center gap-1.5 bg-white px-4 py-1.5 rounded-full border border-slate-200/90 shadow-2xs">
             <span className="text-slate-500 text-[11px] font-medium">Developed by</span>
-            <span className="font-extrabold text-xs text-transparent bg-clip-text bg-gradient-to-r from-brand-600 via-teal-600 to-emerald-600 tracking-wide hover:opacity-90 transition-opacity">
+            <a
+              href="https://abhivorn.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-extrabold text-xs text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-teal-600 tracking-wide hover:opacity-90 transition-opacity"
+            >
               Abhivorn Technologies
-            </span>
+            </a>
+            <span className="text-slate-400 text-xs font-semibold">&</span>
+            <a
+              href="https://digilevelup.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-extrabold text-xs text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 tracking-wide hover:opacity-90 transition-opacity"
+            >
+              DigiLevelUp
+            </a>
           </div>
         </div>
       </div>

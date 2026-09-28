@@ -10,7 +10,7 @@ import Product from '@/models/Product';
 import Banner from '@/models/Banner';
 import { SAMPLE_CATEGORIES, SAMPLE_PRODUCTS } from '@/lib/sample-data';
 
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 async function getHomeData() {
   try {

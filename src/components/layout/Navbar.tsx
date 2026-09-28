@@ -73,19 +73,20 @@ export default function Navbar() {
         isScrolled ? 'border-slate-200/90 shadow-subtle' : 'border-slate-100'
       }`}
     >
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20 gap-4">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 shrink-0 group">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-brand-900 via-brand-700 to-brand-500 flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform">
-              <Bike className="w-6 h-6 text-white group-hover:text-brand-200 transition-colors" />
+            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-brand-800 via-brand-600 to-accent-600 flex items-center justify-center text-white shadow-md shadow-brand-900/10 group-hover:scale-105 transition-transform">
+              <Bike className="w-6 h-6 text-white group-hover:text-accent-100 transition-colors" />
             </div>
             <div className="flex flex-col">
-              <span className="text-base sm:text-lg font-black tracking-tight text-slate-950 uppercase leading-none">
-                SRI RAMA <span className="text-brand-600 font-extrabold">CYCLES</span>
+              <span className="text-sm sm:text-base md:text-lg font-black tracking-tight text-slate-950 uppercase leading-none">
+                SRI RAMA <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-accent-600 font-extrabold">CYCLE & AUTO SPARE PARTS</span>
               </span>
-              <span className="text-[9px] sm:text-[10px] tracking-wider text-slate-500 uppercase font-bold mt-0.5">
-                Cycle & Auto Spare Parts
+              <span className="text-[10px] sm:text-[11px] tracking-wider text-slate-600 uppercase font-bold mt-1">
+                Since 1976
               </span>
             </div>
           </Link>
@@ -129,7 +130,7 @@ export default function Navbar() {
             >
               <Heart className="w-5 h-5" />
               {wishlistCount > 0 && (
-                <span className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center animate-in zoom-in">
+                <span className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-accent-600 text-white text-[10px] font-bold flex items-center justify-center animate-in zoom-in">
                   {wishlistCount}
                 </span>
               )}

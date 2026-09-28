@@ -1,8 +1,9 @@
 export const APP_NAME = 'Sri Rama Cycle & Auto Spare Parts';
-export const APP_SHORT_NAME = 'Sri Rama Cycles';
-export const APP_TAGLINE = 'Premium Bicycles, Auto Spare Parts & Pro Service';
+export const APP_SHORT_NAME = 'Sri Rama Cycle & Auto Spare Parts';
+export const ESTABLISHED_YEAR = '1976';
+export const APP_TAGLINE = 'Since 1976 | Premium Bicycles, Auto Spare Parts & Pro Service';
 export const APP_DESCRIPTION =
-  'Sri Rama Cycle and Auto Spare Parts (Kazipet, Hanumakonda) - Leading store for premium road cycles, mountain bikes, electric cycles, auto spare parts, and expert service.';
+  'Sri Rama Cycle and Auto Spare Parts (Kazipet, Hanumakonda) - Leading store since 1976 for premium road cycles, mountain bikes, electric cycles, auto spare parts, and expert service.';
 
 export const CURRENCY_SYMBOL = '₹';
 export const FREE_SHIPPING_THRESHOLD = 999;
@@ -14,7 +15,9 @@ export const NAV_LINKS = [
   { label: 'Shop All', href: '/shop' },
   { label: 'Road Bikes', href: '/shop?category=road-bikes' },
   { label: 'Mountain Bikes', href: '/shop?category=mountain-bikes' },
-  { label: 'Electric Bikes', href: '/shop?category=electric-bikes' },
+  { label: 'Ladies Bicycles', href: '/shop?category=ladies-bicycles' },
+  { label: 'Disc Brake Cycles', href: '/shop?category=disc-brake-cycles' },
+  { label: 'Standard Cycles', href: '/shop?category=standard-cycles' },
   { label: 'Accessories & Spares', href: '/shop?category=cycling-accessories' },
   { label: 'Track Order', href: '/track-order' },
   { label: 'About Us', href: '/about' },
@@ -46,8 +49,10 @@ export const STORE_CONTACT = {
   rawPhone: '7207653194',
   whatsapp: '+91 72076 53194',
   whatsappLink: 'https://wa.me/917207653194',
-  supportEmail: 'support@sriramacycles.com',
+  supportEmail: 'sreeramacycle@gmail.com',
   address: 'SSS COMPLEX B-3, Mainroad, Kazipet, Hanumakonda (Dist) - 506003, Telangana, India',
   shortAddress: 'SSS COMPLEX B-3, Mainroad, Kazipet, Hanumakonda - 506003',
-  hours: 'Mon - Sun: 9:00 AM - 9:30 PM IST',
+  hours: 'Mon – Sat: 9:00 AM – 8:30 PM | Sun: 9:00 AM – 1:00 PM',
+  weekdaysHours: 'Mon – Sat: 9:00 AM – 8:30 PM',
+  sundayHours: 'Sunday: 9:00 AM – 1:00 PM only',
 };

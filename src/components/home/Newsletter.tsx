@@ -18,10 +18,10 @@ export default function Newsletter() {
   return (
     <section className="py-16 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-gradient-to-r from-brand-900 via-brand-800 to-slate-900 rounded-3xl p-8 sm:p-12 lg:p-16 text-white text-center flex flex-col items-center justify-center relative overflow-hidden shadow-2xl">
+        <div className="bg-gradient-to-r from-brand-950 via-brand-900 to-accent-950 rounded-3xl p-8 sm:p-12 lg:p-16 text-white text-center flex flex-col items-center justify-center relative overflow-hidden shadow-2xl border border-brand-800/50">
           {/* Decorative background blurs */}
-          <div className="absolute -top-24 -right-24 w-80 h-80 bg-brand-500/20 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-24 -left-24 w-80 h-80 bg-brand-400/20 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -top-24 -right-24 w-80 h-80 bg-accent-600/20 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-24 -left-24 w-80 h-80 bg-brand-500/20 rounded-full blur-3xl pointer-events-none" />
 
           <span className="text-xs font-bold text-brand-300 uppercase tracking-widest mb-2">
             The Srirama Cycling Community

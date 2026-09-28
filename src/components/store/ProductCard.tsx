@@ -34,7 +34,7 @@ export default function ProductCard({ product, onQuickView }: IProductCardProps)
       {/* Top Badges */}
       <div className="absolute top-3 left-3 z-10 flex flex-col gap-1.5 items-start">
         {discountPercent > 0 && (
-          <span className="bg-rose-600 text-white text-[11px] font-bold px-2 py-0.5 rounded-md shadow-sm">
+          <span className="bg-accent-600 text-white text-[11px] font-bold px-2 py-0.5 rounded-md shadow-sm">
             -{discountPercent}%
           </span>
         )}
@@ -44,7 +44,7 @@ export default function ProductCard({ product, onQuickView }: IProductCardProps)
           </span>
         )}
         {product.isNewArrival && (
-          <span className="bg-emerald-600 text-white text-[11px] font-bold px-2 py-0.5 rounded-md shadow-sm">
+          <span className="bg-brand-600 text-white text-[11px] font-bold px-2 py-0.5 rounded-md shadow-sm">
             New
           </span>
         )}
@@ -59,12 +59,12 @@ export default function ProductCard({ product, onQuickView }: IProductCardProps)
         }}
         className={`absolute top-3 right-3 z-10 w-9 h-9 rounded-full flex items-center justify-center backdrop-blur-md transition-all duration-200 shadow-sm ${
           isLiked
-            ? 'bg-rose-50 text-rose-600 border border-rose-200'
-            : 'bg-white/90 text-slate-500 hover:text-rose-600 hover:bg-white border border-slate-100'
+            ? 'bg-accent-50 text-accent-600 border border-accent-200'
+            : 'bg-white/90 text-slate-500 hover:text-accent-600 hover:bg-white border border-slate-100'
         }`}
         aria-label="Wishlist"
       >
-        <Heart className={`w-4 h-4 ${isLiked ? 'fill-rose-600' : ''}`} />
+        <Heart className={`w-4 h-4 ${isLiked ? 'fill-accent-600' : ''}`} />
       </button>
 
       {/* Product Image */}
@@ -124,7 +124,7 @@ export default function ProductCard({ product, onQuickView }: IProductCardProps)
         <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
           <div className="flex flex-col">
             <div className="flex items-baseline gap-1.5">
-              <span className="text-base font-extrabold text-slate-900">
+              <span className="text-base font-extrabold text-brand-700">
                 {formatPrice(displayPrice)}
               </span>
               {product.salePrice && product.salePrice > 0 && (
@@ -134,11 +134,11 @@ export default function ProductCard({ product, onQuickView }: IProductCardProps)
               )}
             </div>
             {product.stock > 0 ? (
-              <span className="text-[10px] text-emerald-600 font-medium flex items-center gap-0.5 mt-0.5">
-                <Check className="w-3 h-3" /> In Stock
+              <span className="text-[10px] text-brand-600 font-semibold flex items-center gap-0.5 mt-0.5">
+                <Check className="w-3 h-3 text-brand-600" /> In Stock
               </span>
             ) : (
-              <span className="text-[10px] text-rose-500 font-medium mt-0.5">Out of Stock</span>
+              <span className="text-[10px] text-accent-600 font-semibold mt-0.5">Out of Stock</span>
             )}
           </div>
 
@@ -146,7 +146,7 @@ export default function ProductCard({ product, onQuickView }: IProductCardProps)
           <button
             onClick={() => addToCart(product, 1)}
             disabled={product.stock <= 0}
-            className="h-9 px-3.5 bg-slate-900 hover:bg-brand-600 disabled:bg-slate-200 disabled:cursor-not-allowed text-white text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-colors shadow-sm active:scale-95"
+            className="h-9 px-3.5 bg-brand-600 hover:bg-accent-600 disabled:bg-slate-200 disabled:cursor-not-allowed text-white text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-colors shadow-sm active:scale-95"
             aria-label="Add to cart"
           >
             <ShoppingBag className="w-3.5 h-3.5" />
