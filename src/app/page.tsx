@@ -4,6 +4,7 @@ import FeaturedCategories from '@/components/home/FeaturedCategories';
 import FeaturedProducts from '@/components/home/FeaturedProducts';
 import WhyChooseUs from '@/components/home/WhyChooseUs';
 import CustomerReviews from '@/components/home/CustomerReviews';
+import ScrollReveal from '@/components/common/ScrollReveal';
 import connectToDatabase from '@/lib/mongodb';
 import Category from '@/models/Category';
 import Product from '@/models/Product';
@@ -65,31 +66,41 @@ export default async function HomePage() {
       {/* 1. Hero Carousel */}
       <HeroBanner banners={banners} />
 
-      {/* 2. Featured Categories */}
-      <FeaturedCategories categories={categories} />
+      {/* 2. Featured Categories with Scroll Animation */}
+      <ScrollReveal direction="up" delayMs={50}>
+        <FeaturedCategories categories={categories} />
+      </ScrollReveal>
 
-      {/* 3. Featured Products */}
-      <FeaturedProducts
-        products={featuredProducts}
-        title="Featured Performance Cycles"
-        subtitle="Handcrafted aerodynamics and trail-tested engineering"
-      />
-
-      {/* 4. Best Sellers Section */}
-      {bestSellers && bestSellers.length > 0 && (
+      {/* 3. Featured Products with Scroll Animation */}
+      <ScrollReveal direction="up" delayMs={100}>
         <FeaturedProducts
-          products={bestSellers}
-          title="Most Popular & Best Sellers"
-          subtitle="Top customer favorites trusted by cyclists across India"
-          viewAllLink="/shop?sort=popular"
+          products={featuredProducts}
+          title="Featured Performance Cycles"
+          subtitle="Handcrafted aerodynamics and trail-tested engineering"
         />
+      </ScrollReveal>
+
+      {/* 4. Best Sellers Section with Scroll Animation */}
+      {bestSellers && bestSellers.length > 0 && (
+        <ScrollReveal direction="up" delayMs={150}>
+          <FeaturedProducts
+            products={bestSellers}
+            title="Most Popular & Best Sellers"
+            subtitle="Top customer favorites trusted by cyclists across India"
+            viewAllLink="/shop?sort=popular"
+          />
+        </ScrollReveal>
       )}
 
-      {/* 5. Why Choose Us */}
-      <WhyChooseUs />
+      {/* 5. Why Choose Us with Scroll Animation */}
+      <ScrollReveal direction="up" delayMs={100}>
+        <WhyChooseUs />
+      </ScrollReveal>
 
-      {/* 6. Customer Reviews */}
-      <CustomerReviews />
+      {/* 6. Customer Reviews with Scroll Animation */}
+      <ScrollReveal direction="up" delayMs={150}>
+        <CustomerReviews />
+      </ScrollReveal>
     </div>
   );
 }
