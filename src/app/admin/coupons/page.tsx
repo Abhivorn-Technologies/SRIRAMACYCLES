@@ -17,6 +17,7 @@ import {
 import { useToast } from '@/context/ToastContext';
 import { formatPrice } from '@/lib/utils';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
+import ConfirmModal from '@/components/common/ConfirmModal';
 
 interface ICouponAdmin {
   _id: string;
@@ -142,8 +143,12 @@ export default function AdminCouponsPage() {
     }
   };
 
-  const handleDelete = async (id: string, code: string) => {
-    if (!confirm(`Are you sure you want to delete coupon ${code}?`)) return;
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; code: string } | null>(null);
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    const { id, code } = deleteTarget;
+    setDeleteTarget(null);
 
     try {
       const res = await fetch(`/api/admin/coupons/${id}`, {
@@ -151,10 +156,10 @@ export default function AdminCouponsPage() {
       });
       const data = await res.json();
       if (data.success) {
-        success(`Coupon ${code} deleted`);
+        success(`Coupon ${code} deleted successfully`);
         setCoupons((prev) => prev.filter((c) => c._id !== id));
       } else {
-        error(data.message || 'Failed to delete');
+        error(data.message || 'Failed to delete coupon');
       }
     } catch (err) {
       error('Error deleting coupon');
@@ -281,7 +286,7 @@ export default function AdminCouponsPage() {
                     </td>
                     <td className="py-3.5 px-4 text-right">
                       <button
-                        onClick={() => handleDelete(coupon._id, coupon.code)}
+                        onClick={() => setDeleteTarget({ id: coupon._id, code: coupon.code })}
                         className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition-colors"
                         aria-label="Delete coupon"
                       >
@@ -448,6 +453,16 @@ export default function AdminCouponsPage() {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={!!deleteTarget}
+        title="Delete Coupon"
+        message={`Are you sure you want to delete coupon "${deleteTarget?.code}"? This action cannot be undone.`}
+        confirmText="Delete Coupon"
+        type="danger"
+        onConfirm={confirmDelete}
+        onClose={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }

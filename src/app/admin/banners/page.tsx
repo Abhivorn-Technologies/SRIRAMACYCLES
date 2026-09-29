@@ -6,12 +6,14 @@ import { Plus, Trash2, Edit2, Image as ImageIcon, X } from 'lucide-react';
 import { IBanner } from '@/types';
 import { useToast } from '@/context/ToastContext';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
+import ConfirmModal from '@/components/common/ConfirmModal';
 
 export default function AdminBannersPage() {
   const [banners, setBanners] = useState<IBanner[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingBanner, setEditingBanner] = useState<IBanner | null>(null);
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const { success, error } = useToast();
 
   const [formData, setFormData] = useState({
@@ -75,8 +77,14 @@ export default function AdminBannersPage() {
     setModalOpen(true);
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this banner?')) return;
+  const handleDelete = (id: string) => {
+    setDeleteTargetId(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTargetId) return;
+    const id = deleteTargetId;
+    setDeleteTargetId(null);
 
     try {
       const res = await fetch(`/api/banners/${id}`, { method: 'DELETE' });
@@ -305,6 +313,16 @@ export default function AdminBannersPage() {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={!!deleteTargetId}
+        title="Delete Banner"
+        message="Are you sure you want to delete this promo banner? This action cannot be undone."
+        confirmText="Delete Banner"
+        type="danger"
+        onConfirm={confirmDelete}
+        onClose={() => setDeleteTargetId(null)}
+      />
     </div>
   );
 }

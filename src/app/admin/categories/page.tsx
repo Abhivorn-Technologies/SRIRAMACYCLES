@@ -6,12 +6,14 @@ import { Plus, Edit2, Trash2, FolderTree, X } from 'lucide-react';
 import { ICategory } from '@/types';
 import { useToast } from '@/context/ToastContext';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
+import ConfirmModal from '@/components/common/ConfirmModal';
 
 export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState<ICategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<ICategory | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
   const { success, error } = useToast();
 
   const [formData, setFormData] = useState({
@@ -60,8 +62,14 @@ export default function AdminCategoriesPage() {
     setModalOpen(true);
   };
 
-  const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`Are you sure you want to delete category "${name}"?`)) return;
+  const handleDelete = (id: string, name: string) => {
+    setDeleteTarget({ id, name });
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    const { id, name } = deleteTarget;
+    setDeleteTarget(null);
 
     try {
       const res = await fetch(`/api/categories/${id}`, { method: 'DELETE' });
@@ -292,6 +300,16 @@ export default function AdminCategoriesPage() {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={!!deleteTarget}
+        title="Delete Category"
+        message={`Are you sure you want to delete category "${deleteTarget?.name}"? All items under this category may be affected.`}
+        confirmText="Delete Category"
+        type="danger"
+        onConfirm={confirmDelete}
+        onClose={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }

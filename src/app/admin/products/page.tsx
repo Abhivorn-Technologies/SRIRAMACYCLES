@@ -17,11 +17,13 @@ import { IProduct } from '@/types';
 import { formatPrice } from '@/lib/utils';
 import { useToast } from '@/context/ToastContext';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
+import ConfirmModal from '@/components/common/ConfirmModal';
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<IProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
   const { success, error } = useToast();
 
   const fetchProducts = async () => {
@@ -44,8 +46,14 @@ export default function AdminProductsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search]);
 
-  const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`Are you sure you want to delete "${name}"?`)) return;
+  const handleDelete = (id: string, name: string) => {
+    setDeleteTarget({ id, name });
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    const { id, name } = deleteTarget;
+    setDeleteTarget(null);
 
     try {
       const res = await fetch(`/api/products/${id}`, { method: 'DELETE' });
@@ -217,6 +225,16 @@ export default function AdminProductsPage() {
           </div>
         )}
       </div>
+
+      <ConfirmModal
+        isOpen={!!deleteTarget}
+        title="Delete Product"
+        message={`Are you sure you want to delete product "${deleteTarget?.name}"? This action cannot be undone.`}
+        confirmText="Delete Product"
+        type="danger"
+        onConfirm={confirmDelete}
+        onClose={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }

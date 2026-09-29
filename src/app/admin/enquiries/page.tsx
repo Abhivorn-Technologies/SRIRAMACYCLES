@@ -19,10 +19,12 @@ import { IEnquiry } from '@/types';
 import { formatDateTime } from '@/lib/utils';
 import { useToast } from '@/context/ToastContext';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
+import ConfirmModal from '@/components/common/ConfirmModal';
 
 export default function AdminEnquiriesPage() {
   const [enquiries, setEnquiries] = useState<IEnquiry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'unread' | 'read' | 'replied'>('all');
   const { success, error } = useToast();
@@ -68,8 +70,14 @@ export default function AdminEnquiriesPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to permanently delete this customer enquiry?')) return;
+  const handleDelete = (id: string) => {
+    setDeleteTargetId(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTargetId) return;
+    const id = deleteTargetId;
+    setDeleteTargetId(null);
 
     try {
       const res = await fetch(`/api/enquiries/${id}`, { method: 'DELETE' });
@@ -391,6 +399,16 @@ export default function AdminEnquiriesPage() {
           </div>
         )}
       </div>
+
+      <ConfirmModal
+        isOpen={!!deleteTargetId}
+        title="Delete Enquiry"
+        message="Are you sure you want to permanently delete this customer enquiry?"
+        confirmText="Delete Enquiry"
+        type="danger"
+        onConfirm={confirmDelete}
+        onClose={() => setDeleteTargetId(null)}
+      />
     </div>
   );
 }

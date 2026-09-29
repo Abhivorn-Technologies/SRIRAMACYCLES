@@ -32,6 +32,7 @@ import { formatPrice, formatDateTime } from '@/lib/utils';
 import { useToast } from '@/context/ToastContext';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import POSReceiptModal from '@/components/admin/POSReceiptModal';
+import ConfirmModal from '@/components/common/ConfirmModal';
 import { IProduct, ICategory } from '@/types';
 import { validateName, validatePhone } from '@/lib/validations';
 
@@ -84,6 +85,7 @@ export default function AdminPOSBillingPage() {
   const [isCustomItemModalOpen, setIsCustomItemModalOpen] = useState(false);
   const [customItemForm, setCustomItemForm] = useState({ name: '', price: '' });
   const [receiptData, setReceiptData] = useState<any>(null);
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isHistoryDrawerOpen, setIsHistoryDrawerOpen] = useState(false);
   const [drawerSearch, setDrawerSearch] = useState('');
@@ -245,12 +247,15 @@ export default function AdminPOSBillingPage() {
   // Clear bill
   const handleClearCart = () => {
     if (cart.length === 0) return;
-    if (confirm('Clear current items from the billing counter?')) {
-      setCart([]);
-      setDiscountValue(0);
-      setCashReceived('');
-      setCustomer({ name: '', phone: '', email: '', isExisting: false });
-    }
+    setShowClearConfirm(true);
+  };
+
+  const confirmClearCart = () => {
+    setShowClearConfirm(false);
+    setCart([]);
+    setDiscountValue(0);
+    setCashReceived('');
+    setCustomer({ name: '', phone: '', email: '', isExisting: false });
   };
 
   // Pricing calculations
@@ -1151,6 +1156,16 @@ export default function AdminPOSBillingPage() {
           onNewSale={handleStartNextSale}
         />
       )}
+
+      <ConfirmModal
+        isOpen={showClearConfirm}
+        title="Clear Billing Counter"
+        message="Are you sure you want to clear all current items and customer details from the billing counter?"
+        confirmText="Clear Counter"
+        type="warning"
+        onConfirm={confirmClearCart}
+        onClose={() => setShowClearConfirm(false)}
+      />
     </div>
   );
 }

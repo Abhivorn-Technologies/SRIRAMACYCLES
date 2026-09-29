@@ -26,6 +26,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
 import { IUserAddress } from '@/types';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
+import ConfirmModal from '@/components/common/ConfirmModal';
 
 export default function AccountPage() {
   const { user, loading, logout, fetchUser } = useAuth();
@@ -34,6 +35,7 @@ export default function AccountPage() {
   const [activeTab, setActiveTab] = useState<'overview' | 'addresses'>('overview');
   const [addresses, setAddresses] = useState<IUserAddress[]>([]);
   const [loadingAddresses, setLoadingAddresses] = useState(false);
+  const [deleteAddressId, setDeleteAddressId] = useState<string | null>(null);
 
   // Address Modal / Form State
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
@@ -203,8 +205,14 @@ export default function AccountPage() {
   };
 
   // Delete Address
-  const handleDeleteAddress = async (addressId: string) => {
-    if (!confirm('Are you sure you want to delete this address?')) return;
+  const handleDeleteAddress = (addressId: string) => {
+    setDeleteAddressId(addressId);
+  };
+
+  const confirmDeleteAddress = async () => {
+    if (!deleteAddressId) return;
+    const addressId = deleteAddressId;
+    setDeleteAddressId(null);
 
     try {
       const res = await fetch(`/api/user/addresses/${addressId}`, {
@@ -812,6 +820,16 @@ export default function AccountPage() {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={!!deleteAddressId}
+        title="Delete Saved Address"
+        message="Are you sure you want to delete this saved delivery address?"
+        confirmText="Delete Address"
+        type="danger"
+        onConfirm={confirmDeleteAddress}
+        onClose={() => setDeleteAddressId(null)}
+      />
     </div>
   );
 }
