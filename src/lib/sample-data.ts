@@ -156,7 +156,7 @@ export const SAMPLE_PRODUCTS: IProduct[] = [
     stock: 8,
     sku: 'SRC-MTB-002',
     images: [
-      'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=1000&q=80',
+      '/images/categories/mountain-bikes.jpg',
       'https://images.unsplash.com/photo-1576435728678-68d0fbf94e91?w=1000&q=80',
     ],
     shortDescription:
@@ -236,7 +236,7 @@ export const SAMPLE_PRODUCTS: IProduct[] = [
     sku: 'SRC-DB-004',
     images: [
       'https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=1000&q=80',
-      'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=1000&q=80',
+      '/images/categories/disc-brake-cycles.jpg',
     ],
     shortDescription:
       'Precision dual hydraulic disc brakes (160mm rotors), 21-speed EZ-Fire shifters, and zoom front suspension fork.',

@@ -9,13 +9,13 @@ export async function GET(req: NextRequest) {
   try {
     const authData = extractAuthUser(req, 'admin');
     if (!authData || authData.role !== 'admin') {
-      return NextResponse.json({ success: false, user: null }, { status: 401 });
+      return NextResponse.json({ success: true, user: null }, { status: 200 });
     }
 
     await connectToDatabase();
     const user = await User.findById(authData.userId).select('-password');
     if (!user || !user.isActive || user.role !== 'admin') {
-      return NextResponse.json({ success: false, user: null }, { status: 401 });
+      return NextResponse.json({ success: true, user: null }, { status: 200 });
     }
 
     return NextResponse.json({ success: true, user });

@@ -56,7 +56,7 @@ const CLEAN_SLIDES: HeroSlide[] = [
     titleHighlight: 'Built for Untamed Adventures.',
     subtitle:
       'Heavy-duty RockShox suspension, hydraulic disc brakes, and rugged geometry ready for every mountain trail.',
-    image: 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=1200&q=85',
+    image: '/images/categories/mountain-bikes.jpg',
     ctaText: 'Shop Mountain Bikes',
     ctaLink: '/shop?category=mountain-bikes',
     secondaryText: 'Explore Gear',

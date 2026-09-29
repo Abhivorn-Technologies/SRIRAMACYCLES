@@ -52,6 +52,7 @@ export const STORE_CONTACT = {
   supportEmail: 'sreeramacycle@gmail.com',
   address: 'SSS COMPLEX B-3, Mainroad, Kazipet, Hanumakonda (Dist) - 506003, Telangana, India',
   shortAddress: 'SSS COMPLEX B-3, Mainroad, Kazipet, Hanumakonda - 506003',
+  googleMapsLink: 'https://maps.google.com/?q=Sri+Rama+Cycle+%26+Auto+Spare+Parts+SSS+COMPLEX+B-3+Mainroad+Kazipet+Hanumakonda+506003',
   hours: 'Mon – Sat: 9:00 AM – 8:30 PM | Sun: 9:00 AM – 1:00 PM',
   weekdaysHours: 'Mon – Sat: 9:00 AM – 8:30 PM',
   sundayHours: 'Sunday: 9:00 AM – 1:00 PM only',

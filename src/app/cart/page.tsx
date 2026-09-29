@@ -317,6 +317,12 @@ export default function CartPage() {
                 )}
               </div>
 
+              {/* Estimated Delivery Notice */}
+              <div className="flex items-center gap-2 p-3 bg-amber-50 border border-amber-200/90 rounded-xl text-xs text-amber-900 font-bold">
+                <Truck className="w-4 h-4 text-amber-600 shrink-0" />
+                <span>Estimated Delivery: <strong>5 Working Days</strong></span>
+              </div>
+
               {/* Price Breakdown */}
               <div className="flex flex-col gap-2.5 pt-4 border-t border-slate-100 text-xs">
                 <div className="flex justify-between text-slate-600">

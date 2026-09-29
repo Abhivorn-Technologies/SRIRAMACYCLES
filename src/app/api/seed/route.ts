@@ -157,7 +157,7 @@ async function handleSeed(req: Request) {
         stock: 8,
         sku: 'SRC-MTB-002',
         images: [
-          'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=1000&q=80',
+          '/images/categories/mountain-bikes.jpg',
         ],
         shortDescription:
           'Hydroformed 6061-T6 alloy frame with RockShox 120mm air lockout suspension and Shimano Deore 1x12.',
@@ -326,7 +326,7 @@ async function handleSeed(req: Request) {
           'Full-suspension, hydraulic disc brakes, and rugged all-terrain geometry built for untamed adventures.',
         tag: 'Trail Dominance',
         image:
-          'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=1800&q=85',
+          '/images/categories/mountain-bikes.jpg',
         ctaText: 'Shop Mountain Bikes',
         ctaLink: '/shop?category=mountain-bikes',
         position: 'hero',

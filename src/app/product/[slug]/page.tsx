@@ -236,7 +236,7 @@ export default function ProductDetailPage() {
                         : 'border-slate-200 hover:border-slate-300'
                     }`}
                   >
-                    <Image src={img} alt="thumb" fill className="object-cover" />
+                    <Image src={img} alt="thumb" fill sizes="96px" className="object-cover" />
                   </button>
                 ))}
               </div>

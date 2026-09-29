@@ -158,7 +158,7 @@ async function seedDatabase() {
       name: 'Mountain Bikes',
       slug: 'mountain-bikes',
       description: 'Heavy-duty suspension, rugged grip tires, and hydraulic discs engineered to conquer trails.',
-      image: 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=800&q=80',
+      image: '/images/categories/mountain-bikes.jpg',
       icon: 'Mountain',
       order: 2,
     },
@@ -257,7 +257,7 @@ async function seedDatabase() {
       stock: 8,
       sku: 'SRC-MTB-002',
       images: [
-        'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=1000&q=80',
+        '/images/categories/mountain-bikes.jpg',
         'https://images.unsplash.com/photo-1576435728678-68d0fbf94e91?w=1000&q=80',
       ],
       shortDescription:
@@ -517,7 +517,7 @@ async function seedDatabase() {
         'Full-suspension, hydraulic disc brakes, and rugged all-terrain geometry built for untamed adventures.',
       tag: 'Trail Dominance',
       image:
-        'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=1800&q=85',
+        '/images/categories/mountain-bikes.jpg',
       ctaText: 'Shop Mountain Bikes',
       ctaLink: '/shop?category=mountain-bikes',
       position: 'hero',

@@ -23,6 +23,8 @@ import {
   Bike,
   Sparkles,
   Plus,
+  Minus,
+  Trash2,
 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
@@ -37,7 +39,7 @@ type CheckoutStep = 'phone' | 'address' | 'payment';
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { cart, subtotal, shipping, tax, discount, total, appliedCoupon, applyCoupon, removeCoupon, clearCart } = useCart();
+  const { cart, subtotal, shipping, tax, discount, total, appliedCoupon, applyCoupon, removeCoupon, clearCart, updateQuantity, removeFromCart } = useCart();
   const { user } = useAuth();
   const { error, success, info } = useToast();
 
@@ -424,27 +426,97 @@ export default function CheckoutPage() {
             {/* Collapsible Item Details */}
             {isOrderSummaryOpen && (
               <div className="mt-4 pt-4 border-t border-slate-200/60 flex flex-col gap-3 animate-in fade-in duration-150">
-                {cart.map((item, idx) => (
-                  <div key={idx} className="flex items-center justify-between gap-3 text-xs">
-                    <div className="flex items-center gap-2.5">
-                      <div className="relative w-10 h-10 rounded-lg overflow-hidden bg-white border border-slate-200 shrink-0">
-                        <Image
-                          src={item.product.images[0] || 'https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=200'}
-                          alt={item.product.name}
-                          fill
-                          className="object-cover"
-                        />
+                {cart.map((item, idx) => {
+                  const unitPrice =
+                    item.product.salePrice && item.product.salePrice > 0
+                      ? item.product.salePrice
+                      : item.product.price;
+                  return (
+                    <div
+                      key={idx}
+                      className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs p-2.5 rounded-xl bg-white border border-slate-200/70 shadow-2xs"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-slate-50 border border-slate-200 shrink-0">
+                          <Image
+                            src={item.product.images[0] || 'https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=200'}
+                            alt={item.product.name}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                        <div>
+                          <p className="font-bold text-slate-800 line-clamp-1">{item.product.name}</p>
+                          {item.selectedSize && (
+                            <p className="text-[10px] text-slate-500 font-medium">Variant: {item.selectedSize}</p>
+                          )}
+                          <p className="text-[11px] font-bold text-slate-900 mt-0.5">{formatPrice(unitPrice)} each</p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-bold text-slate-800 line-clamp-1">{item.product.name}</p>
-                        <p className="text-[11px] text-slate-500">Qty: {item.quantity} {item.selectedSize ? `• ${item.selectedSize}` : ''}</p>
+
+                      <div className="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-0 border-slate-100">
+                        {/* Quantity Counter */}
+                        <div className="flex items-center border border-slate-200 rounded-lg bg-slate-50 p-0.5">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              updateQuantity(
+                                item.product._id,
+                                item.quantity - 1,
+                                item.selectedSize,
+                                item.selectedColor
+                              )
+                            }
+                            className="w-6 h-6 flex items-center justify-center rounded-md hover:bg-white text-slate-700 font-bold transition-colors cursor-pointer"
+                            aria-label="Decrease quantity"
+                          >
+                            <Minus className="w-3 h-3" />
+                          </button>
+                          <span className="w-7 text-center text-xs font-bold text-slate-900">
+                            {item.quantity}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              updateQuantity(
+                                item.product._id,
+                                item.quantity + 1,
+                                item.selectedSize,
+                                item.selectedColor
+                              )
+                            }
+                            className="w-6 h-6 flex items-center justify-center rounded-md hover:bg-white text-slate-700 font-bold transition-colors cursor-pointer"
+                            aria-label="Increase quantity"
+                          >
+                            <Plus className="w-3 h-3" />
+                          </button>
+                        </div>
+
+                        {/* Total price for item */}
+                        <span className="font-black text-slate-900 text-xs min-w-[70px] text-right">
+                          {formatPrice(unitPrice * item.quantity)}
+                        </span>
+
+                        {/* Delete button */}
+                        <button
+                          type="button"
+                          onClick={() =>
+                            removeFromCart(
+                              item.product._id,
+                              item.selectedSize,
+                              item.selectedColor
+                            )
+                          }
+                          className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition-colors cursor-pointer"
+                          aria-label="Remove item"
+                          title="Remove Item"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
                       </div>
                     </div>
-                    <span className="font-bold text-slate-900">
-                      {formatPrice((item.product.salePrice || item.product.price) * item.quantity)}
-                    </span>
-                  </div>
-                ))}
+                  );
+                })}
 
                 {/* Price Breakdown */}
                 <div className="pt-2 border-t border-slate-200/60 flex flex-col gap-1 text-[11px] text-slate-600">
@@ -459,8 +531,12 @@ export default function CheckoutPage() {
                     </div>
                   )}
                   <div className="flex justify-between">
-                    <span>Delivery</span>
+                    <span>Delivery Fee</span>
                     <span className="text-emerald-600 font-bold">FREE</span>
+                  </div>
+                  <div className="flex justify-between text-amber-700 font-bold">
+                    <span>Estimated Delivery</span>
+                    <span>5 Working Days</span>
                   </div>
                   <div className="flex justify-between font-bold text-slate-900 pt-1 text-xs">
                     <span>Total Amount</span>
@@ -1054,6 +1130,17 @@ export default function CheckoutPage() {
                     className="w-4 h-4 text-brand-600 accent-brand-600"
                   />
                 </label>
+              </div>
+
+              {/* Delivery Timeframe Notice */}
+              <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200/90 flex items-start gap-3 text-xs">
+                <Truck className="w-4.5 h-4.5 text-amber-600 shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="font-bold text-amber-950">Insured Delivery Timeframe: 5 Working Days</h4>
+                  <p className="text-[11px] text-amber-800 leading-snug mt-0.5">
+                    Your cycle & spares will be assembled, pre-tuned, and delivered to your doorstep within 5 working days.
+                  </p>
+                </div>
               </div>
 
               {/* Final Submit Place Order */}

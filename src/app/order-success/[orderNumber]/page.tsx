@@ -11,10 +11,12 @@ import {
   ArrowRight,
   ShieldCheck,
   Calendar,
+  FileText,
 } from 'lucide-react';
 import { IOrder } from '@/types';
 import { formatPrice, formatDate } from '@/lib/utils';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
+import TaxInvoiceModal from '@/components/common/TaxInvoiceModal';
 
 export default function OrderSuccessPage() {
   const params = useParams();
@@ -22,6 +24,7 @@ export default function OrderSuccessPage() {
 
   const [order, setOrder] = useState<IOrder | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
 
   useEffect(() => {
     async function fetchOrder() {
@@ -78,7 +81,16 @@ export default function OrderSuccessPage() {
                 {order?.orderNumber || orderNumber}
               </span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              {order && (
+                <button
+                  onClick={() => setIsInvoiceOpen(true)}
+                  className="bg-white hover:bg-slate-100 text-slate-800 font-bold text-xs py-2.5 px-4 rounded-xl border border-slate-200 shadow-2xs flex items-center gap-1.5 transition-colors cursor-pointer"
+                >
+                  <FileText className="w-4 h-4 text-brand-600" />
+                  <span>Tax Invoice</span>
+                </button>
+              )}
               <Link
                 href={`/track-order?orderId=${order?.orderNumber || orderNumber}`}
                 className="bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs py-2.5 px-5 rounded-xl flex items-center gap-1.5 shadow-sm transition-colors"
@@ -86,6 +98,18 @@ export default function OrderSuccessPage() {
                 <Truck className="w-4 h-4" />
                 <span>Track Order Live</span>
               </Link>
+            </div>
+          </div>
+
+          {/* Delivery Timeframe Notice */}
+          <div className="w-full bg-amber-50 border border-amber-200/90 rounded-2xl p-4 flex items-center gap-3.5 text-left mb-6">
+            <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+              <Truck className="w-5 h-5" />
+            </div>
+            <div>
+              <h4 className="text-[11px] font-bold text-amber-950 uppercase tracking-wider">Estimated Doorstep Delivery</h4>
+              <p className="text-sm font-black text-amber-900 mt-0.5">Within 5 Working Days</p>
+              <p className="text-[11px] text-amber-800 mt-0.5">Includes 95% pre-assembly, precision tuning, and doorstep delivery.</p>
             </div>
           </div>
 
@@ -153,6 +177,14 @@ export default function OrderSuccessPage() {
           </div>
         </div>
       </div>
+
+      {order && (
+        <TaxInvoiceModal
+          order={order}
+          isOpen={isInvoiceOpen}
+          onClose={() => setIsInvoiceOpen(false)}
+        />
+      )}
     </div>
   );
 }

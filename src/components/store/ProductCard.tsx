@@ -69,7 +69,7 @@ export default function ProductCard({ product, onQuickView }: IProductCardProps)
 
       {/* Product Image */}
       <div className="relative aspect-[4/3] w-full bg-slate-50 overflow-hidden">
-        <Link href={`/product/${product.slug}`} className="block w-full h-full">
+        <Link href={`/product/${product.slug}`} className="block relative w-full h-full">
           <Image
             src={mainImage}
             alt={product.name}

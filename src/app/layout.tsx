@@ -33,6 +33,11 @@ export const metadata: Metadata = {
     siteName: APP_NAME,
     type: 'website',
   },
+  icons: {
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
