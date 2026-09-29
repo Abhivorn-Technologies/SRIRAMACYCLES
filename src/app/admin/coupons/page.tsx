@@ -5,6 +5,7 @@ import {
   Tag,
   Plus,
   Trash2,
+  Edit2,
   CheckCircle2,
   XCircle,
   Calendar,
@@ -40,6 +41,7 @@ export default function AdminCouponsPage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingCoupon, setEditingCoupon] = useState<ICouponAdmin | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   // Form State
@@ -77,7 +79,47 @@ export default function AdminCouponsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleCreateCoupon = async (e: React.FormEvent) => {
+  const handleOpenCreateModal = () => {
+    setEditingCoupon(null);
+    setFormData({
+      code: '',
+      description: '',
+      discountType: 'percentage',
+      discountValue: '',
+      minOrderAmount: '0',
+      maxDiscountAmount: '',
+      expiryDate: '',
+      usageLimit: '1000',
+      isActive: true,
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleOpenEditModal = (coupon: ICouponAdmin) => {
+    setEditingCoupon(coupon);
+    let expStr = '';
+    if (coupon.expiryDate) {
+      try {
+        expStr = new Date(coupon.expiryDate).toISOString().split('T')[0];
+      } catch (e) {
+        expStr = '';
+      }
+    }
+    setFormData({
+      code: coupon.code,
+      description: coupon.description || '',
+      discountType: coupon.discountType,
+      discountValue: coupon.discountValue ? coupon.discountValue.toString() : '',
+      minOrderAmount: coupon.minOrderAmount !== undefined ? coupon.minOrderAmount.toString() : '0',
+      maxDiscountAmount: coupon.maxDiscountAmount !== undefined && coupon.maxDiscountAmount !== null ? coupon.maxDiscountAmount.toString() : '',
+      expiryDate: expStr,
+      usageLimit: coupon.usageLimit ? coupon.usageLimit.toString() : '1000',
+      isActive: coupon.isActive,
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleSaveCoupon = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!formData.code.trim()) {
@@ -91,15 +133,20 @@ export default function AdminCouponsPage() {
 
     setSubmitting(true);
     try {
-      const res = await fetch('/api/admin/coupons', {
-        method: 'POST',
+      const isEdit = !!editingCoupon;
+      const url = isEdit ? `/api/admin/coupons/${editingCoupon._id}` : '/api/admin/coupons';
+      const method = isEdit ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
       const data = await res.json();
       if (data.success) {
-        success('Coupon created successfully!');
+        success(isEdit ? 'Coupon updated successfully!' : 'Coupon created successfully!');
         setIsModalOpen(false);
+        setEditingCoupon(null);
         setFormData({
           code: '',
           description: '',
@@ -113,10 +160,10 @@ export default function AdminCouponsPage() {
         });
         fetchCoupons();
       } else {
-        error(data.message || 'Failed to create coupon');
+        error(data.message || (isEdit ? 'Failed to update coupon' : 'Failed to create coupon'));
       }
     } catch (err) {
-      error('An error occurred while creating coupon');
+      error('An error occurred while saving coupon');
     } finally {
       setSubmitting(false);
     }
@@ -185,7 +232,7 @@ export default function AdminCouponsPage() {
           </p>
         </div>
         <button
-          onClick={() => setIsModalOpen(true)}
+          onClick={handleOpenCreateModal}
           className="bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-xs transition-colors self-start sm:self-auto"
         >
           <Plus className="w-4 h-4" />
@@ -285,13 +332,24 @@ export default function AdminCouponsPage() {
                       </button>
                     </td>
                     <td className="py-3.5 px-4 text-right">
-                      <button
-                        onClick={() => setDeleteTarget({ id: coupon._id, code: coupon.code })}
-                        className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition-colors"
-                        aria-label="Delete coupon"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      <div className="flex items-center justify-end gap-1">
+                        <button
+                          onClick={() => handleOpenEditModal(coupon)}
+                          className="p-1.5 text-slate-400 hover:text-brand-600 rounded-lg hover:bg-brand-50 transition-colors"
+                          aria-label="Edit coupon"
+                          title="Edit Coupon"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => setDeleteTarget({ id: coupon._id, code: coupon.code })}
+                          className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition-colors"
+                          aria-label="Delete coupon"
+                          title="Delete Coupon"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -314,17 +372,22 @@ export default function AdminCouponsPage() {
                 <div className="w-8 h-8 rounded-xl bg-brand-50 text-brand-700 flex items-center justify-center">
                   <Tag className="w-4 h-4" />
                 </div>
-                <h2 className="text-base font-bold text-slate-900">Create New Coupon</h2>
+                <h2 className="text-base font-bold text-slate-900">
+                  {editingCoupon ? 'Edit Coupon' : 'Create New Coupon'}
+                </h2>
               </div>
               <button
-                onClick={() => setIsModalOpen(false)}
+                onClick={() => {
+                  setIsModalOpen(false);
+                  setEditingCoupon(null);
+                }}
                 className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleCreateCoupon} className="flex flex-col gap-4 mt-4">
+            <form onSubmit={handleSaveCoupon} className="flex flex-col gap-4 mt-4">
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">
@@ -436,7 +499,10 @@ export default function AdminCouponsPage() {
               <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
                 <button
                   type="button"
-                  onClick={() => setIsModalOpen(false)}
+                  onClick={() => {
+                    setIsModalOpen(false);
+                    setEditingCoupon(null);
+                  }}
                   className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100"
                 >
                   Cancel
@@ -446,7 +512,11 @@ export default function AdminCouponsPage() {
                   disabled={submitting}
                   className="px-5 py-2 rounded-xl text-xs font-bold bg-brand-600 hover:bg-brand-700 text-white shadow-xs"
                 >
-                  {submitting ? 'Creating...' : 'Save Coupon'}
+                  {submitting
+                    ? 'Saving...'
+                    : editingCoupon
+                    ? 'Update Coupon'
+                    : 'Save Coupon'}
                 </button>
               </div>
             </form>
