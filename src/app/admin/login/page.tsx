@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Bike, Lock, Mail, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
@@ -61,22 +63,29 @@ export default function AdminLoginPage({ onSuccess }: IAdminLoginPageProps = {})
       
       {/* Background Soft Glow */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-emerald-100/60 rounded-full blur-3xl" />
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-brand-500/10 rounded-full blur-3xl" />
       </div>
 
       <div className="relative z-10 max-w-md w-full bg-white border border-slate-200/90 p-8 sm:p-10 rounded-3xl shadow-xl">
         
         {/* Header Branding */}
-        <div className="text-center mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-emerald-600 flex items-center justify-center mx-auto mb-3.5 text-white shadow-md shadow-emerald-600/20">
-            <Bike className="w-8 h-8" />
-          </div>
+        <div className="text-center mb-8 flex flex-col items-center">
+          <Link href="/" className="inline-flex items-center gap-2 mb-4 group">
+            <Image
+              src="/SRI RAMA logo 3.png"
+              alt="Sri Rama Cycle Store & Auto Spares"
+              width={340}
+              height={100}
+              priority
+              className="h-20 sm:h-24 md:h-28 w-auto object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-md"
+            />
+          </Link>
           
-          <h1 className="text-2xl font-black tracking-tight text-slate-950 uppercase">
-            SRI RAMA <span className="text-emerald-600">CYCLES</span>
+          <h1 className="text-xl font-black tracking-tight text-slate-950 uppercase">
+            Admin Management Console
           </h1>
-          <p className="text-[11px] tracking-widest text-slate-500 uppercase font-bold mt-0.5">
-            Admin Management Portal
+          <p className="text-[11px] tracking-widest text-brand-600 uppercase font-extrabold mt-1">
+            Sri Rama Store Control Panel
           </p>
         </div>
 
@@ -93,6 +102,7 @@ export default function AdminLoginPage({ onSuccess }: IAdminLoginPageProps = {})
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter admin email address"
+                suppressHydrationWarning
                 className="w-full bg-slate-50/70 border border-slate-200 hover:border-slate-300 focus:border-brand-600 focus:bg-white rounded-2xl py-3 pl-11 pr-4 text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500/15 transition-all placeholder:text-slate-400 font-medium"
               />
               <Mail className="w-4 h-4 text-slate-400 absolute left-4 top-3.5" />
@@ -110,6 +120,7 @@ export default function AdminLoginPage({ onSuccess }: IAdminLoginPageProps = {})
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter security password"
+                suppressHydrationWarning
                 className="w-full bg-slate-50/70 border border-slate-200 hover:border-slate-300 focus:border-brand-600 focus:bg-white rounded-2xl py-3 pl-11 pr-11 text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500/15 transition-all placeholder:text-slate-400 font-medium"
               />
               <Lock className="w-4 h-4 text-slate-400 absolute left-4 top-3.5" />
@@ -134,7 +145,7 @@ export default function AdminLoginPage({ onSuccess }: IAdminLoginPageProps = {})
           <button
             type="submit"
             disabled={loading}
-            className="mt-3 w-full bg-emerald-600 hover:bg-emerald-700 disabled:opacity-70 text-white text-xs sm:text-sm font-bold py-3.5 rounded-2xl flex items-center justify-center gap-2 shadow-md shadow-emerald-600/20 hover:scale-[1.01] active:scale-[0.98] transition-all"
+            className="mt-3 w-full bg-brand-600 hover:bg-brand-700 disabled:opacity-70 text-white text-xs sm:text-sm font-extrabold py-3.5 rounded-2xl flex items-center justify-center gap-2 shadow-md shadow-brand-600/30 hover:scale-[1.01] active:scale-[0.98] transition-all btn-glow cursor-pointer"
           >
             {loading ? (
               <LoadingSpinner size="sm" />

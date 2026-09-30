@@ -1,12 +1,15 @@
 import mongoose from 'mongoose';
 import dns from 'dns';
 
-// Ensure DNS SRV queries resolve reliably on all platforms (avoid querySrv ECONNREFUSED)
+// Force Node.js to use Google DNS which supports SRV queries.
+// Local Windows ISP DNS blocks UDP SRV record lookups needed by mongodb+srv://
 try {
-  dns.setServers(['8.8.8.8', '1.1.1.1', '8.8.4.4']);
+  dns.setServers(['8.8.8.8', '8.8.4.4', '1.1.1.1']);
+  dns.setDefaultResultOrder?.('ipv4first');
 } catch {
-  // Ignore in environments where setServers might be restricted
+  // Ignore if unsupported
 }
+
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/sriramacycles';
 const MONGODB_DB_NAME = process.env.MONGODB_DB_NAME || 'sriramacycles';

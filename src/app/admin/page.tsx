@@ -63,7 +63,7 @@ export default function AdminDashboardPage() {
   const recentEnquiries = data?.recentEnquiries || [];
 
   return (
-    <div className="flex flex-col gap-8 max-w-7xl mx-auto">
+    <div className="flex flex-col gap-4 sm:gap-5 max-w-7xl mx-auto">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>

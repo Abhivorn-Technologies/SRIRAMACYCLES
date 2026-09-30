@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import {
   Bike,
@@ -52,39 +53,38 @@ export default function AdminSidebar({
   const content = (
     <div
       className={`flex flex-col h-full justify-between bg-white text-slate-700 ${
-        isCollapsed ? 'p-2.5 items-center' : 'p-4'
+        isCollapsed ? 'p-2 items-center' : 'px-3.5 py-2.5'
       }`}
     >
-      <div className="flex flex-col gap-6 w-full">
+      <div className="flex flex-col gap-1 w-full">
         {/* Admin Logo */}
         <div
-          className={`flex items-center ${
-            isCollapsed ? 'justify-center pt-2' : 'justify-between px-2 pt-2'
+          className={`flex items-center w-full ${
+            isCollapsed ? 'justify-center py-1' : 'justify-center p-0 mb-1'
           }`}
         >
           <Link
             href="/admin"
-            className={`flex items-center gap-2.5 min-w-0 ${isCollapsed ? 'justify-center' : ''}`}
+            className="flex items-center justify-center w-full group p-0 m-0"
             title="Sri Rama Admin Console"
           >
-            <div className="w-9 h-9 rounded-xl bg-brand-50 border border-brand-200 text-brand-700 flex items-center justify-center shadow-xs shrink-0">
-              <Bike className="w-4 h-4 text-brand-700" />
+            <div className="relative overflow-hidden flex items-center justify-center w-full p-0 m-0">
+              <Image
+                src="/SRI RAMA logo 3.png"
+                alt="Sri Rama Admin Console"
+                width={280}
+                height={85}
+                priority
+                className={`${
+                  isCollapsed ? 'h-9 sm:h-10 w-auto' : 'h-12 sm:h-14 md:h-16 w-full object-contain'
+                } drop-shadow-sm group-hover:scale-105 transition-transform duration-300`}
+              />
             </div>
-            {!isCollapsed && (
-              <div className="flex flex-col min-w-0 overflow-hidden">
-                <span className="text-[11px] font-black text-slate-900 uppercase tracking-tight leading-tight truncate max-w-[140px]">
-                  Sri Rama Cycle & Auto Spare Parts
-                </span>
-                <span className="text-[9px] text-brand-700 font-bold uppercase tracking-wider truncate">
-                  Admin Console
-                </span>
-              </div>
-            )}
           </Link>
           {onCloseMobile && (
             <button
               onClick={onCloseMobile}
-              className="lg:hidden p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100"
+              className="lg:hidden p-1 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100"
               aria-label="Close menu"
             >
               <X className="w-5 h-5" />
@@ -93,7 +93,7 @@ export default function AdminSidebar({
         </div>
 
         {/* Navigation Items */}
-        <nav className="flex flex-col gap-1.5 pt-2 w-full">
+        <nav className="flex flex-col gap-1 w-full">
           {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive =
@@ -128,12 +128,12 @@ export default function AdminSidebar({
                   {!isCollapsed && <span className="truncate">{item.label}</span>}
                 </div>
                 {!isCollapsed && item.badge && (
-                  <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-500 text-white shadow-2xs">
+                  <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-brand-600 text-white shadow-2xs">
                     {item.badge}
                   </span>
                 )}
                 {isCollapsed && item.badge && (
-                  <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white"></span>
+                  <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-brand-600 ring-2 ring-white"></span>
                 )}
               </Link>
             );

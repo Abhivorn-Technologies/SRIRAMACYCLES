@@ -242,7 +242,7 @@ export default function AddProductPage() {
         <button
           onClick={handleSubmit}
           disabled={loading}
-          className="bg-emerald-600 hover:bg-emerald-700 disabled:opacity-75 text-white text-xs sm:text-sm font-bold py-3 px-6 rounded-2xl flex items-center justify-center gap-2 shadow-sm transition-all"
+          className="bg-brand-600 hover:bg-brand-700 disabled:opacity-75 text-white text-xs sm:text-sm font-extrabold py-3 px-6 rounded-2xl flex items-center justify-center gap-2 shadow-md shadow-brand-600/30 transition-all btn-glow cursor-pointer"
         >
           {loading ? (
             <LoadingSpinner size="sm" />
@@ -663,7 +663,7 @@ export default function AddProductPage() {
           <button
             type="submit"
             disabled={loading}
-            className="bg-emerald-600 hover:bg-emerald-700 disabled:opacity-75 text-white text-xs sm:text-sm font-bold py-3.5 px-8 rounded-2xl flex items-center justify-center gap-2 shadow-md transition-all"
+            className="bg-brand-600 hover:bg-brand-700 disabled:opacity-75 text-white text-xs sm:text-sm font-extrabold py-3.5 px-8 rounded-2xl flex items-center justify-center gap-2 shadow-md shadow-brand-600/30 transition-all btn-glow cursor-pointer"
           >
             {loading ? (
               <LoadingSpinner size="sm" />

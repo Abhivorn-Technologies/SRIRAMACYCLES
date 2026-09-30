@@ -7,7 +7,7 @@
 :root {
   --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   --background: #ffffff;
-  --foreground: #0f172a;
+  --foreground: #09090b;
 }
 
 html {
@@ -23,23 +23,24 @@ body {
   overflow-x: hidden;
 }
 
-/* Custom modern scrollbar */
+/* Custom modern red scrollbar matching Sri Rama logo */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #f8fafc;
 }
 
 ::-webkit-scrollbar-thumb {
   background: #cbd5e1;
-  border-radius: 4px;
+  border-radius: 9999px;
+  transition: background-color 0.2s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #166534;
+  background: #E61A24;
 }
 
 /* Keyframe Animations */
@@ -54,12 +55,12 @@ body {
   }
 }
 
-@keyframes pulseGlow {
+@keyframes pulseGlowRed {
   0%, 100% {
-    box-shadow: 0 0 15px rgba(22, 101, 52, 0.2);
+    box-shadow: 0 0 15px rgba(230, 26, 36, 0.25);
   }
   50% {
-    box-shadow: 0 0 25px rgba(22, 101, 52, 0.45);
+    box-shadow: 0 0 30px rgba(230, 26, 36, 0.55);
   }
 }
 
@@ -68,7 +69,7 @@ body {
     transform: translateY(0px);
   }
   50% {
-    transform: translateY(-6px);
+    transform: translateY(-8px);
   }
 }
 
@@ -81,9 +82,18 @@ body {
   }
 }
 
+@keyframes gearRotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* Soft transition utilities */
 .transition-luxury {
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .animate-fade-in-up {
@@ -94,37 +104,39 @@ body {
   animation: floatSmooth 4s ease-in-out infinite;
 }
 
-.animate-pulse-glow {
-  animation: pulseGlow 3s infinite ease-in-out;
+.animate-pulse-red-glow {
+  animation: pulseGlowRed 3s infinite ease-in-out;
 }
 
 /* Subtle glassmorphic utilities */
 .glass-nav {
-  background: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(226, 232, 240, 0.8);
 }
 
-/* Premium Card hover lift & glow */
+/* Premium Card hover lift, zoom & red glow highlights */
 .card-hover-lift {
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s ease;
 }
 
 .card-hover-lift:hover {
-  transform: translateY(-6px) scale(1.01);
-  box-shadow: 0 20px 35px -10px rgba(15, 23, 42, 0.1), 0 0 20px rgba(22, 101, 52, 0.06);
+  transform: translateY(-8px) scale(1.015);
+  box-shadow: 0 20px 40px -12px rgba(230, 26, 36, 0.2), 0 0 20px rgba(230, 26, 36, 0.08);
+  border-color: rgba(230, 26, 36, 0.3);
 }
 
 /* Image Zoom Container */
 .image-zoom-container {
   overflow: hidden;
+  border-radius: inherit;
 }
 
 .image-zoom-container img {
@@ -132,7 +144,7 @@ body {
 }
 
 .image-zoom-container:hover img {
-  transform: scale(1.08);
+  transform: scale(1.1);
 }
 
 /* Glowing Interactive Buttons */
@@ -142,10 +154,11 @@ body {
 }
 
 .btn-glow:hover {
-  box-shadow: 0 10px 25px -5px rgba(22, 101, 52, 0.35);
+  box-shadow: 0 12px 28px -6px rgba(230, 26, 36, 0.45);
   transform: translateY(-2px);
 }
 
 .btn-glow:active {
   transform: translateY(0) scale(0.98);
 }
+

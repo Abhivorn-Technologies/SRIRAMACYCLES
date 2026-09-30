@@ -22,6 +22,11 @@ export default function ScrollReveal({
     const node = ref.current;
     if (!node) return;
 
+    if (typeof IntersectionObserver === 'undefined') {
+      setIsVisible(true);
+      return;
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -30,8 +35,8 @@ export default function ScrollReveal({
         }
       },
       {
-        threshold: 0.1,
-        rootMargin: '0px 0px -40px 0px',
+        threshold: 0.08,
+        rootMargin: '0px 0px -50px 0px',
       }
     );
 
@@ -40,18 +45,18 @@ export default function ScrollReveal({
   }, []);
 
   const getTransformStyle = () => {
-    if (isVisible) return 'translate3d(0, 0, 0)';
+    if (isVisible) return 'translate3d(0, 0, 0) scale(1)';
     switch (direction) {
       case 'up':
-        return 'translate3d(0, 32px, 0)';
+        return 'translate3d(0, 45px, 0) scale(0.96)';
       case 'down':
-        return 'translate3d(0, -32px, 0)';
+        return 'translate3d(0, -45px, 0) scale(0.96)';
       case 'left':
-        return 'translate3d(32px, 0, 0)';
+        return 'translate3d(45px, 0, 0) scale(0.96)';
       case 'right':
-        return 'translate3d(-32px, 0, 0)';
+        return 'translate3d(-45px, 0, 0) scale(0.96)';
       default:
-        return 'translate3d(0, 0, 0)';
+        return 'translate3d(0, 0, 0) scale(1)';
     }
   };
 

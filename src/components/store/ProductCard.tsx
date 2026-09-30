@@ -34,17 +34,17 @@ export default function ProductCard({ product, onQuickView }: IProductCardProps)
       {/* Top Badges with subtle Floating Animation */}
       <div className="absolute top-3.5 left-3.5 z-10 flex flex-col gap-1.5 items-start pointer-events-none">
         {discountPercent > 0 && (
-          <span className="bg-gradient-to-r from-accent-600 to-rose-600 text-white text-[11px] font-black px-2.5 py-1 rounded-xl shadow-md tracking-wider">
+          <span className="bg-gradient-to-r from-brand-600 via-red-600 to-rose-600 text-white text-[11px] font-black px-2.5 py-1 rounded-xl shadow-md shadow-brand-600/30 tracking-wider">
             -{discountPercent}%
           </span>
         )}
         {product.isFeatured && (
-          <span className="bg-amber-500 text-white text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-lg shadow-sm">
+          <span className="bg-slate-950 text-white text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-lg shadow-sm border border-slate-800">
             Featured
           </span>
         )}
         {product.isNewArrival && (
-          <span className="bg-brand-600 text-white text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-lg shadow-sm">
+          <span className="bg-brand-600 text-white text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-lg shadow-sm">
             New
           </span>
         )}
@@ -59,13 +59,13 @@ export default function ProductCard({ product, onQuickView }: IProductCardProps)
         }}
         className={`absolute top-3.5 right-3.5 z-20 w-9 h-9 rounded-full flex items-center justify-center backdrop-blur-md transition-all duration-300 shadow-md active:scale-90 ${
           isLiked
-            ? 'bg-accent-50 text-accent-600 border border-accent-200 scale-110'
-            : 'bg-white/85 text-slate-500 hover:text-accent-600 hover:bg-white border border-slate-200/60 hover:scale-110'
+            ? 'bg-brand-50 text-brand-600 border border-brand-200 scale-110'
+            : 'bg-white/90 text-slate-500 hover:text-brand-600 hover:bg-white border border-slate-200/60 hover:scale-110'
         }`}
         aria-label="Wishlist"
         title={isLiked ? 'Remove from Wishlist' : 'Add to Wishlist'}
       >
-        <Heart className={`w-4 h-4 transition-transform duration-200 ${isLiked ? 'fill-accent-600 scale-110' : ''}`} />
+        <Heart className={`w-4 h-4 transition-transform duration-200 ${isLiked ? 'fill-brand-600 text-brand-600 scale-110' : ''}`} />
       </button>
 
       {/* Product Image Container with Zoom Effect */}

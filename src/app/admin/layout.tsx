@@ -86,7 +86,7 @@ function AdminContent({ children }: { children: React.ReactNode }) {
 
   // If already on the dedicated login route
   if (pathname === '/admin/login') {
-    return <AdminLoginPage onSuccess={fetchAdminUser} />;
+    return <>{children}</>;
   }
 
   // Loading state
@@ -121,7 +121,7 @@ function AdminContent({ children }: { children: React.ReactNode }) {
           isSidebarCollapsed={isSidebarCollapsed}
           onToggleSidebarCollapse={toggleSidebarCollapse}
         />
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">{children}</main>
+        <main className="flex-1 overflow-y-auto px-4 py-3 sm:px-6 sm:py-4 lg:px-8 lg:py-5">{children}</main>
       </div>
     </div>
   );

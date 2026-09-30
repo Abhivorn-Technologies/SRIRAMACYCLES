@@ -46,8 +46,8 @@ export default function AdminHeader({
         )}
 
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-xs font-semibold text-slate-500 hidden sm:inline">
+          <span className="w-2 h-2 rounded-full bg-brand-600 animate-pulse shadow-sm shadow-brand-600/50" />
+          <span className="text-xs font-bold text-slate-700 hidden sm:inline">
             Store Status: Live & Synced
           </span>
         </div>

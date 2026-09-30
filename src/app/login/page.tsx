@@ -2,6 +2,7 @@
 
 import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Bike, Lock, User, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
@@ -62,11 +63,16 @@ function LoginForm() {
     <div className="min-h-[85vh] flex items-center justify-center bg-slate-50/60 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full bg-white p-8 sm:p-10 rounded-3xl border border-slate-200/90 shadow-xl">
         {/* Header Logo */}
-        <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 mb-3 group">
-            <div className="w-12 h-12 rounded-2xl bg-brand-50 border border-brand-200 text-brand-700 flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
-              <Bike className="w-6 h-6" />
-            </div>
+        <div className="text-center mb-8 flex flex-col items-center">
+          <Link href="/" className="inline-flex items-center gap-2 mb-4 group">
+            <Image
+              src="/SRI RAMA logo 3.png"
+              alt="Sri Rama Cycle Store & Auto Spares"
+              width={200}
+              height={60}
+              priority
+              className="h-14 w-auto object-contain group-hover:scale-105 transition-transform duration-300"
+            />
           </Link>
           <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase">
             Customer Sign In

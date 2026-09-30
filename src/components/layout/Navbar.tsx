@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   Bike,
@@ -75,19 +76,18 @@ export default function Navbar() {
     >
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20 gap-4">
+        <div className="flex items-center justify-between h-24 sm:h-28 md:h-30 gap-6">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 shrink-0 group">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-brand-800 via-brand-600 to-accent-600 flex items-center justify-center text-white shadow-md shadow-brand-900/10 group-hover:scale-105 transition-transform">
-              <Bike className="w-6 h-6 text-white group-hover:text-accent-100 transition-colors" />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-sm sm:text-base md:text-lg font-black tracking-tight text-slate-950 uppercase leading-none">
-                SRI RAMA <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-accent-600 font-extrabold">CYCLE & AUTO SPARE PARTS</span>
-              </span>
-              <span className="text-[10px] sm:text-[11px] tracking-wider text-slate-600 uppercase font-bold mt-1">
-                Since 1976
-              </span>
+          <Link href="/" className="flex items-center gap-3 shrink-0 group py-2 pl-2 sm:pl-5 md:pl-8">
+            <div className="relative overflow-hidden transition-transform duration-300 group-hover:scale-105">
+              <Image
+                src="/SRI RAMA logo 3.png"
+                alt="Sri Rama Cycle Store & Auto Spares"
+                width={400}
+                height={120}
+                priority
+                className="h-16 sm:h-20 md:h-24 lg:h-26 w-auto object-contain drop-shadow-lg"
+              />
             </div>
           </Link>
 

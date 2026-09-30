@@ -32,18 +32,26 @@ export const metadata: Metadata = {
     description: APP_DESCRIPTION,
     siteName: APP_NAME,
     type: 'website',
+    images: [
+      {
+        url: '/SRI RAMA logo 3.png',
+        width: 1200,
+        height: 630,
+        alt: 'Sri Rama Cycle Store & Auto Spares Logo',
+      },
+    ],
   },
   icons: {
-    icon: '/favicon.svg',
-    shortcut: '/favicon.svg',
-    apple: '/favicon.svg',
+    icon: '/SRI RAMA logo 3.png',
+    shortcut: '/SRI RAMA logo 3.png',
+    apple: '/SRI RAMA logo 3.png',
   },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="scroll-smooth">
-      <body className="min-h-screen flex flex-col bg-white text-slate-900 selection:bg-brand-500 selection:text-white">
+    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
+      <body className="min-h-screen flex flex-col bg-white text-slate-900 selection:bg-brand-500 selection:text-white" suppressHydrationWarning>
         <ToastProvider>
           <AuthProvider>
             <CartProvider>
