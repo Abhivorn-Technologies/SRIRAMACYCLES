@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import Image from 'next/image';
 import {
   ArrowLeft,
   Truck,
@@ -14,6 +15,8 @@ import {
   User,
   ShieldCheck,
   CheckCircle2,
+  PackageCheck,
+  Tag,
 } from 'lucide-react';
 import { IOrder, OrderStatusType } from '@/types';
 import { formatPrice, formatDate, formatDateTime } from '@/lib/utils';
@@ -289,25 +292,90 @@ export default function AdminOrderDetailPage() {
             </div>
           </div>
 
-          {/* Ordered Products Summary */}
+          {/* Ordered Products Summary & Packing Verification */}
           <div className="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col gap-4 text-xs">
-            <h3 className="text-sm font-black text-slate-900 uppercase tracking-tight">
-              Ordered Items ({order.items.length})
-            </h3>
-            <div className="flex flex-col gap-2.5">
-              {order.items.map((it, i) => (
-                <div key={i} className="flex justify-between pb-2 border-b border-slate-100">
-                  <div>
-                    <strong className="text-slate-900 block">{it.name}</strong>
-                    <span className="text-slate-400 text-[10px]">
-                      Qty: {it.quantity} {it.variant?.size ? `• ${it.variant.size}` : ''}
-                    </span>
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <PackageCheck className="w-4 h-4 text-brand-600" />
+                <h3 className="text-sm font-black text-slate-900 uppercase tracking-tight">
+                  Ordered Items & Packing Checklist ({order.items.length})
+                </h3>
+              </div>
+              <span className="text-[11px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
+                Verify Color Variant
+              </span>
+            </div>
+
+            <div className="flex flex-col gap-3">
+              {order.items.map((it: any, i: number) => {
+                const itemImg =
+                  it.image ||
+                  (it.product && typeof it.product === 'object' && it.product.images?.[0]) ||
+                  '/images/products/gang-linear-ibc-main.png';
+                const color = it.variant?.color || it.selectedColor || (it as any).color;
+                const size = it.variant?.size || it.selectedSize || (it as any).size;
+
+                return (
+                  <div
+                    key={i}
+                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-slate-50/70 border border-slate-200/80 hover:bg-slate-50 transition-colors"
+                  >
+                    <div className="flex items-center gap-3.5 min-w-0">
+                      {/* Product Thumbnail */}
+                      <div className="relative w-16 h-16 rounded-xl bg-white border border-slate-200 shrink-0 overflow-hidden p-1 shadow-2xs flex items-center justify-center">
+                        <Image
+                          src={itemImg}
+                          alt={it.name || 'Ordered Cycle'}
+                          fill
+                          sizes="64px"
+                          className="object-contain p-1"
+                        />
+                      </div>
+
+                      {/* Item Details & Badges */}
+                      <div className="min-w-0 flex flex-col gap-1">
+                        <strong className="text-slate-900 font-bold text-xs sm:text-sm line-clamp-1 block">
+                          {it.name}
+                        </strong>
+
+                        {/* Variant Badges */}
+                        <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
+                          {color ? (
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-900 border border-amber-300 shadow-2xs">
+                              <span className="w-2 h-2 rounded-full bg-amber-500 ring-2 ring-amber-200 shrink-0" />
+                              <span>Color: {color}</span>
+                            </span>
+                          ) : (
+                            <span className="text-[10px] text-slate-400 font-medium">
+                              Standard Color
+                            </span>
+                          )}
+
+                          {size && (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-800 border border-blue-200">
+                              <span>Size: {size}</span>
+                            </span>
+                          )}
+                        </div>
+
+                        <span className="text-[11px] text-slate-500 font-medium mt-0.5">
+                          Unit: {formatPrice(it.price)} × Qty: {it.quantity}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Price Total */}
+                    <div className="text-right sm:self-center shrink-0 pt-2 sm:pt-0 border-t sm:border-0 border-slate-200/60 flex sm:flex-col justify-between sm:justify-center items-center sm:items-end">
+                      <span className="text-[10px] text-slate-400 font-medium sm:hidden">
+                        Item Total:
+                      </span>
+                      <span className="font-black text-slate-900 text-sm">
+                        {formatPrice(it.price * it.quantity)}
+                      </span>
+                    </div>
                   </div>
-                  <span className="font-bold text-slate-900">
-                    {formatPrice(it.price * it.quantity)}
-                  </span>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             <div className="flex flex-col gap-1.5 pt-2 border-t border-slate-100 font-semibold">

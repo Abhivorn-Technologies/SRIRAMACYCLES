@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { Truck, MapPin, ArrowLeft, ShieldCheck, Printer } from 'lucide-react';
 import { IOrder } from '@/types';
@@ -130,31 +131,72 @@ export default function OrderDetailPage() {
             </h3>
             <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="border-b border-slate-200 text-slate-400 font-bold uppercase">
-                  <th className="py-2.5">Item Description</th>
+                <tr className="border-b border-slate-200 text-slate-400 font-bold uppercase text-[11px]">
+                  <th className="py-2.5 w-16">Item</th>
+                  <th className="py-2.5">Description & Variant</th>
                   <th className="py-2.5 text-center">Qty</th>
                   <th className="py-2.5 text-right">Unit Price</th>
                   <th className="py-2.5 text-right">Total</th>
                 </tr>
               </thead>
               <tbody>
-                {order.items.map((item, i) => (
-                  <tr key={i} className="border-b border-slate-100">
-                    <td className="py-3 font-semibold text-slate-900">
-                      {item.name}
-                      {item.variant?.size && (
-                        <span className="text-[11px] text-slate-400 block font-normal">
-                          Size: {item.variant.size}
+                {order.items.map((item: any, i: number) => {
+                  const itemImg =
+                    item.image ||
+                    (item.product && typeof item.product === 'object' && item.product.images?.[0]) ||
+                    '/images/products/gang-linear-ibc-main.png';
+                  const color = item.variant?.color || item.selectedColor || (item as any).color;
+                  const size = item.variant?.size || item.selectedSize || (item as any).size;
+
+                  return (
+                    <tr key={i} className="border-b border-slate-100 hover:bg-slate-50/50">
+                      {/* Image Thumbnail */}
+                      <td className="py-3 pr-2">
+                        <div className="relative w-14 h-14 rounded-xl bg-slate-50 border border-slate-200 overflow-hidden p-1 shrink-0 flex items-center justify-center">
+                          <Image
+                            src={itemImg}
+                            alt={item.name || 'Ordered Cycle'}
+                            fill
+                            sizes="56px"
+                            className="object-contain p-0.5"
+                          />
+                        </div>
+                      </td>
+
+                      {/* Product Name & Variants */}
+                      <td className="py-3 font-semibold text-slate-900">
+                        <span className="block text-slate-900 font-bold text-xs sm:text-sm">
+                          {item.name}
                         </span>
-                      )}
-                    </td>
-                    <td className="py-3 text-center text-slate-600">{item.quantity}</td>
-                    <td className="py-3 text-right text-slate-600">{formatPrice(item.price)}</td>
-                    <td className="py-3 text-right font-bold text-slate-900">
-                      {formatPrice(item.price * item.quantity)}
-                    </td>
-                  </tr>
-                ))}
+
+                        <div className="flex flex-wrap items-center gap-1.5 mt-1">
+                          {color && (
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-900 border border-amber-300">
+                              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+                              <span>Color: {color}</span>
+                            </span>
+                          )}
+
+                          {size && (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 text-blue-800 border border-blue-200">
+                              <span>Size: {size}</span>
+                            </span>
+                          )}
+                        </div>
+
+                        <span className="text-[10px] text-slate-400 block font-normal mt-0.5">
+                          1-Year Sri Rama Frame Warranty Included
+                        </span>
+                      </td>
+
+                      <td className="py-3 text-center text-slate-700 font-semibold">{item.quantity}</td>
+                      <td className="py-3 text-right text-slate-600">{formatPrice(item.price)}</td>
+                      <td className="py-3 text-right font-black text-slate-900">
+                        {formatPrice(item.price * item.quantity)}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

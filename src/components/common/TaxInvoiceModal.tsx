@@ -133,9 +133,14 @@ export default function TaxInvoiceModal({ order, isOpen, onClose }: ITaxInvoiceM
                     <td className="py-3 px-3 font-semibold text-slate-400">{idx + 1}</td>
                     <td className="py-3 px-3">
                       <p className="font-bold text-slate-900">{item.name}</p>
+                      {((item as any).variant?.color || (item as any).selectedColor || (item as any).color) && (
+                        <p className="text-[10px] text-amber-800 font-semibold">
+                          Color: {(item as any).variant?.color || (item as any).selectedColor || (item as any).color}
+                        </p>
+                      )}
                       {(item.variant?.size || (item as any).selectedSize || (item as any).size) && (
-                        <p className="text-[10px] text-slate-500">
-                          Variant: {item.variant?.size || (item as any).selectedSize || (item as any).size}
+                        <p className="text-[10px] text-slate-500 font-medium">
+                          Size: {item.variant?.size || (item as any).selectedSize || (item as any).size}
                         </p>
                       )}
                       <p className="text-[10px] text-slate-400">1-Year Frame Warranty Included</p>

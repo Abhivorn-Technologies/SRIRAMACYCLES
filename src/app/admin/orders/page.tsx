@@ -3,6 +3,7 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import Image from 'next/image';
 import { Search, ShoppingBag, Eye, Calendar, User, Store, Globe, Printer, Receipt, RefreshCw, ArrowLeft } from 'lucide-react';
 import { IOrder, OrderStatusType } from '@/types';
 import { formatPrice, formatDate, formatDateTime } from '@/lib/utils';
@@ -166,7 +167,7 @@ function AdminOrdersContent() {
                   <th className="py-3.5 px-4">Order ID & Date</th>
                   <th className="py-3.5 px-4">Sales Channel</th>
                   <th className="py-3.5 px-4">Customer & Phone</th>
-                  <th className="py-3.5 px-4">Items</th>
+                  <th className="py-3.5 px-4">Items & Variants</th>
                   <th className="py-3.5 px-4">Total Amount</th>
                   <th className="py-3.5 px-4">Payment</th>
                   <th className="py-3.5 px-4">Status</th>
@@ -210,9 +211,63 @@ function AdminOrdersContent() {
                         </span>
                       </td>
 
-                      <td className="py-3.5 px-4 text-slate-700">
-                        {ord.items.length} item(s) ({ord.items.reduce((a, b) => a + b.quantity, 0)}{' '}
-                        units)
+                      <td className="py-3 px-4 text-slate-700 min-w-[220px] max-w-[300px]">
+                        <div className="flex flex-col gap-1.5">
+                          {ord.items.slice(0, 2).map((it: any, idx: number) => {
+                            const itemImg =
+                              it.image ||
+                              (it.product && typeof it.product === 'object' && it.product.images?.[0]) ||
+                              '/images/products/gang-linear-ibc-main.png';
+                            const color = it.variant?.color || it.selectedColor || (it as any).color;
+                            const size = it.variant?.size || it.selectedSize || (it as any).size;
+
+                            return (
+                              <div key={idx} className="flex items-center gap-2">
+                                <div className="relative w-9 h-9 rounded-lg bg-slate-50 border border-slate-200 shrink-0 overflow-hidden p-0.5">
+                                  <Image
+                                    src={itemImg}
+                                    alt={it.name || 'Cycle'}
+                                    fill
+                                    sizes="36px"
+                                    className="object-contain"
+                                  />
+                                </div>
+                                <div className="min-w-0 flex-1 leading-tight">
+                                  <p className="font-bold text-xs text-slate-900 truncate" title={it.name}>
+                                    {it.name}
+                                  </p>
+                                  <div className="flex flex-wrap items-center gap-1 mt-0.5">
+                                    <span className="text-[10px] font-bold text-slate-700 bg-slate-100 px-1 rounded">
+                                      x{it.quantity}
+                                    </span>
+                                    {color && (
+                                      <span
+                                        className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-900 bg-amber-50 border border-amber-200/80 px-1.5 py-0.2 rounded truncate max-w-[130px]"
+                                        title={color}
+                                      >
+                                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+                                        {color}
+                                      </span>
+                                    )}
+                                    {size && (
+                                      <span
+                                        className="text-[10px] font-medium text-slate-600 bg-slate-100 border border-slate-200 px-1.5 py-0.2 rounded truncate max-w-[90px]"
+                                        title={size}
+                                      >
+                                        {size}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                          {ord.items.length > 2 && (
+                            <span className="text-[10px] font-bold text-brand-700 pl-11">
+                              +{ord.items.length - 2} more item(s)
+                            </span>
+                          )}
+                        </div>
                       </td>
 
                       <td className="py-3.5 px-4 font-black text-slate-900">

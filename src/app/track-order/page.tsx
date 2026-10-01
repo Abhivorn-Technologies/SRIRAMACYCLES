@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, Suspense } from 'react';
+import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import {
   Truck,
@@ -285,15 +286,56 @@ function TrackOrderContent() {
               </div>
 
               <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200">
-                <span className="font-bold text-slate-900 block mb-1">Items In Shipment:</span>
-                <ul className="flex flex-col gap-1 text-slate-600">
-                  {order.items.map((it, i) => (
-                    <li key={i} className="flex justify-between">
-                      <span>{it.name} (x{it.quantity})</span>
-                      <span className="font-semibold">{formatPrice(it.price * it.quantity)}</span>
-                    </li>
-                  ))}
-                </ul>
+                <span className="font-bold text-slate-900 block mb-2">Items In Shipment ({order.items.length}):</span>
+                <div className="flex flex-col gap-2">
+                  {order.items.map((it: any, i: number) => {
+                    const itemImg =
+                      it.image ||
+                      (it.product && typeof it.product === 'object' && it.product.images?.[0]) ||
+                      '/images/products/gang-linear-ibc-main.png';
+                    const color = it.variant?.color || it.selectedColor || (it as any).color;
+                    const size = it.variant?.size || it.selectedSize || (it as any).size;
+
+                    return (
+                      <div key={i} className="flex items-center justify-between gap-2.5 p-2 rounded-xl bg-white border border-slate-200/80">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <div className="relative w-10 h-10 rounded-lg bg-slate-50 border border-slate-200 overflow-hidden shrink-0 flex items-center justify-center p-0.5">
+                            <Image
+                              src={itemImg}
+                              alt={it.name || 'Cycle'}
+                              fill
+                              sizes="40px"
+                              className="object-contain"
+                            />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="font-bold text-slate-900 text-xs truncate" title={it.name}>
+                              {it.name}
+                            </p>
+                            <div className="flex flex-wrap items-center gap-1 mt-0.5">
+                              <span className="text-[10px] font-bold text-slate-700 bg-slate-100 px-1 rounded">
+                                x{it.quantity}
+                              </span>
+                              {color && (
+                                <span className="text-[10px] font-bold text-amber-900 bg-amber-50 border border-amber-200 px-1.5 rounded truncate max-w-[120px]" title={color}>
+                                  {color}
+                                </span>
+                              )}
+                              {size && (
+                                <span className="text-[10px] font-medium text-slate-600 bg-slate-100 px-1.5 rounded truncate max-w-[90px]" title={size}>
+                                  {size}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        <span className="font-black text-slate-900 text-xs shrink-0">
+                          {formatPrice(it.price * it.quantity)}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </div>
           </div>

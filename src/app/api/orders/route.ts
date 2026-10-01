@@ -51,21 +51,50 @@ export async function POST(req: NextRequest) {
     // Calculate subtotal & validate items
     for (const item of items) {
       const unitPrice =
-        item.product.salePrice && item.product.salePrice > 0
+        item.product?.salePrice && item.product.salePrice > 0
           ? item.product.salePrice
-          : item.product.price;
+          : (item.product?.price || item.price || 0);
 
-      subtotal += unitPrice * item.quantity;
+      subtotal += unitPrice * (item.quantity || 1);
+
+      const chosenSize = item.selectedSize || item.variant?.size || '';
+      const chosenColor = item.selectedColor || item.variant?.color || '';
+
+      // Determine the best image matching the color variant
+      let itemImage = item.image || '';
+      const productImages: string[] = item.product?.images || [];
+      if (chosenColor && productImages.length > 0) {
+        const lowerColor = chosenColor.toLowerCase();
+        const matchedImg = productImages.find((img) => {
+          const lowerImg = img.toLowerCase();
+          if (lowerColor.includes('green') && lowerImg.includes('green')) return true;
+          if (lowerColor.includes('yellow') && lowerImg.includes('yellow')) return true;
+          if (lowerColor.includes('black') && lowerImg.includes('black')) return true;
+          if (lowerColor.includes('blue') && (lowerImg.includes('blue') || lowerImg.includes('main'))) return true;
+          if (lowerColor.includes('red') && lowerImg.includes('red')) return true;
+          if (lowerColor.includes('orange') && (lowerImg.includes('orange') || lowerImg.includes('yellow'))) return true;
+          return false;
+        });
+        if (matchedImg) {
+          itemImage = matchedImg;
+        }
+      }
+      if (!itemImage && productImages.length > 0) {
+        itemImage = productImages[0];
+      }
+      if (!itemImage) {
+        itemImage = '/images/products/gang-linear-ibc-main.png';
+      }
 
       validatedItems.push({
-        product: item.product._id || item.product,
-        name: item.product.name || item.name,
-        image: item.product.images?.[0] || item.image || '',
+        product: item.product?._id || item.product?.id || item.product,
+        name: item.product?.name || item.name || 'Sri Rama Premium Cycle',
+        image: itemImage,
         price: unitPrice,
-        quantity: item.quantity,
+        quantity: item.quantity || 1,
         variant: {
-          size: item.selectedSize || item.variant?.size || '',
-          color: item.selectedColor || item.variant?.color || '',
+          size: chosenSize,
+          color: chosenColor,
         },
       });
     }

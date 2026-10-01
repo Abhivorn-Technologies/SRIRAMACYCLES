@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import {
   CheckCircle2,
@@ -132,22 +133,64 @@ export default function OrderSuccessPage() {
               {/* Items List */}
               <div>
                 <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-3">
-                  Ordered Items
+                  Ordered Items ({order.items.length})
                 </h4>
-                <div className="flex flex-col gap-2">
-                  {order.items.map((item, i) => (
-                    <div
-                      key={i}
-                      className="flex items-center justify-between py-2 border-b border-slate-100 text-xs"
-                    >
-                      <span className="font-medium text-slate-800">
-                        {item.name} <span className="text-slate-400">x{item.quantity}</span>
-                      </span>
-                      <span className="font-bold text-slate-900">
-                        {formatPrice(item.price * item.quantity)}
-                      </span>
-                    </div>
-                  ))}
+                <div className="flex flex-col gap-2.5">
+                  {order.items.map((item: any, i: number) => {
+                    const itemImg =
+                      item.image ||
+                      (item.product && typeof item.product === 'object' && item.product.images?.[0]) ||
+                      '/images/products/gang-linear-ibc-main.png';
+                    const color = item.variant?.color || item.selectedColor || (item as any).color;
+                    const size = item.variant?.size || item.selectedSize || (item as any).size;
+
+                    return (
+                      <div
+                        key={i}
+                        className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-2xl bg-slate-50/70 border border-slate-200/70"
+                      >
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="relative w-14 h-14 rounded-xl bg-white border border-slate-200 shrink-0 overflow-hidden p-1 shadow-2xs flex items-center justify-center">
+                            <Image
+                              src={itemImg}
+                              alt={item.name || 'Ordered Cycle'}
+                              fill
+                              sizes="56px"
+                              className="object-contain p-0.5"
+                            />
+                          </div>
+
+                          <div className="min-w-0 flex flex-col gap-0.5">
+                            <h5 className="text-xs font-bold text-slate-900 line-clamp-1">
+                              {item.name}
+                            </h5>
+
+                            <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
+                              {color && (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-900 border border-amber-300">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+                                  <span>Color: {color}</span>
+                                </span>
+                              )}
+                              {size && (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 text-blue-800 border border-blue-200">
+                                  <span>Size: {size}</span>
+                                </span>
+                              )}
+                            </div>
+
+                            <span className="text-[11px] text-slate-500 mt-0.5">
+                              Qty: {item.quantity} × {formatPrice(item.price)}
+                            </span>
+                          </div>
+                        </div>
+
+                        <span className="font-black text-slate-900 text-xs sm:self-center shrink-0">
+                          {formatPrice(item.price * item.quantity)}
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 

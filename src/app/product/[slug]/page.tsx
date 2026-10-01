@@ -44,6 +44,7 @@ export default function ProductDetailPage() {
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState('');
+  const [selectedColor, setSelectedColor] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState<'specs' | 'desc' | 'shipping' | 'reviews'>('specs');
 
@@ -58,6 +59,21 @@ export default function ProductDetailPage() {
   const { isInWishlist, toggleWishlist } = useWishlist();
   const { success, error } = useToast();
 
+  const availableColors = React.useMemo(() => {
+    if (!product) return [];
+    const fromVariants = (product.variants?.map((v) => v.color).filter(Boolean) as string[]) || [];
+    if (fromVariants.length > 0) {
+      return Array.from(new Set(fromVariants));
+    }
+    const colorSpec = product.specifications?.find((s) =>
+      s.key?.toLowerCase().includes('color')
+    );
+    if (colorSpec && colorSpec.value) {
+      return colorSpec.value.split(',').map((c) => c.trim()).filter(Boolean);
+    }
+    return [];
+  }, [product]);
+
   useEffect(() => {
     async function fetchProduct() {
       setLoading(true);
@@ -70,6 +86,16 @@ export default function ProductDetailPage() {
           setReviews(data.reviews || []);
           if (data.product.variants && data.product.variants.length > 0) {
             setSelectedSize(data.product.variants[0].size || '');
+            const firstColor = data.product.variants.find((v: any) => v.color)?.color || '';
+            setSelectedColor(firstColor);
+          } else {
+            const colorSpec = data.product.specifications?.find((s: any) =>
+              s.key?.toLowerCase().includes('color')
+            );
+            if (colorSpec && colorSpec.value) {
+              const firstColor = colorSpec.value.split(',')[0]?.trim() || '';
+              setSelectedColor(firstColor);
+            }
           }
         }
       } catch (err) {
@@ -162,9 +188,43 @@ export default function ProductDetailPage() {
     product.salePrice && product.salePrice > 0 ? product.salePrice : product.price;
   const images = product.images && product.images.length > 0 ? product.images : [];
 
+  const handleColorSelect = (color: string) => {
+    setSelectedColor(color);
+    if (product?.images && product.images.length > 0) {
+      const lower = color.toLowerCase();
+      const matchIdx = product.images.findIndex((img) => {
+        const lowerImg = img.toLowerCase();
+        if (lower.includes('green') && lowerImg.includes('green')) return true;
+        if (lower.includes('yellow') && (lowerImg.includes('yellow') || lowerImg.includes('black-yellow'))) return true;
+        if (lower.includes('black') && (lowerImg.includes('black') || lowerImg.includes('black-yellow'))) return true;
+        if (lower.includes('blue') && (lowerImg.includes('blue') || lowerImg.includes('main'))) return true;
+        if (lower.includes('red') && lowerImg.includes('red')) return true;
+        if (lower.includes('orange') && (lowerImg.includes('orange') || lowerImg.includes('yellow'))) return true;
+        return false;
+      });
+      if (matchIdx !== -1) {
+        setSelectedImage(matchIdx);
+      }
+    }
+  };
+
   const handleBuyNow = () => {
-    addToCart(product, quantity, selectedSize);
-    router.push('/checkout');
+    const chosenImage =
+      (product.images && product.images[selectedImage]) || product.images?.[0] || '';
+    const buyNowPayload = {
+      product,
+      quantity,
+      selectedSize,
+      selectedColor,
+      image: chosenImage,
+    };
+    try {
+      sessionStorage.setItem('srirama_buy_now', JSON.stringify(buyNowPayload));
+    } catch (e) {
+      console.error('Failed to store buyNow item:', e);
+    }
+    // Navigate directly to checkout for ONLY this product without affecting cart
+    router.push('/checkout?buyNow=1');
   };
 
   const handleShare = () => {
@@ -309,6 +369,39 @@ export default function ProductDetailPage() {
                 {product.shortDescription || product.description}
               </p>
 
+              {/* Color Selection */}
+              {availableColors.length > 0 && (
+                <div className="mt-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-xs font-bold text-slate-900 uppercase">
+                      Select Color:
+                    </label>
+                    {selectedColor && (
+                      <span className="text-[11px] font-bold text-amber-900 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200">
+                        {selectedColor}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex flex-wrap gap-2.5">
+                    {availableColors.map((color, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => handleColorSelect(color)}
+                        className={`px-3.5 py-2 rounded-xl text-xs font-bold border transition-all flex items-center gap-2 cursor-pointer ${
+                          selectedColor === color
+                            ? 'border-amber-500 bg-amber-50/80 text-amber-950 shadow-xs ring-2 ring-amber-300'
+                            : 'border-slate-200 hover:border-slate-300 text-slate-700 bg-white'
+                        }`}
+                      >
+                        <span className="w-2.5 h-2.5 rounded-full bg-amber-500 ring-1 ring-amber-200 shrink-0" />
+                        <span>{color}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Frame / Wheel Sizes */}
               {product.variants && product.variants.some((v) => v.size) && (
                 <div className="mt-6">
@@ -367,7 +460,7 @@ export default function ProductDetailPage() {
                   </div>
 
                   <button
-                    onClick={() => addToCart(product, quantity, selectedSize)}
+                    onClick={() => addToCart(product, quantity, selectedSize, selectedColor)}
                     disabled={product.stock <= 0}
                     className="flex-1 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white text-sm font-bold py-3.5 px-6 rounded-2xl flex items-center justify-center gap-2 transition-colors shadow-md active:scale-95"
                   >

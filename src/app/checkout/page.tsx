@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   ShieldCheck,
   Truck,
@@ -37,11 +37,88 @@ import { validatePhone, validateAddress, validateName, validateEmail, validatePo
 
 type CheckoutStep = 'phone' | 'address' | 'payment';
 
-export default function CheckoutPage() {
+function CheckoutContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isBuyNow = searchParams.get('buyNow') === '1' || searchParams.get('mode') === 'buynow';
+
   const { cart, subtotal, shipping, tax, discount, total, appliedCoupon, applyCoupon, removeCoupon, clearCart, updateQuantity, removeFromCart } = useCart();
   const { user } = useAuth();
   const { error, success, info } = useToast();
+
+  const [buyNowItem, setBuyNowItem] = useState<any | null>(null);
+  const [isClientLoaded, setIsClientLoaded] = useState(false);
+  const [buyNowCoupon, setBuyNowCoupon] = useState<string | null>(null);
+  const [buyNowDiscount, setBuyNowDiscount] = useState<number>(0);
+
+  useEffect(() => {
+    setIsClientLoaded(true);
+    if (isBuyNow) {
+      try {
+        const stored = sessionStorage.getItem('srirama_buy_now');
+        if (stored) {
+          setBuyNowItem(JSON.parse(stored));
+        }
+      } catch (e) {
+        console.error('Failed to parse buyNow from sessionStorage', e);
+      }
+    }
+  }, [isBuyNow]);
+
+  const checkoutItems: any[] = useMemo(() => {
+    return isBuyNow ? (buyNowItem ? [buyNowItem] : []) : cart;
+  }, [isBuyNow, buyNowItem, cart]);
+
+  const checkoutSubtotal = useMemo(() => {
+    return checkoutItems.reduce((acc, item) => {
+      const unitPrice =
+        item.product?.salePrice && item.product.salePrice > 0
+          ? item.product.salePrice
+          : (item.product?.price || item.price || 0);
+      return acc + unitPrice * (item.quantity || 1);
+    }, 0);
+  }, [checkoutItems]);
+
+  const activeCoupon = isBuyNow ? buyNowCoupon : appliedCoupon;
+
+  const checkoutDiscount = useMemo(() => {
+    if (isBuyNow) {
+      return buyNowDiscount;
+    }
+    return discount;
+  }, [isBuyNow, buyNowDiscount, discount]);
+
+  const discountedSubtotal = Math.max(0, checkoutSubtotal - checkoutDiscount);
+  const checkoutShipping =
+    discountedSubtotal >= 999 || discountedSubtotal === 0 ? 0 : 99;
+  const checkoutTotal = discountedSubtotal + checkoutShipping;
+
+  const handleUpdateBuyNowQty = (newQty: number) => {
+    if (!buyNowItem) return;
+    if (newQty <= 0) {
+      try {
+        sessionStorage.removeItem('srirama_buy_now');
+      } catch (e) {}
+      setBuyNowItem(null);
+      return;
+    }
+    const updated = { ...buyNowItem, quantity: newQty };
+    setBuyNowItem(updated);
+    try {
+      sessionStorage.setItem('srirama_buy_now', JSON.stringify(updated));
+    } catch (e) {}
+  };
+
+  const finishOrder = (orderNumber: string) => {
+    if (isBuyNow) {
+      try {
+        sessionStorage.removeItem('srirama_buy_now');
+      } catch (e) {}
+    } else {
+      clearCart();
+    }
+    router.push(`/order-success/${orderNumber}`);
+  };
 
   const [step, setStep] = useState<CheckoutStep>('phone');
   const [loading, setLoading] = useState(false);
@@ -263,8 +340,8 @@ export default function CheckoutPage() {
 
   // Step 3 -> Place Order
   const handlePlaceOrder = async () => {
-    if (cart.length === 0) {
-      error('Your cart is empty');
+    if (checkoutItems.length === 0) {
+      error(isBuyNow ? 'No product selected for instant checkout' : 'Your cart is empty');
       return;
     }
 
@@ -296,10 +373,10 @@ export default function CheckoutPage() {
           pincode: addressData.pincode.trim(),
           country: 'India',
         },
-        items: cart,
+        items: checkoutItems,
         paymentMethod: paymentMethod,
         notes: sendUpdates ? 'Subscribed to WhatsApp order updates' : '',
-        couponCode: appliedCoupon || undefined,
+        couponCode: activeCoupon || undefined,
       };
 
       const res = await fetch('/api/orders', {
@@ -314,8 +391,7 @@ export default function CheckoutPage() {
         // 1. If Cash on Delivery, complete immediately
         if (paymentMethod === 'COD') {
           success('Order placed successfully! Redirecting...');
-          clearCart();
-          router.push(`/order-success/${data.order.orderNumber}`);
+          finishOrder(data.order.orderNumber);
           return;
         }
 
@@ -383,8 +459,7 @@ export default function CheckoutPage() {
                 const verifyData = await verifyRes.json();
                 if (verifyData.success) {
                   success('Payment verified successfully! Redirecting...');
-                  clearCart();
-                  router.push(`/order-success/${data.order.orderNumber}`);
+                  finishOrder(data.order.orderNumber);
                 } else {
                   error(verifyData.message || 'Payment verification failed');
                   router.push(`/order-success/${data.order.orderNumber}`);
@@ -417,8 +492,7 @@ export default function CheckoutPage() {
             }),
           });
           success('Online payment confirmed! Redirecting...');
-          clearCart();
-          router.push(`/order-success/${data.order.orderNumber}`);
+          finishOrder(data.order.orderNumber);
           return;
         }
       } else {
@@ -431,25 +505,81 @@ export default function CheckoutPage() {
     }
   };
 
-  const handleApplyCouponCode = (e: React.FormEvent) => {
+  const handleApplyCouponCode = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!couponCodeInput.trim()) return;
-    const applied = applyCoupon(couponCodeInput.trim());
-    if (applied) {
-      setCouponCodeInput('');
+    const cleanCode = couponCodeInput.trim().toUpperCase();
+    if (!cleanCode) return;
+
+    if (isBuyNow) {
+      try {
+        const res = await fetch('/api/coupons/validate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code: cleanCode, cartSubtotal: checkoutSubtotal }),
+        });
+        const data = await res.json();
+        if (data.success && data.coupon) {
+          setBuyNowCoupon(data.coupon.code);
+          const disc =
+            data.coupon.discountType === 'percentage'
+              ? Math.round((checkoutSubtotal * data.coupon.discountValue) / 100)
+              : data.coupon.discountAmount;
+          setBuyNowDiscount(disc);
+          success(data.message || `Coupon ${data.coupon.code} applied!`);
+          setCouponCodeInput('');
+        } else if (cleanCode === 'RIDE10') {
+          setBuyNowCoupon('RIDE10');
+          setBuyNowDiscount(Math.round(checkoutSubtotal * 0.1));
+          success('Coupon RIDE10 applied: 10% Off!');
+          setCouponCodeInput('');
+        } else if (cleanCode === 'SRIRAMA15') {
+          setBuyNowCoupon('SRIRAMA15');
+          setBuyNowDiscount(Math.round(checkoutSubtotal * 0.15));
+          success('Coupon SRIRAMA15 applied: 15% Off!');
+          setCouponCodeInput('');
+        } else if (cleanCode === 'WELCOME5') {
+          setBuyNowCoupon('WELCOME5');
+          setBuyNowDiscount(Math.round(checkoutSubtotal * 0.05));
+          success('Coupon WELCOME5 applied: 5% Off!');
+          setCouponCodeInput('');
+        } else {
+          error(data.message || 'Invalid coupon code');
+        }
+      } catch (err) {
+        error('Failed to validate coupon code');
+      }
+    } else {
+      const applied = await applyCoupon(cleanCode);
+      if (applied) {
+        setCouponCodeInput('');
+      }
     }
   };
 
-  if (cart.length === 0 && !loading) {
+  const handleRemoveCoupon = () => {
+    if (isBuyNow) {
+      setBuyNowCoupon(null);
+      setBuyNowDiscount(0);
+      info('Coupon removed');
+    } else {
+      removeCoupon();
+    }
+  };
+
+  if (isClientLoaded && checkoutItems.length === 0 && !loading) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white p-8 rounded-3xl border border-slate-200/80 text-center shadow-md">
           <div className="w-14 h-14 rounded-2xl bg-brand-50 text-brand-700 flex items-center justify-center mx-auto mb-4 border border-brand-200">
             <Bike className="w-7 h-7" />
           </div>
-          <h2 className="text-xl font-bold text-slate-900">Your Cart is Empty</h2>
+          <h2 className="text-xl font-bold text-slate-900">
+            {isBuyNow ? 'No Product Selected for Instant Purchase' : 'Your Cart is Empty'}
+          </h2>
           <p className="text-xs text-slate-500 mt-1 mb-6">
-            Add cycles or accessories to your cart to proceed with fast checkout.
+            {isBuyNow
+              ? 'Please select a cycle and click "Instant Buy Now" to proceed.'
+              : 'Add cycles or accessories to your cart to proceed with fast checkout.'}
           </p>
           <Link
             href="/shop"
@@ -514,14 +644,22 @@ export default function CheckoutPage() {
                   <Bike className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-xs font-bold text-slate-900">Order Summary</h3>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-xs font-bold text-slate-900">Order Summary</h3>
+                    {isBuyNow && (
+                      <span className="text-[10px] font-black bg-amber-100 text-amber-900 px-2 py-0.5 rounded-full border border-amber-300">
+                        ⚡ Instant Buy Now
+                      </span>
+                    )}
+                  </div>
                   <p className="text-[11px] text-slate-500">
-                    {cart.reduce((acc, i) => acc + i.quantity, 0)} item(s) in cart
+                    {checkoutItems.reduce((acc, i) => acc + (i.quantity || 1), 0)} item(s){' '}
+                    {isBuyNow ? '(Selected Product Only)' : 'in cart'}
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-sm font-black text-slate-900">{formatPrice(total)}</span>
+                <span className="text-sm font-black text-slate-900">{formatPrice(checkoutTotal)}</span>
                 {isOrderSummaryOpen ? (
                   <ChevronUp className="w-4 h-4 text-slate-400" />
                 ) : (
@@ -533,31 +671,48 @@ export default function CheckoutPage() {
             {/* Collapsible Item Details */}
             {isOrderSummaryOpen && (
               <div className="mt-4 pt-4 border-t border-slate-200/60 flex flex-col gap-3 animate-in fade-in duration-150">
-                {cart.map((item, idx) => {
+                {checkoutItems.map((item, idx) => {
                   const unitPrice =
-                    item.product.salePrice && item.product.salePrice > 0
+                    item.product?.salePrice && item.product.salePrice > 0
                       ? item.product.salePrice
-                      : item.product.price;
+                      : (item.product?.price || item.price || 0);
+                  const itemImg =
+                    item.image ||
+                    item.product?.images?.[0] ||
+                    '/images/products/gang-linear-ibc-main.png';
+                  const color = item.selectedColor || item.variant?.color;
+                  const size = item.selectedSize || item.variant?.size;
+
                   return (
                     <div
                       key={idx}
                       className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs p-2.5 rounded-xl bg-white border border-slate-200/70 shadow-2xs"
                     >
                       <div className="flex items-center gap-2.5">
-                        <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-slate-50 border border-slate-200 shrink-0">
+                        <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-slate-50 border border-slate-200 shrink-0 p-0.5 flex items-center justify-center">
                           <Image
-                            src={item.product.images[0] || 'https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=200'}
-                            alt={item.product.name}
+                            src={itemImg}
+                            alt={item.product?.name || item.name || 'Cycle'}
                             fill
                             sizes="48px"
-                            className="object-cover"
+                            className="object-contain"
                           />
                         </div>
                         <div>
-                          <p className="font-bold text-slate-800 line-clamp-1">{item.product.name}</p>
-                          {item.selectedSize && (
-                            <p className="text-[10px] text-slate-500 font-medium">Variant: {item.selectedSize}</p>
-                          )}
+                          <p className="font-bold text-slate-800 line-clamp-1">{item.product?.name || item.name}</p>
+                          <div className="flex flex-wrap items-center gap-1 mt-0.5">
+                            {color && (
+                              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-900 bg-amber-50 border border-amber-300 px-1.5 py-0.2 rounded-full">
+                                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+                                {color}
+                              </span>
+                            )}
+                            {size && (
+                              <span className="text-[10px] font-semibold text-blue-800 bg-blue-50 border border-blue-200 px-1.5 py-0.2 rounded-full">
+                                {size}
+                              </span>
+                            )}
+                          </div>
                           <p className="text-[11px] font-bold text-slate-900 mt-0.5">{formatPrice(unitPrice)} each</p>
                         </div>
                       </div>
@@ -568,12 +723,14 @@ export default function CheckoutPage() {
                           <button
                             type="button"
                             onClick={() =>
-                              updateQuantity(
-                                item.product._id,
-                                item.quantity - 1,
-                                item.selectedSize,
-                                item.selectedColor
-                              )
+                              isBuyNow
+                                ? handleUpdateBuyNowQty((item.quantity || 1) - 1)
+                                : updateQuantity(
+                                    item.product._id,
+                                    item.quantity - 1,
+                                    item.selectedSize,
+                                    item.selectedColor
+                                  )
                             }
                             className="w-6 h-6 flex items-center justify-center rounded-md hover:bg-white text-slate-700 font-bold transition-colors cursor-pointer"
                             aria-label="Decrease quantity"
@@ -586,12 +743,14 @@ export default function CheckoutPage() {
                           <button
                             type="button"
                             onClick={() =>
-                              updateQuantity(
-                                item.product._id,
-                                item.quantity + 1,
-                                item.selectedSize,
-                                item.selectedColor
-                              )
+                              isBuyNow
+                                ? handleUpdateBuyNowQty((item.quantity || 1) + 1)
+                                : updateQuantity(
+                                    item.product._id,
+                                    item.quantity + 1,
+                                    item.selectedSize,
+                                    item.selectedColor
+                                  )
                             }
                             className="w-6 h-6 flex items-center justify-center rounded-md hover:bg-white text-slate-700 font-bold transition-colors cursor-pointer"
                             aria-label="Increase quantity"
@@ -609,11 +768,13 @@ export default function CheckoutPage() {
                         <button
                           type="button"
                           onClick={() =>
-                            removeFromCart(
-                              item.product._id,
-                              item.selectedSize,
-                              item.selectedColor
-                            )
+                            isBuyNow
+                              ? handleUpdateBuyNowQty(0)
+                              : removeFromCart(
+                                  item.product._id,
+                                  item.selectedSize,
+                                  item.selectedColor
+                                )
                           }
                           className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition-colors cursor-pointer"
                           aria-label="Remove item"
@@ -630,17 +791,19 @@ export default function CheckoutPage() {
                 <div className="pt-2 border-t border-slate-200/60 flex flex-col gap-1 text-[11px] text-slate-600">
                   <div className="flex justify-between">
                     <span>Subtotal</span>
-                    <span>{formatPrice(subtotal)}</span>
+                    <span>{formatPrice(checkoutSubtotal)}</span>
                   </div>
-                  {discount > 0 && (
+                  {checkoutDiscount > 0 && (
                     <div className="flex justify-between text-emerald-600 font-bold">
                       <span>Coupon Discount</span>
-                      <span>-{formatPrice(discount)}</span>
+                      <span>-{formatPrice(checkoutDiscount)}</span>
                     </div>
                   )}
                   <div className="flex justify-between">
                     <span>Delivery Fee</span>
-                    <span className="text-emerald-600 font-bold">FREE</span>
+                    <span className="text-emerald-600 font-bold">
+                      {checkoutShipping === 0 ? 'FREE' : formatPrice(checkoutShipping)}
+                    </span>
                   </div>
                   <div className="flex justify-between text-amber-700 font-bold">
                     <span>Estimated Delivery</span>
@@ -648,7 +811,7 @@ export default function CheckoutPage() {
                   </div>
                   <div className="flex justify-between font-bold text-slate-900 pt-1 text-xs">
                     <span>Total Amount</span>
-                    <span>{formatPrice(total)}</span>
+                    <span>{formatPrice(checkoutTotal)}</span>
                   </div>
                 </div>
               </div>
@@ -657,16 +820,16 @@ export default function CheckoutPage() {
 
           {/* Coupon Code Section */}
           <div className="bg-white border border-slate-200/80 rounded-2xl p-3 shadow-2xs">
-            {appliedCoupon ? (
+            {activeCoupon ? (
               <div className="flex items-center justify-between text-xs">
                 <span className="flex items-center gap-1.5 font-bold text-emerald-700">
                   <Tag className="w-3.5 h-3.5 text-emerald-600" />
-                  Code: {appliedCoupon} applied (-{formatPrice(discount)})
+                  Code: {activeCoupon} applied (-{formatPrice(checkoutDiscount)})
                 </span>
                 <button
                   type="button"
-                  onClick={removeCoupon}
-                  className="text-rose-600 font-bold text-[11px] hover:underline"
+                  onClick={handleRemoveCoupon}
+                  className="text-rose-600 font-bold text-[11px] hover:underline cursor-pointer"
                 >
                   Remove
                 </button>
@@ -1262,7 +1425,7 @@ export default function CheckoutPage() {
                 ) : (
                   <>
                     <Lock className="w-4 h-4" />
-                    <span>Place Order • {formatPrice(total)}</span>
+                    <span>Place Order • {formatPrice(checkoutTotal)}</span>
                   </>
                 )}
               </button>
@@ -1278,5 +1441,19 @@ export default function CheckoutPage() {
 
       </div>
     </div>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+          <LoadingSpinner size="lg" />
+        </div>
+      }
+    >
+      <CheckoutContent />
+    </Suspense>
   );
 }
