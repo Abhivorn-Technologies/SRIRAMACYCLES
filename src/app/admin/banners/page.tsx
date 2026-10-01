@@ -282,34 +282,40 @@ export default function AdminBannersPage() {
 
       {/* Modal */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in">
-          <div className="relative bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-100 flex flex-col gap-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <h3 className="text-base font-black text-slate-900">
-                {editingBanner ? 'Edit Banner' : 'Create Banner'}
-              </h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in">
+          <div className="relative bg-white rounded-3xl max-w-lg w-full max-h-[85vh] shadow-2xl border border-slate-100 flex flex-col overflow-hidden">
+            {/* Sticky Header */}
+            <div className="flex items-center justify-between px-6 py-4 sm:px-8 sm:py-5 border-b border-slate-100 shrink-0 bg-white z-10">
+              <div>
+                <h3 className="text-base font-black text-slate-900">
+                  {editingBanner ? 'Edit Banner' : 'Create Banner'}
+                </h3>
+                <p className="text-[11px] text-slate-400 font-medium">Configure headline, image & button destination</p>
+              </div>
               <button
                 onClick={() => setModalOpen(false)}
-                className="p-1 text-slate-400 hover:text-slate-600"
+                className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleFormSubmit} className="flex flex-col gap-4">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                  Banner Headline *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.title}
-                  onChange={(e) => setFormData((p) => ({ ...p, title: e.target.value }))}
-                  placeholder="e.g. Conquer Mountain Trails"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-brand-500/20"
-                />
-              </div>
+            <form onSubmit={handleFormSubmit} className="flex flex-col flex-1 min-h-0">
+              {/* Scrollable Body */}
+              <div className="flex-1 overflow-y-auto px-6 py-4 sm:px-8 sm:py-5 space-y-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    Banner Headline *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.title}
+                    onChange={(e) => setFormData((p) => ({ ...p, title: e.target.value }))}
+                    placeholder="e.g. Conquer Mountain Trails"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                  />
+                </div>
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1.5">
@@ -533,21 +539,28 @@ export default function AdminBannersPage() {
                   </div>
                 </div>
               </div>
+            </div>
 
-              <div className="flex justify-end gap-3 pt-3 border-t border-slate-100">
-                <button
-                  type="button"
-                  onClick={() => setModalOpen(false)}
-                  className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 text-xs font-bold text-white bg-brand-600 hover:bg-brand-500 rounded-xl shadow-sm"
-                >
-                  {editingBanner ? 'Update' : 'Create'}
-                </button>
+              {/* Sticky Footer */}
+              <div className="flex items-center justify-between px-6 py-3.5 sm:px-8 sm:py-4 border-t border-slate-100 bg-slate-50/80 shrink-0 z-10">
+                <span className="text-[11px] text-slate-400 font-medium hidden sm:inline">
+                  {editingBanner ? 'Updating existing banner' : 'Creating new homepage banner'}
+                </span>
+                <div className="flex items-center gap-2.5 ml-auto">
+                  <button
+                    type="button"
+                    onClick={() => setModalOpen(false)}
+                    className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-200/60 rounded-xl transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-5 py-2 text-xs font-bold text-white bg-brand-600 hover:bg-brand-500 active:scale-95 rounded-xl shadow-sm transition-all"
+                  >
+                    {editingBanner ? 'Update Banner' : 'Create Banner'}
+                  </button>
+                </div>
               </div>
             </form>
           </div>
