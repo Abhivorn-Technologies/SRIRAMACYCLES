@@ -47,7 +47,8 @@ export function extractAuthUser(
     if (isAdminRoute) {
       token = nextReq.cookies?.get?.('admin_token')?.value;
     } else {
-      token = nextReq.cookies?.get?.('customer_token')?.value ||
+      token = nextReq.cookies?.get?.('admin_token')?.value ||
+              nextReq.cookies?.get?.('customer_token')?.value ||
               nextReq.cookies?.get?.('auth_token')?.value ||
               nextReq.cookies?.get?.('token')?.value;
     }
@@ -67,7 +68,7 @@ export function extractAuthUser(
       if (isAdminRoute) {
         token = cookies.admin_token;
       } else {
-        token = cookies.customer_token || cookies.auth_token || cookies.token;
+        token = cookies.admin_token || cookies.customer_token || cookies.auth_token || cookies.token;
       }
     }
 

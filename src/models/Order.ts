@@ -38,6 +38,13 @@ export interface IOrderDocument extends Document {
     estimatedDelivery?: Date;
     statusUpdates: IOrderStatusUpdate[];
   };
+  paymentDetails?: {
+    gateway?: string;
+    orderId?: string;
+    paymentId?: string;
+    signature?: string;
+    paidAt?: Date;
+  };
   notes?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -138,6 +145,13 @@ const OrderSchema = new Schema<IOrderDocument>(
       customDiscount: { type: Number, default: 0 },
       gstInvoiceNumber: { type: String, default: '' },
       notes: { type: String, default: '' },
+    },
+    paymentDetails: {
+      gateway: { type: String, default: '' },
+      orderId: { type: String, default: '' },
+      paymentId: { type: String, default: '' },
+      signature: { type: String, default: '' },
+      paidAt: { type: Date },
     },
     tracking: {
       carrier: { type: String, default: 'Srirama Express Courier' },

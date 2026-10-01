@@ -34,7 +34,7 @@ const CLEAN_SLIDES: HeroSlide[] = [
     subtitle:
       'Ultra-light carbon frames, Shimano 105 gearing, and aerodynamic precision for riders who demand excellence.',
     image: 'https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=1200&q=85',
-    ctaText: 'Explore Bikes',
+    ctaText: 'Explore Road Cycles',
     ctaLink: '/shop?category=road-bikes',
     secondaryText: 'Shop All Cycles',
     secondaryLink: '/shop',
@@ -48,11 +48,11 @@ const CLEAN_SLIDES: HeroSlide[] = [
     subtitle:
       'Heavy-duty RockShox suspension, hydraulic disc brakes, and rugged geometry ready for every mountain trail.',
     image: '/images/categories/mountain-bikes.jpg',
-    ctaText: 'Shop Mountain Bikes',
+    ctaText: 'Shop Mountain Cycles',
     ctaLink: '/shop?category=mountain-bikes',
     secondaryText: 'Explore Gear',
     secondaryLink: '/shop?category=cycling-accessories',
-    priceTag: 'Trail MTBs from ₹24,999',
+    priceTag: 'Mountain Cycles from ₹5,525',
   },
   {
     id: '3',
@@ -66,7 +66,7 @@ const CLEAN_SLIDES: HeroSlide[] = [
     ctaLink: '/shop?category=disc-brake-cycles',
     secondaryText: 'View Ladies Cycles',
     secondaryLink: '/shop?category=ladies-bicycles',
-    priceTag: 'Bicycles from ₹7,999',
+    priceTag: 'Quality Cycles from ₹5,525',
   },
   {
     id: '4',

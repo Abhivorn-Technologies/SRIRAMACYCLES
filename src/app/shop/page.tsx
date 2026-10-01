@@ -10,6 +10,7 @@ import ProductCard from '@/components/store/ProductCard';
 import FilterSidebar from '@/components/store/FilterSidebar';
 import QuickViewModal from '@/components/store/QuickViewModal';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
+import Pagination from '@/components/common/Pagination';
 
 function ShopContent() {
   const searchParams = useSearchParams();
@@ -22,16 +23,18 @@ function ShopContent() {
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
   const [quickViewProduct, setQuickViewProduct] = useState<IProduct | null>(null);
 
-  // Filter States
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '');
   const [selectedBrand, setSelectedBrand] = useState(searchParams.get('brand') || '');
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
+  const [isFeaturedOnly, setIsFeaturedOnly] = useState(searchParams.get('featured') === 'true');
+  const [isBestSellerOnly, setIsBestSellerOnly] = useState(searchParams.get('bestSeller') === 'true');
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 150000]);
   const [inStockOnly, setInStockOnly] = useState(false);
   const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'newest');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
+  const itemsPerPage = 9;
 
   // Sync URL search params on initial load or param change
   useEffect(() => {
@@ -39,11 +42,15 @@ function ShopContent() {
     const brand = searchParams.get('brand') || '';
     const q = searchParams.get('search') || '';
     const sort = searchParams.get('sort') || 'newest';
+    const feat = searchParams.get('featured') === 'true';
+    const best = searchParams.get('bestSeller') === 'true';
 
     setSelectedCategory(cat);
     setSelectedBrand(brand);
     setSearchQuery(q);
     setSortBy(sort);
+    setIsFeaturedOnly(feat);
+    setIsBestSellerOnly(best);
   }, [searchParams]);
 
   // Fetch Categories once
@@ -70,11 +77,13 @@ function ShopContent() {
       if (selectedCategory) params.append('category', selectedCategory);
       if (selectedBrand) params.append('brand', selectedBrand);
       if (searchQuery) params.append('search', searchQuery);
+      if (isFeaturedOnly) params.append('featured', 'true');
+      if (isBestSellerOnly) params.append('bestSeller', 'true');
       if (priceRange[1] < 150000) params.append('maxPrice', priceRange[1].toString());
       if (inStockOnly) params.append('inStock', 'true');
       if (sortBy) params.append('sort', sortBy);
       params.append('page', page.toString());
-      params.append('limit', '12');
+      params.append('limit', itemsPerPage.toString());
 
       const res = await fetch(`/api/products?${params.toString()}`);
       const data = await res.json();
@@ -92,7 +101,7 @@ function ShopContent() {
     } finally {
       setLoading(false);
     }
-  }, [selectedCategory, selectedBrand, searchQuery, priceRange, inStockOnly, sortBy, page]);
+  }, [selectedCategory, selectedBrand, searchQuery, isFeaturedOnly, isBestSellerOnly, priceRange, inStockOnly, sortBy, page]);
 
   useEffect(() => {
     fetchProducts();
@@ -102,6 +111,8 @@ function ShopContent() {
     setSelectedCategory('');
     setSelectedBrand('');
     setSearchQuery('');
+    setIsFeaturedOnly(false);
+    setIsBestSellerOnly(false);
     setPriceRange([0, 150000]);
     setInStockOnly(false);
     setSortBy('newest');
@@ -171,8 +182,36 @@ function ShopContent() {
         </div>
 
         {/* Active Filter Tags (Shown only if any filter is active) */}
-        {(selectedCategory || selectedBrand || searchQuery) && (
+        {(selectedCategory || selectedBrand || searchQuery || isFeaturedOnly || isBestSellerOnly) && (
           <div className="flex flex-wrap items-center gap-2 mb-6 -mt-2">
+            {isFeaturedOnly && (
+              <span className="inline-flex items-center gap-1.5 bg-amber-50 border border-amber-300 text-amber-900 text-xs font-semibold px-3 py-1 rounded-full">
+                Featured Cycles
+                <button
+                  onClick={() => {
+                    setIsFeaturedOnly(false);
+                    router.push(selectedCategory ? `/shop?category=${selectedCategory}` : '/shop');
+                  }}
+                  className="hover:text-amber-950 font-bold ml-0.5"
+                >
+                  ×
+                </button>
+              </span>
+            )}
+            {isBestSellerOnly && (
+              <span className="inline-flex items-center gap-1.5 bg-brand-50 border border-brand-300 text-brand-800 text-xs font-semibold px-3 py-1 rounded-full">
+                Best Sellers
+                <button
+                  onClick={() => {
+                    setIsBestSellerOnly(false);
+                    router.push(selectedCategory ? `/shop?category=${selectedCategory}` : '/shop');
+                  }}
+                  className="hover:text-brand-950 font-bold ml-0.5"
+                >
+                  ×
+                </button>
+              </span>
+            )}
             {selectedCategory && (
               <span className="inline-flex items-center gap-1.5 bg-brand-50 border border-brand-200 text-brand-700 text-xs font-semibold px-3 py-1 rounded-full">
                 Category: {selectedCategory}
@@ -255,37 +294,20 @@ function ShopContent() {
                 </div>
 
                 {/* Pagination */}
-                {totalPages > 1 && (
-                  <div className="mt-12 flex items-center justify-center gap-2">
-                    <button
-                      onClick={() => setPage((p) => Math.max(1, p - 1))}
-                      disabled={page === 1}
-                      className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-700 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50"
-                    >
-                      Previous
-                    </button>
-                    {Array.from({ length: totalPages }).map((_, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => setPage(idx + 1)}
-                        className={`w-9 h-9 rounded-xl text-xs font-bold transition-all ${
-                          page === idx + 1
-                            ? 'bg-brand-600 text-white shadow-sm'
-                            : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
-                        }`}
-                      >
-                        {idx + 1}
-                      </button>
-                    ))}
-                    <button
-                      onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                      disabled={page === totalPages}
-                      className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-700 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50"
-                    >
-                      Next
-                    </button>
-                  </div>
-                )}
+                <div className="mt-10">
+                  <Pagination
+                    currentPage={page}
+                    totalPages={totalPages}
+                    totalItems={totalCount}
+                    itemsPerPage={itemsPerPage}
+                    onPageChange={(p) => {
+                      setPage(p);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    itemLabel="products"
+                    className="rounded-2xl border border-slate-200/80 shadow-xs"
+                  />
+                </div>
               </>
             ) : (
               /* Empty State */

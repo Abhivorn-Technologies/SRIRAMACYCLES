@@ -359,7 +359,8 @@ export default function ProductDetailPage() {
                           product.stock ? Math.min(product.stock, q + 1) : q + 1
                         )
                       }
-                      className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-white text-slate-700 font-bold"
+                      disabled={typeof product.stock === 'number' && quantity >= product.stock}
+                      className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-white disabled:opacity-30 disabled:cursor-not-allowed text-slate-700 font-bold"
                     >
                       +
                     </button>
@@ -368,10 +369,10 @@ export default function ProductDetailPage() {
                   <button
                     onClick={() => addToCart(product, quantity, selectedSize)}
                     disabled={product.stock <= 0}
-                    className="flex-1 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-300 text-white text-sm font-bold py-3.5 px-6 rounded-2xl flex items-center justify-center gap-2 transition-colors shadow-md active:scale-95"
+                    className="flex-1 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white text-sm font-bold py-3.5 px-6 rounded-2xl flex items-center justify-center gap-2 transition-colors shadow-md active:scale-95"
                   >
                     <ShoppingBag className="w-4 h-4" />
-                    Add to Cart
+                    {product.stock <= 0 ? 'Out of Stock' : 'Add to Cart'}
                   </button>
 
                   <button

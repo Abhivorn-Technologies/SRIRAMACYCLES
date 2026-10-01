@@ -1,9 +1,9 @@
 export const APP_NAME = 'Sri Rama Cycle & Auto Spare Parts';
 export const APP_SHORT_NAME = 'Sri Rama Cycle & Auto Spare Parts';
 export const ESTABLISHED_YEAR = '1976';
-export const APP_TAGLINE = 'Since 1976 | Premium Bicycles, Auto Spare Parts & Pro Service';
+export const APP_TAGLINE = 'Since 1976 | Premium Cycles, Auto Spare Parts & Pro Service';
 export const APP_DESCRIPTION =
-  'Sri Rama Cycle and Auto Spare Parts (Kazipet, Hanumakonda) - Leading store since 1976 for premium road cycles, mountain bikes, electric cycles, auto spare parts, and expert service.';
+  'Sri Rama Cycle and Auto Spare Parts (Kazipet, Hanumakonda) - Leading store since 1976 for premium road cycles, mountain cycles, standard cycles, disc brake cycles, auto spare parts, and expert service.';
 
 export const CURRENCY_SYMBOL = '₹';
 export const FREE_SHIPPING_THRESHOLD = 999;
@@ -13,9 +13,9 @@ export const TAX_RATE = 0; // Prices are inclusive of GST
 export const NAV_LINKS = [
   { label: 'Home', href: '/' },
   { label: 'Shop All', href: '/shop' },
-  { label: 'Road Bikes', href: '/shop?category=road-bikes' },
-  { label: 'Mountain Bikes', href: '/shop?category=mountain-bikes' },
-  { label: 'Ladies Bicycles', href: '/shop?category=ladies-bicycles' },
+  { label: 'Road Cycles', href: '/shop?category=road-bikes' },
+  { label: 'Mountain Cycles', href: '/shop?category=mountain-bikes' },
+  { label: 'Ladies Cycles', href: '/shop?category=ladies-bicycles' },
   { label: 'Disc Brake Cycles', href: '/shop?category=disc-brake-cycles' },
   { label: 'Standard Cycles', href: '/shop?category=standard-cycles' },
   { label: 'Accessories & Spares', href: '/shop?category=cycling-accessories' },

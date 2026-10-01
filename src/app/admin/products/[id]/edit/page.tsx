@@ -531,6 +531,7 @@ export default function EditProductPage() {
                       src={imgUrl}
                       alt={`Product image ${index + 1}`}
                       fill
+                      sizes="120px"
                       className="object-cover"
                     />
 

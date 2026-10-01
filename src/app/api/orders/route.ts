@@ -95,12 +95,36 @@ export async function POST(req: NextRequest) {
 
       // Deduct stock in DB if connected
       for (const item of items) {
-        if (item.product._id && item.product._id.match(/^[0-9a-fA-F]{24}$/)) {
-          const productDoc = await Product.findById(item.product._id);
-          if (productDoc) {
-            productDoc.stock = Math.max(0, productDoc.stock - item.quantity);
-            await productDoc.save();
+        const prodId =
+          item.product?._id ||
+          item.product?.id ||
+          (typeof item.product === 'string' && item.product.match(/^[0-9a-fA-F]{24}$/)
+            ? item.product
+            : null);
+
+        let productDoc = null;
+        if (prodId && prodId.match(/^[0-9a-fA-F]{24}$/)) {
+          productDoc = await Product.findById(prodId);
+        } else if (item.product?.slug) {
+          productDoc = await Product.findOne({ slug: item.product.slug });
+        }
+
+        if (productDoc) {
+          productDoc.stock = Math.max(0, productDoc.stock - item.quantity);
+          // If product has variants, decrement matching variant's stock as well
+          const chosenSize = item.selectedSize || item.variant?.size;
+          const chosenColor = item.selectedColor || item.variant?.color;
+          if (productDoc.variants && productDoc.variants.length > 0 && (chosenSize || chosenColor)) {
+            const matchedVariant = productDoc.variants.find(
+              (v: any) =>
+                (!chosenSize || v.size === chosenSize) &&
+                (!chosenColor || v.color === chosenColor)
+            );
+            if (matchedVariant && typeof matchedVariant.stock === 'number') {
+              matchedVariant.stock = Math.max(0, matchedVariant.stock - item.quantity);
+            }
           }
+          await productDoc.save();
         }
       }
 

@@ -10,7 +10,7 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const auth = extractAuthUser(req);
+    const auth = extractAuthUser(req, 'admin');
     if (!auth || auth.role !== 'admin') {
       return NextResponse.json(
         { success: false, message: 'Unauthorized: Admin access required' },
@@ -49,7 +49,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const auth = extractAuthUser(req);
+    const auth = extractAuthUser(req, 'admin');
     if (!auth || auth.role !== 'admin') {
       return NextResponse.json(
         { success: false, message: 'Unauthorized: Admin access required' },
@@ -60,16 +60,24 @@ export async function DELETE(
     await connectToDatabase();
     const { id } = params;
 
-    // Check if any products are using this category
+    // Reassign any products under this category to another active category so deletion is never blocked
     const count = await Product.countDocuments({ category: id });
     if (count > 0) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: `Cannot delete category. There are ${count} products assigned to it.`,
-        },
-        { status: 400 }
-      );
+      const fallbackCat = await Category.findOne({ _id: { $ne: id }, isActive: true });
+      if (fallbackCat) {
+        await Product.updateMany(
+          { category: id },
+          {
+            $set: {
+              category: fallbackCat._id,
+              categorySlug: fallbackCat.slug,
+              categoryName: fallbackCat.name,
+            },
+          }
+        );
+      } else {
+        await Product.deleteMany({ category: id });
+      }
     }
 
     const category = await Category.findByIdAndDelete(id);

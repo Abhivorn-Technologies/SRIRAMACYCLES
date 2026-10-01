@@ -9,7 +9,7 @@ import { APP_NAME, APP_DESCRIPTION } from '@/lib/constants';
 
 export const metadata: Metadata = {
   title: {
-    default: `${APP_NAME} | Bicycles & Auto Spare Parts, Kazipet Hanumakonda`,
+    default: `${APP_NAME} | Cycles & Auto Spare Parts, Kazipet Hanumakonda`,
     template: `%s | ${APP_NAME}`,
   },
   description: APP_DESCRIPTION,
@@ -19,11 +19,12 @@ export const metadata: Metadata = {
     'Cycles in Hanumakonda',
     'Auto Spare Parts Kazipet',
     'Ravula Rakesh Kumar',
-    'road bikes Telangana',
-    'mountain bikes',
-    'electric cycles',
+    'road cycles Telangana',
+    'mountain cycles',
+    'standard cycles',
+    'disc brake cycles',
     'cycling accessories',
-    'buy bicycle online',
+    'buy cycle online',
   ],
   authors: [{ name: 'Sri Rama Cycle & Auto Spare Parts' }],
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
@@ -42,9 +43,16 @@ export const metadata: Metadata = {
     ],
   },
   icons: {
-    icon: '/SRI RAMA logo 3.png',
-    shortcut: '/SRI RAMA logo 3.png',
-    apple: '/SRI RAMA logo 3.png',
+    icon: [
+      { url: '/favicon.ico' },
+      { url: '/favicon-32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/favicon.png', sizes: '512x512', type: 'image/png' },
+    ],
+    shortcut: '/favicon.ico',
+    apple: [
+      { url: '/favicon.png', sizes: '180x180', type: 'image/png' },
+    ],
   },
 };
 

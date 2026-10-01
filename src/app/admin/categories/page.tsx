@@ -2,11 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { Plus, Edit2, Trash2, FolderTree, X } from 'lucide-react';
+import { Plus, Edit2, Trash2, FolderTree, X, Eye, EyeOff } from 'lucide-react';
 import { ICategory } from '@/types';
 import { useToast } from '@/context/ToastContext';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import ConfirmModal from '@/components/common/ConfirmModal';
+import Pagination from '@/components/common/Pagination';
 
 export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState<ICategory[]>([]);
@@ -14,6 +15,8 @@ export default function AdminCategoriesPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<ICategory | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
   const { success, error } = useToast();
 
   const [formData, setFormData] = useState({
@@ -22,12 +25,13 @@ export default function AdminCategoriesPage() {
     description: '',
     image: '',
     order: '0',
+    isActive: true,
   });
 
   const fetchCategories = async () => {
     try {
       setLoading(true);
-      const res = await fetch('/api/categories');
+      const res = await fetch('/api/categories?all=true');
       const data = await res.json();
       if (data.success) {
         setCategories(data.categories);
@@ -46,7 +50,7 @@ export default function AdminCategoriesPage() {
 
   const openAddModal = () => {
     setEditingCategory(null);
-    setFormData({ name: '', slug: '', description: '', image: '', order: '0' });
+    setFormData({ name: '', slug: '', description: '', image: '', order: '0', isActive: true });
     setModalOpen(true);
   };
 
@@ -58,8 +62,39 @@ export default function AdminCategoriesPage() {
       description: cat.description || '',
       image: cat.image || '',
       order: cat.order?.toString() || '0',
+      isActive: cat.isActive !== false,
     });
     setModalOpen(true);
+  };
+
+  const handleToggleActive = async (cat: ICategory) => {
+    const updatedStatus = cat.isActive === false ? true : false;
+    // Optimistic update
+    setCategories((prev) =>
+      prev.map((c) => (c._id === cat._id ? { ...c, isActive: updatedStatus } : c))
+    );
+    try {
+      const res = await fetch(`/api/categories/${cat._id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isActive: updatedStatus }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        success(`"${cat.name}" is now ${updatedStatus ? 'Live on Website' : 'Hidden from Website'}`);
+      } else {
+        // Rollback
+        setCategories((prev) =>
+          prev.map((c) => (c._id === cat._id ? { ...c, isActive: cat.isActive } : c))
+        );
+        error(data.message || 'Failed to update visibility');
+      }
+    } catch (err) {
+      setCategories((prev) =>
+        prev.map((c) => (c._id === cat._id ? { ...c, isActive: cat.isActive } : c))
+      );
+      error('Failed to update category visibility');
+    }
   };
 
   const handleDelete = (id: string, name: string) => {
@@ -99,6 +134,7 @@ export default function AdminCategoriesPage() {
         body: JSON.stringify({
           ...formData,
           order: Number(formData.order),
+          isActive: formData.isActive,
         }),
       });
 
@@ -115,6 +151,13 @@ export default function AdminCategoriesPage() {
       error('An error occurred');
     }
   };
+
+  const totalItems = categories.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+  const paginatedCategories = categories.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   return (
     <div className="flex flex-col gap-6 max-w-7xl mx-auto">
@@ -152,17 +195,18 @@ export default function AdminCategoriesPage() {
                   <th className="py-3.5 px-4">Slug</th>
                   <th className="py-3.5 px-4">Description</th>
                   <th className="py-3.5 px-4">Products</th>
+                  <th className="py-3.5 px-4">Website Visibility</th>
                   <th className="py-3.5 px-4 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {categories.map((cat) => (
+                {paginatedCategories.map((cat) => (
                   <tr key={cat._id} className="hover:bg-slate-50/50">
                     <td className="py-3.5 px-4">
                       <div className="flex items-center gap-3">
                         <div className="relative w-10 h-10 rounded-xl bg-slate-100 overflow-hidden border border-slate-200 shrink-0">
                           {cat.image ? (
-                            <Image src={cat.image} alt={cat.name} fill className="object-cover" />
+                            <Image src={cat.image} alt={cat.name} fill sizes="40px" className="object-cover" />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center text-slate-400">
                               <FolderTree className="w-4 h-4" />
@@ -185,6 +229,38 @@ export default function AdminCategoriesPage() {
                       </span>
                     </td>
 
+                    {/* Website Visibility */}
+                    <td className="py-3.5 px-4">
+                      <button
+                        onClick={() => handleToggleActive(cat)}
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold transition-all border shadow-2xs hover:scale-105 active:scale-95 cursor-pointer ${
+                          cat.isActive !== false
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
+                            : 'bg-slate-100 text-slate-500 border-slate-200 hover:bg-slate-200'
+                        }`}
+                        title={
+                          cat.isActive !== false
+                            ? 'Currently LIVE on website. Click to Hide.'
+                            : 'Currently HIDDEN from website. Click to Publish.'
+                        }
+                      >
+                        <span
+                          className={`w-2 h-2 rounded-full ${
+                            cat.isActive !== false ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'
+                          }`}
+                        />
+                        {cat.isActive !== false ? (
+                          <span className="flex items-center gap-1">
+                            <Eye className="w-3.5 h-3.5 text-emerald-600" /> Live on Website
+                          </span>
+                        ) : (
+                          <span className="flex items-center gap-1">
+                            <EyeOff className="w-3.5 h-3.5 text-slate-400" /> Hidden
+                          </span>
+                        )}
+                      </button>
+                    </td>
+
                     <td className="py-3.5 px-4 text-right">
                       <div className="flex items-center justify-end gap-2">
                         <button
@@ -205,6 +281,14 @@ export default function AdminCategoriesPage() {
                 ))}
               </tbody>
             </table>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              itemsPerPage={itemsPerPage}
+              onPageChange={(p) => setCurrentPage(p)}
+              itemLabel="categories"
+            />
           </div>
         ) : (
           <div className="p-12 text-center text-slate-400 text-xs">No categories found.</div>
@@ -237,7 +321,7 @@ export default function AdminCategoriesPage() {
                   required
                   value={formData.name}
                   onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))}
-                  placeholder="e.g. Gravel Bikes"
+                  placeholder="e.g. Mountain Cycles"
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-brand-500/20"
                 />
               </div>
@@ -250,7 +334,7 @@ export default function AdminCategoriesPage() {
                   type="text"
                   value={formData.slug}
                   onChange={(e) => setFormData((p) => ({ ...p, slug: e.target.value }))}
-                  placeholder="e.g. gravel-bikes"
+                  placeholder="e.g. mountain-cycles"
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-brand-500/20"
                 />
               </div>
@@ -278,6 +362,20 @@ export default function AdminCategoriesPage() {
                   onChange={(e) => setFormData((p) => ({ ...p, description: e.target.value }))}
                   placeholder="Category description..."
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-xs font-medium resize-none"
+                />
+              </div>
+
+              {/* Show on Website Toggle */}
+              <div className="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+                <div>
+                  <span className="text-xs font-bold text-slate-900 block">Show on Website</span>
+                  <span className="text-[11px] text-slate-500">Enable this category across customer shop navigation and filters</span>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={formData.isActive}
+                  onChange={(e) => setFormData((p) => ({ ...p, isActive: e.target.checked }))}
+                  className="w-4 h-4 accent-brand-600 rounded cursor-pointer"
                 />
               </div>
 

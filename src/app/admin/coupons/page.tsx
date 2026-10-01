@@ -19,6 +19,7 @@ import { useToast } from '@/context/ToastContext';
 import { formatPrice } from '@/lib/utils';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import ConfirmModal from '@/components/common/ConfirmModal';
+import Pagination from '@/components/common/Pagination';
 
 interface ICouponAdmin {
   _id: string;
@@ -40,6 +41,8 @@ export default function AdminCouponsPage() {
   const [coupons, setCoupons] = useState<ICouponAdmin[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCoupon, setEditingCoupon] = useState<ICouponAdmin | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -213,10 +216,21 @@ export default function AdminCouponsPage() {
     }
   };
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
   const filteredCoupons = coupons.filter(
     (c) =>
       c.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
       c.description?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const totalItems = filteredCoupons.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+  const paginatedCoupons = filteredCoupons.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
   );
 
   return (
@@ -292,7 +306,7 @@ export default function AdminCouponsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 font-medium">
-                {filteredCoupons.map((coupon) => (
+                {paginatedCoupons.map((coupon) => (
                   <tr key={coupon._id} className="hover:bg-slate-50/60 transition-colors">
                     <td className="py-3.5 px-4">
                       <div className="flex flex-col">
@@ -355,6 +369,14 @@ export default function AdminCouponsPage() {
                 ))}
               </tbody>
             </table>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              itemsPerPage={itemsPerPage}
+              onPageChange={(p) => setCurrentPage(p)}
+              itemLabel="coupons"
+            />
           </div>
         ) : (
           <div className="p-12 text-center text-slate-400 text-xs">

@@ -24,11 +24,20 @@ export async function GET(req: NextRequest) {
     const sort = searchParams.get('sort') || 'newest';
     const page = parseInt(searchParams.get('page') || '1', 10);
     const limit = parseInt(searchParams.get('limit') || '12', 10);
+    const showAll = searchParams.get('all') === 'true';
+    const activeFilter = searchParams.get('isActive');
 
     try {
       await connectToDatabase();
 
-      const query: any = { isActive: true };
+      const query: any = {};
+      if (activeFilter === 'true') {
+        query.isActive = true;
+      } else if (activeFilter === 'false') {
+        query.isActive = false;
+      } else if (!showAll) {
+        query.isActive = true;
+      }
 
       if (category) {
         const catDoc = await Category.findOne({ slug: category });
@@ -85,20 +94,18 @@ export async function GET(req: NextRequest) {
         Product.countDocuments(query),
       ]);
 
-      if (products.length > 0) {
-        const brands = await Product.distinct('brand', { isActive: true });
-        return NextResponse.json({
-          success: true,
-          products,
-          pagination: {
-            total,
-            page,
-            limit,
-            pages: Math.ceil(total / limit),
-          },
-          availableBrands: brands.filter(Boolean),
-        });
-      }
+      const brands = await Product.distinct('brand', { isActive: true });
+      return NextResponse.json({
+        success: true,
+        products,
+        pagination: {
+          total,
+          page,
+          limit,
+          pages: Math.max(1, Math.ceil(total / limit)),
+        },
+        availableBrands: brands.filter(Boolean),
+      });
     } catch (dbErr) {
       console.warn('Database query failed, returning rich fallback catalog:', dbErr);
     }
@@ -129,6 +136,15 @@ export async function GET(req: NextRequest) {
     }
     if (inStock === 'true') {
       filtered = filtered.filter((p) => p.stock > 0);
+    }
+    if (isFeatured === 'true') {
+      filtered = filtered.filter((p) => p.isFeatured);
+    }
+    if (isBestSeller === 'true') {
+      filtered = filtered.filter((p) => p.isBestSeller);
+    }
+    if (isNewArrival === 'true') {
+      filtered = filtered.filter((p) => p.isNewArrival);
     }
 
     if (sort === 'price-asc') {

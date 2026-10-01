@@ -8,34 +8,34 @@ const TELANGANA_REVIEWS = [
   {
     name: 'Ravinder Reddy',
     location: 'Kazipet, Hanumakonda',
-    bike: 'Sri Rama Apex Carbon Road Racer',
+    cycle: 'Sri Rama Apex Carbon Road Cycle',
     rating: 5,
     date: 'Verified Buyer • 2 days ago',
     comment:
-      'Bought my road racer directly from Sri Rama Cycle Store in Kazipet. Rakesh Kumar garu personally guided me on frame sizing and gear tuning. Smooth ride all the way to Laknavaram lake. Best showroom in Warangal district!',
+      'Bought my road cycle directly from Sri Rama Cycle Store in Kazipet. Rakesh Kumar garu personally guided me on frame sizing and gear tuning. Smooth ride all the way to Laknavaram lake. Best showroom in Warangal district!',
   },
   {
     name: 'Kalyan Goud',
     location: 'Hanamkonda, Warangal',
-    bike: 'Sri Rama Terra Pro 29" MTB',
+    cycle: 'Sri Rama Terra Pro 29" Mountain Cycle',
     rating: 5,
     date: 'Verified Buyer • 1 week ago',
     comment:
-      'Took the 29" MTB for trail riding near Kakatiya University and Ramappa. The hydraulic disc brakes and RockShox suspension are rock solid. Sri Rama\'s genuine spares guarantee is 100% trustworthy!',
+      'Took the 29" mountain cycle for trail riding near Kakatiya University and Ramappa. The hydraulic disc brakes and suspension are rock solid. Sri Rama\'s genuine spares guarantee is 100% trustworthy!',
   },
   {
     name: 'Sravanthi Rao',
     location: 'Subedari, Hanumakonda',
-    bike: 'Sri Rama E-Bike & City Cruiser',
+    cycle: 'Sri Rama Elegance City Comfort Cycle',
     rating: 5,
     date: 'Verified Buyer • 3 days ago',
     comment:
-      'Daily commute between Waddepally and Naimnagar is super smooth now! Fantastic battery range and comfortable saddle. Sri Rama Cycles Kazipet provides top-class free servicing and genuine auto spares.',
+      'Daily commute between Waddepally and Naimnagar is super smooth now! Ergonomic step-through frame, smooth riding, and comfortable saddle. Sri Rama Cycles Kazipet provides top-class free servicing and genuine spares.',
   },
   {
     name: 'Vamshi Krishna',
     location: 'Hasanparthy, Hanumakonda',
-    bike: 'Shimano 21-Speed Gear & Spares',
+    cycle: 'Shimano 21-Speed Gear & Spares',
     rating: 5,
     date: 'Verified Buyer • 5 days ago',
     comment:
@@ -44,7 +44,7 @@ const TELANGANA_REVIEWS = [
   {
     name: 'Prashanth Kumar',
     location: 'Fatima Nagar, Kazipet',
-    bike: 'Junior Alloy Disc Brake Cycle',
+    cycle: 'Junior Alloy Disc Brake Cycle',
     rating: 5,
     date: 'Verified Buyer • 1 week ago',
     comment:
@@ -53,7 +53,7 @@ const TELANGANA_REVIEWS = [
   {
     name: 'Babu Rao',
     location: 'Warangal Fort Road, Warangal',
-    bike: 'Standard Heavy-Duty Transport Cycle',
+    cycle: 'Standard Heavy-Duty Transport Cycle',
     rating: 5,
     date: 'Verified Buyer • 2 weeks ago',
     comment:
@@ -170,7 +170,7 @@ export default function CustomerReviews() {
                       <span className="truncate">{rev.location}</span>
                     </span>
                     <span className="text-brand-700 font-extrabold bg-brand-50 px-2 py-0.5 rounded-md border border-brand-200/60 truncate shrink-0 max-w-[150px]">
-                      {rev.bike}
+                      {rev.cycle || (rev as any).bike}
                     </span>
                   </div>
                 </div>

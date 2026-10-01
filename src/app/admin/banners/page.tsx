@@ -7,6 +7,7 @@ import { IBanner } from '@/types';
 import { useToast } from '@/context/ToastContext';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import ConfirmModal from '@/components/common/ConfirmModal';
+import Pagination from '@/components/common/Pagination';
 
 export default function AdminBannersPage() {
   const [banners, setBanners] = useState<IBanner[]>([]);
@@ -14,6 +15,8 @@ export default function AdminBannersPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingBanner, setEditingBanner] = useState<IBanner | null>(null);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
   const { success, error } = useToast();
 
   const [formData, setFormData] = useState({
@@ -131,6 +134,13 @@ export default function AdminBannersPage() {
     }
   };
 
+  const totalItems = banners.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+  const paginatedBanners = banners.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   return (
     <div className="flex flex-col gap-6 max-w-7xl mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -159,13 +169,13 @@ export default function AdminBannersPage() {
             <LoadingSpinner size="lg" />
           </div>
         ) : banners.length > 0 ? (
-          banners.map((b) => (
+          paginatedBanners.map((b) => (
             <div
               key={b._id}
               className="bg-white rounded-3xl border border-slate-200/80 overflow-hidden shadow-xs flex flex-col justify-between"
             >
               <div className="relative aspect-[16/8] w-full bg-slate-900">
-                <Image src={b.image} alt={b.title} fill className="object-cover opacity-80" />
+                <Image src={b.image} alt={b.title} fill sizes="(max-width: 768px) 100vw, 400px" className="object-cover opacity-80" />
                 <div className="absolute inset-0 p-5 flex flex-col justify-end text-white bg-gradient-to-t from-slate-950/90 to-transparent">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-brand-400">
                     {b.tag || 'Hero Slide'}
@@ -201,6 +211,18 @@ export default function AdminBannersPage() {
           </div>
         )}
       </div>
+
+      {banners.length > 0 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          itemsPerPage={itemsPerPage}
+          onPageChange={(p) => setCurrentPage(p)}
+          itemLabel="banners"
+          className="rounded-2xl border border-slate-200/80 shadow-xs"
+        />
+      )}
 
       {/* Modal */}
       {modalOpen && (

@@ -225,7 +225,7 @@ export default function Navbar() {
             <form onSubmit={handleSearchSubmit} className="relative max-w-2xl mx-auto">
               <input
                 type="text"
-                placeholder="Search road bikes, mountain cycles, electric bikes, gear..."
+                placeholder="Search road cycles, mountain cycles, standard cycles, spares..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 autoFocus

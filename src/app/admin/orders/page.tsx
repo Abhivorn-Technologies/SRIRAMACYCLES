@@ -9,6 +9,7 @@ import { formatPrice, formatDate, formatDateTime } from '@/lib/utils';
 import { useToast } from '@/context/ToastContext';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import POSReceiptModal from '@/components/admin/POSReceiptModal';
+import Pagination from '@/components/common/Pagination';
 
 function AdminOrdersContent() {
   const searchParams = useSearchParams();
@@ -20,6 +21,8 @@ function AdminOrdersContent() {
   const [statusFilter, setStatusFilter] = useState('All');
   const [channelFilter, setChannelFilter] = useState<'ALL' | 'ONLINE' | 'POS'>(initialChannel);
   const [selectedReceipt, setSelectedReceipt] = useState<any>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
   const { error } = useToast();
 
   const fetchOrders = async () => {
@@ -44,12 +47,20 @@ function AdminOrdersContent() {
   };
 
   useEffect(() => {
+    setCurrentPage(1);
     fetchOrders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, statusFilter, channelFilter]);
 
   const posCount = orders.filter((o) => o.orderSource === 'POS').length;
   const onlineCount = orders.filter((o) => o.orderSource !== 'POS').length;
+
+  const totalItems = orders.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+  const paginatedOrders = orders.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   return (
     <div className="flex flex-col gap-6 max-w-7xl mx-auto">
@@ -163,7 +174,7 @@ function AdminOrdersContent() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {orders.map((ord) => {
+                {paginatedOrders.map((ord) => {
                   const isPOS = ord.orderSource === 'POS';
                   const paymentDisplay = ord.posDetails?.paymentMode || ord.paymentMethod;
 
@@ -272,6 +283,14 @@ function AdminOrdersContent() {
                 })}
               </tbody>
             </table>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              itemsPerPage={itemsPerPage}
+              onPageChange={(p) => setCurrentPage(p)}
+              itemLabel="orders"
+            />
           </div>
         ) : (
           <div className="p-12 text-center text-slate-400 text-xs">No orders found.</div>

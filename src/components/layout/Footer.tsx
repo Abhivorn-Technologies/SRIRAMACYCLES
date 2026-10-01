@@ -82,7 +82,7 @@ export default function Footer() {
             </Link>
 
             <p className="text-xs sm:text-sm text-slate-700 leading-relaxed max-w-sm">
-              <strong className="text-slate-950 font-black">{STORE_CONTACT.businessName}</strong> (Prop. {STORE_CONTACT.proprietor}) - Hanumakonda&apos;s leading showroom for premium bicycles, road racers, MTBs, smart electric bikes, genuine auto spares, and precision tuning.
+              <strong className="text-slate-950 font-black">{STORE_CONTACT.businessName}</strong> (Prop. {STORE_CONTACT.proprietor}) - Hanumakonda&apos;s leading showroom for premium bicycles, road cycles, MTBs, standard & geared cycles, genuine auto spares, and precision tuning.
             </p>
           </div>
 
@@ -94,27 +94,27 @@ export default function Footer() {
             <ul className="flex flex-col gap-2.5 text-xs text-slate-700 font-medium">
               <li>
                 <Link href="/shop?category=road-bikes" className="hover:text-brand-600 transition-colors">
-                  Road & Racing Bikes
+                  Road & Racing Cycles
                 </Link>
               </li>
               <li>
                 <Link href="/shop?category=mountain-bikes" className="hover:text-brand-600 transition-colors">
-                  Mountain Bikes (MTB)
+                  Mountain Cycles (MTB)
                 </Link>
               </li>
               <li>
                 <Link href="/shop?category=ladies-bicycles" className="hover:text-brand-600 transition-colors">
-                  Ladies Cycle
+                  Ladies Cycles
                 </Link>
               </li>
               <li>
                 <Link href="/shop?category=junior-bikes" className="hover:text-brand-600 transition-colors">
-                  Junior Bikes
+                  Junior Cycles
                 </Link>
               </li>
               <li>
                 <Link href="/shop?category=kids-bikes" className="hover:text-brand-600 transition-colors">
-                  Kids Cycle
+                  Kids Cycles
                 </Link>
               </li>
               <li>

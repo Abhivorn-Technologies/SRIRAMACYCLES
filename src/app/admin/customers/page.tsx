@@ -6,12 +6,15 @@ import { IUser } from '@/types';
 import { formatPrice, formatDate } from '@/lib/utils';
 import { useToast } from '@/context/ToastContext';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
+import Pagination from '@/components/common/Pagination';
 
 export default function AdminCustomersPage() {
   const [customers, setCustomers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [channelFilter, setChannelFilter] = useState<'all' | 'registered' | 'offline'>('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
   const { error } = useToast();
 
   const fetchCustomers = async () => {
@@ -30,9 +33,14 @@ export default function AdminCustomersPage() {
   };
 
   useEffect(() => {
+    setCurrentPage(1);
     fetchCustomers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [channelFilter]);
 
   const filteredCustomers = useMemo(() => {
     return customers.filter((c) => {
@@ -44,6 +52,13 @@ export default function AdminCustomersPage() {
 
   const registeredCount = customers.filter((c) => c.isRegistered).length;
   const offlineCount = customers.filter((c) => !c.isRegistered).length;
+
+  const totalItems = filteredCustomers.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+  const paginatedCustomers = filteredCustomers.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   return (
     <div className="flex flex-col gap-6 max-w-7xl mx-auto">
@@ -130,7 +145,7 @@ export default function AdminCustomersPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {filteredCustomers.map((c) => (
+                {paginatedCustomers.map((c) => (
                   <tr key={c._id} className="hover:bg-slate-50/50">
                     <td className="py-3.5 px-4">
                       <div className="flex items-center gap-3">
@@ -186,6 +201,14 @@ export default function AdminCustomersPage() {
                 ))}
               </tbody>
             </table>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              itemsPerPage={itemsPerPage}
+              onPageChange={(p) => setCurrentPage(p)}
+              itemLabel="customers"
+            />
           </div>
         ) : (
           <div className="p-12 text-center text-slate-400 text-xs">No customer records found.</div>

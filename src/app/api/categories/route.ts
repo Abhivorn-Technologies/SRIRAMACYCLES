@@ -8,11 +8,15 @@ import { SAMPLE_CATEGORIES } from '@/lib/sample-data';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
+    const { searchParams } = new URL(req.url);
+    const showAll = searchParams.get('all') === 'true';
+    const query = showAll ? {} : { isActive: true };
+
     try {
       await connectToDatabase();
-      const categories = await Category.find({ isActive: true })
+      const categories = await Category.find(query)
         .sort({ order: 1, name: 1 })
         .lean();
 
@@ -46,7 +50,7 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const auth = extractAuthUser(req);
+    const auth = extractAuthUser(req, 'admin');
     if (!auth || auth.role !== 'admin') {
       return NextResponse.json(
         { success: false, message: 'Unauthorized: Admin access required' },

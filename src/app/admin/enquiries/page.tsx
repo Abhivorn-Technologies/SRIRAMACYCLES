@@ -20,6 +20,7 @@ import { formatDateTime } from '@/lib/utils';
 import { useToast } from '@/context/ToastContext';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import ConfirmModal from '@/components/common/ConfirmModal';
+import Pagination from '@/components/common/Pagination';
 
 export default function AdminEnquiriesPage() {
   const [enquiries, setEnquiries] = useState<IEnquiry[]>([]);
@@ -27,6 +28,8 @@ export default function AdminEnquiriesPage() {
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'unread' | 'read' | 'replied'>('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
   const { success, error } = useToast();
 
   const fetchEnquiries = async () => {
@@ -109,6 +112,17 @@ export default function AdminEnquiriesPage() {
       return matchesStatus && matchesSearch;
     });
   }, [enquiries, statusFilter, searchQuery]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, statusFilter]);
+
+  const totalItems = filteredEnquiries.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+  const paginatedEnquiries = filteredEnquiries.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   const unreadCount = enquiries.filter((e) => e.status === 'unread').length;
   const readCount = enquiries.filter((e) => e.status === 'read').length;
@@ -238,7 +252,7 @@ export default function AdminEnquiriesPage() {
             <span className="text-xs text-slate-400 font-medium">Loading enquiries...</span>
           </div>
         ) : filteredEnquiries.length > 0 ? (
-          filteredEnquiries.map((enq) => {
+          paginatedEnquiries.map((enq) => {
             const cleanPhone = enq.phone ? enq.phone.replace(/[^0-9]/g, '') : '';
             const waNumber = cleanPhone.startsWith('91')
               ? cleanPhone
@@ -397,6 +411,18 @@ export default function AdminEnquiriesPage() {
               </p>
             </div>
           </div>
+        )}
+
+        {filteredEnquiries.length > 0 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            itemsPerPage={itemsPerPage}
+            onPageChange={(p) => setCurrentPage(p)}
+            itemLabel="enquiries"
+            className="rounded-2xl border border-slate-200/80 shadow-xs"
+          />
         )}
       </div>
 

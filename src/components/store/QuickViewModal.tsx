@@ -66,7 +66,7 @@ export default function QuickViewModal({ product, onClose }: IQuickViewModalProp
                     selectedImage === idx ? 'border-brand-600 ring-2 ring-brand-100' : 'border-slate-200'
                   }`}
                 >
-                  <Image src={img} alt="thumb" fill className="object-cover" />
+                  <Image src={img} alt="thumb" fill sizes="64px" className="object-cover" />
                 </button>
               ))}
             </div>
@@ -88,19 +88,33 @@ export default function QuickViewModal({ product, onClose }: IQuickViewModalProp
               <span className="text-xs text-slate-400">({product.numReviews} reviews)</span>
             </div>
 
-            {/* Price */}
-            <div className="mt-4 flex items-baseline gap-3">
-              <span className="text-2xl font-black text-slate-900">
-                {formatPrice(displayPrice)}
-              </span>
-              {product.salePrice && product.salePrice > 0 && (
-                <span className="text-base text-slate-400 line-through font-medium">
-                  {formatPrice(product.price)}
+            {/* Price & Stock */}
+            <div className="mt-4 flex items-center justify-between flex-wrap gap-2">
+              <div className="flex items-baseline gap-3">
+                <span className="text-2xl font-black text-slate-900">
+                  {formatPrice(displayPrice)}
                 </span>
-              )}
-              {discountPercent > 0 && (
-                <span className="bg-rose-50 text-rose-600 border border-rose-200 text-xs font-bold px-2 py-0.5 rounded-full">
-                  Save {discountPercent}%
+                {product.salePrice && product.salePrice > 0 && (
+                  <span className="text-base text-slate-400 line-through font-medium">
+                    {formatPrice(product.price)}
+                  </span>
+                )}
+                {discountPercent > 0 && (
+                  <span className="bg-rose-50 text-rose-600 border border-rose-200 text-xs font-bold px-2 py-0.5 rounded-full">
+                    Save {discountPercent}%
+                  </span>
+                )}
+              </div>
+
+              {product.stock > 0 ? (
+                <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${
+                  product.stock <= 5 ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                }`}>
+                  {product.stock <= 5 ? `Only ${product.stock} Left` : 'In Stock'}
+                </span>
+              ) : (
+                <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200">
+                  Out of Stock
                 </span>
               )}
             </div>
@@ -147,8 +161,9 @@ export default function QuickViewModal({ product, onClose }: IQuickViewModalProp
                 </button>
                 <span className="w-8 text-center text-sm font-bold text-slate-800">{quantity}</span>
                 <button
-                  onClick={() => setQuantity((q) => q + 1)}
-                  className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white text-slate-600 font-bold"
+                  onClick={() => setQuantity((q) => product.stock ? Math.min(product.stock, q + 1) : q + 1)}
+                  disabled={typeof product.stock === 'number' && quantity >= product.stock}
+                  className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white disabled:opacity-30 disabled:cursor-not-allowed text-slate-600 font-bold"
                 >
                   +
                 </button>
@@ -160,10 +175,10 @@ export default function QuickViewModal({ product, onClose }: IQuickViewModalProp
                   onClose();
                 }}
                 disabled={product.stock <= 0}
-                className="flex-1 bg-brand-600 hover:bg-brand-700 disabled:bg-slate-300 text-white text-sm font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors shadow-sm"
+                className="flex-1 bg-brand-600 hover:bg-brand-700 disabled:bg-slate-200 disabled:cursor-not-allowed text-white text-sm font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors shadow-sm"
               >
                 <ShoppingBag className="w-4 h-4" />
-                Add to Cart
+                {product.stock <= 0 ? 'Out of Stock' : 'Add to Cart'}
               </button>
 
               <button

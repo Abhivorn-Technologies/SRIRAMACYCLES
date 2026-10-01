@@ -71,7 +71,7 @@ export default function CartPage() {
         </div>
         <h2 className="text-2xl font-black text-slate-900">Your Shopping Cart is Empty</h2>
         <p className="text-xs sm:text-sm text-slate-500 max-w-sm mt-2 mb-8">
-          Explore our premium range of road bikes, mountain machines, hybrid cycles, and accessories to start your adventure.
+          Explore our premium range of road cycles, mountain cycles, standard cycles, and accessories to start your adventure.
         </p>
         <Link
           href="/shop"
@@ -156,6 +156,7 @@ export default function CartPage() {
                         src={image}
                         alt={item.product.name}
                         fill
+                        sizes="80px"
                         className="object-cover object-center"
                       />
                     </div>
@@ -172,6 +173,16 @@ export default function CartPage() {
                       {item.selectedSize && (
                         <span className="text-xs text-slate-500 mt-0.5">
                           Size: <strong>{item.selectedSize}</strong>
+                        </span>
+                      )}
+                      {typeof item.product.stock === 'number' && item.product.stock <= 0 && (
+                        <span className="text-[11px] font-bold text-rose-600 mt-0.5">
+                          Out of Stock
+                        </span>
+                      )}
+                      {typeof item.product.stock === 'number' && item.product.stock > 0 && item.product.stock <= 5 && (
+                        <span className="text-[11px] font-semibold text-amber-600 mt-0.5">
+                          Only {item.product.stock} left in stock
                         </span>
                       )}
                       <span className="text-xs font-bold text-slate-900 sm:hidden mt-1">
@@ -208,7 +219,13 @@ export default function CartPage() {
                             item.selectedColor
                           )
                         }
-                        className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-white text-slate-700 font-bold"
+                        disabled={typeof item.product.stock === 'number' && item.quantity >= item.product.stock}
+                        className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-white disabled:opacity-30 disabled:cursor-not-allowed text-slate-700 font-bold"
+                        title={
+                          typeof item.product.stock === 'number' && item.quantity >= item.product.stock
+                            ? 'Maximum available stock reached'
+                            : 'Increase quantity'
+                        }
                       >
                         +
                       </button>

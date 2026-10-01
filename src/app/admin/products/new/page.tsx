@@ -488,6 +488,7 @@ export default function AddProductPage() {
                       src={imgUrl}
                       alt={`Product image ${index + 1}`}
                       fill
+                      sizes="120px"
                       className="object-cover"
                     />
 

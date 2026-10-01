@@ -39,20 +39,20 @@ async function getHomeData() {
           : SAMPLE_CATEGORIES,
       featuredProducts:
         featuredProducts && featuredProducts.length > 0
-          ? JSON.parse(JSON.stringify(featuredProducts))
-          : SAMPLE_PRODUCTS.filter((p) => p.isFeatured),
+          ? JSON.parse(JSON.stringify(featuredProducts)).slice(0, 8)
+          : SAMPLE_PRODUCTS.filter((p) => p.isFeatured).slice(0, 8),
       bestSellers:
         bestSellers && bestSellers.length > 0
-          ? JSON.parse(JSON.stringify(bestSellers))
-          : SAMPLE_PRODUCTS.filter((p) => p.isBestSeller),
+          ? JSON.parse(JSON.stringify(bestSellers)).slice(0, 8)
+          : SAMPLE_PRODUCTS.filter((p) => p.isBestSeller).slice(0, 8),
       banners: banners && banners.length > 0 ? JSON.parse(JSON.stringify(banners)) : [],
     };
   } catch (error) {
     console.warn('Using rich fallback data while DB connects');
     return {
       categories: SAMPLE_CATEGORIES,
-      featuredProducts: SAMPLE_PRODUCTS.filter((p) => p.isFeatured),
-      bestSellers: SAMPLE_PRODUCTS.filter((p) => p.isBestSeller),
+      featuredProducts: SAMPLE_PRODUCTS.filter((p) => p.isFeatured).slice(0, 8),
+      bestSellers: SAMPLE_PRODUCTS.filter((p) => p.isBestSeller).slice(0, 8),
       banners: [],
     };
   }
@@ -66,28 +66,33 @@ export default async function HomePage() {
       {/* 1. Hero Carousel */}
       <HeroBanner banners={banners} />
 
-      {/* 2. Featured Categories with Scroll Animation */}
+      {/* 2. Featured Categories with Scroll Animation (Capped to 6 cards on Home) */}
       <ScrollReveal direction="up" delayMs={50}>
         <FeaturedCategories categories={categories} />
       </ScrollReveal>
 
-      {/* 3. Featured Products with Scroll Animation */}
+      {/* 3. Featured Products with Scroll Animation (Capped to 8 cards on Home) */}
       <ScrollReveal direction="up" delayMs={100}>
         <FeaturedProducts
           products={featuredProducts}
           title="Featured Performance Cycles"
           subtitle="Handcrafted aerodynamics and trail-tested engineering"
+          viewAllLink="/shop?featured=true"
+          buttonText="View All Featured Cycles"
+          limit={8}
         />
       </ScrollReveal>
 
-      {/* 4. Best Sellers Section with Scroll Animation */}
+      {/* 4. Best Sellers Section with Scroll Animation (Capped to 8 cards on Home) */}
       {bestSellers && bestSellers.length > 0 && (
         <ScrollReveal direction="up" delayMs={150}>
           <FeaturedProducts
             products={bestSellers}
             title="Most Popular & Best Sellers"
             subtitle="Top customer favorites trusted by cyclists across India"
-            viewAllLink="/shop?sort=popular"
+            viewAllLink="/shop?bestSeller=true"
+            buttonText="View All Best Sellers"
+            limit={8}
           />
         </ScrollReveal>
       )}
