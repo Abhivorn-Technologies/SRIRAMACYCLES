@@ -10,7 +10,7 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const auth = extractAuthUser(request);
+    const auth = extractAuthUser(request, 'admin');
     if (!auth || auth.role !== 'admin') {
       return NextResponse.json(
         { success: false, message: 'Unauthorized access' },
@@ -65,7 +65,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const auth = extractAuthUser(request);
+    const auth = extractAuthUser(request, 'admin');
     if (!auth || auth.role !== 'admin') {
       return NextResponse.json(
         { success: false, message: 'Unauthorized access' },

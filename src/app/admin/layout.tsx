@@ -9,7 +9,7 @@ import { useToast } from '@/context/ToastContext';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import AdminLoginPage from './login/page';
 
-const ADMIN_SESSION_TIMEOUT_MS = 60 * 60 * 1000; // 1 Hour Strict Timeout
+const ADMIN_SESSION_TIMEOUT_MS = 24 * 60 * 60 * 1000; // 24 Hours Timeout
 
 function AdminContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -46,7 +46,7 @@ function AdminContent({ children }: { children: React.ReactNode }) {
 
   // Handle session timeout & auto-logout
   const handleSessionExpire = useCallback(async () => {
-    toastError('Admin session expired (1 Hour timeout). Please sign in again to continue.');
+    toastError('Admin session expired. Please sign in again to continue.');
     await adminLogout();
   }, [adminLogout, toastError]);
 

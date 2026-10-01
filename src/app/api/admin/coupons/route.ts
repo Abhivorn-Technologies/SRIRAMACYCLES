@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
-    const auth = extractAuthUser(request);
+    const auth = extractAuthUser(request, 'admin');
     if (!auth || auth.role !== 'admin') {
       return NextResponse.json(
         { success: false, message: 'Unauthorized access' },
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const auth = extractAuthUser(request);
+    const auth = extractAuthUser(request, 'admin');
     if (!auth || auth.role !== 'admin') {
       return NextResponse.json(
         { success: false, message: 'Unauthorized access' },

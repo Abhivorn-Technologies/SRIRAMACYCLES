@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
     }
 
     const isAdminUser = user.role === 'admin';
-    const sessionMaxAge = isAdminUser ? 60 * 60 : 7 * 24 * 60 * 60; // 1 hour for admin, 7 days for customer
+    const sessionMaxAge = 7 * 24 * 60 * 60; // 7 days session duration
 
     const token = signToken(
       {
@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
         role: user.role,
         name: user.name,
       },
-      isAdminUser ? '1h' : '7d'
+      '7d'
     );
 
     const response = NextResponse.json(
@@ -149,7 +149,7 @@ export async function POST(req: NextRequest) {
           role: 'admin',
           name: 'Sri Rama Administrator',
         },
-        '1h'
+        '7d'
       );
 
       const response = NextResponse.json(
@@ -173,7 +173,7 @@ export async function POST(req: NextRequest) {
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
         path: '/',
-        maxAge: 3600,
+        maxAge: 7 * 24 * 60 * 60,
       });
 
       return response;

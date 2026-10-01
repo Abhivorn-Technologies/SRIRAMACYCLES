@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
   try {
-    const auth = extractAuthUser(req);
+    const auth = extractAuthUser(req, 'admin');
     if (!auth || auth.role !== 'admin') {
       return NextResponse.json(
         { success: false, message: 'Unauthorized: Admin access required' },

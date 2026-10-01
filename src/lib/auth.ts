@@ -21,7 +21,7 @@ export async function comparePassword(password: string, hashedPassword: string):
 }
 
 export function signToken(payload: ITokenPayload, customExpiry?: string): string {
-  const expiresIn = customExpiry || (payload.role === 'admin' ? '1h' : '7d');
+  const expiresIn = customExpiry || '7d';
   return jwt.sign(payload, JWT_SECRET, { expiresIn } as jwt.SignOptions);
 }
 
@@ -38,58 +38,74 @@ export function extractAuthUser(
   preferredRole?: 'admin' | 'customer'
 ): ITokenPayload | null {
   try {
-    // 1. Check cookies (NextRequest.cookies or raw header)
-    let token = '';
     const nextReq = request as any;
-    const url = nextReq.nextUrl?.pathname || nextReq.url || '';
-    const isAdminRoute = preferredRole === 'admin' || url.includes('/api/admin') || url.includes('/admin');
+    const url = (nextReq.nextUrl?.pathname || nextReq.url || '').toLowerCase();
+    const referer = (request.headers.get('referer') || '').toLowerCase();
 
-    if (isAdminRoute) {
-      token = nextReq.cookies?.get?.('admin_token')?.value;
-    } else {
-      token = nextReq.cookies?.get?.('customer_token')?.value ||
-              nextReq.cookies?.get?.('auth_token')?.value;
-    }
+    // 1. Extract tokens from NextRequest.cookies or raw Cookie header
+    let adminToken = nextReq.cookies?.get?.('admin_token')?.value;
+    let customerToken =
+      nextReq.cookies?.get?.('customer_token')?.value ||
+      nextReq.cookies?.get?.('auth_token')?.value;
 
-    if (!token) {
+    if (!adminToken || !customerToken) {
       const cookieHeader = request.headers.get('cookie') || '';
-      const cookies = Object.fromEntries(
-        cookieHeader
-          .split(';')
-          .map((c) => c.trim())
-          .filter(Boolean)
-          .map((c) => {
-            const [k, ...v] = c.split('=');
-            return [k, decodeURIComponent(v.join('='))];
-          })
-      );
-      if (isAdminRoute) {
-        token = cookies.admin_token;
-      } else {
-        token = cookies.customer_token || cookies.auth_token;
+      if (cookieHeader) {
+        const cookies = Object.fromEntries(
+          cookieHeader
+            .split(';')
+            .map((c) => c.trim())
+            .filter(Boolean)
+            .map((c) => {
+              const [k, ...v] = c.split('=');
+              return [k, decodeURIComponent(v.join('='))];
+            })
+        );
+        if (!adminToken) adminToken = cookies.admin_token;
+        if (!customerToken) customerToken = cookies.customer_token || cookies.auth_token;
       }
     }
 
     // 2. Check Authorization header
-    if (!token) {
-      const authHeader = request.headers.get('authorization');
-      if (authHeader && authHeader.startsWith('Bearer ')) {
-        token = authHeader.split(' ')[1];
-      }
+    let bearerToken = '';
+    const authHeader = request.headers.get('authorization');
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      bearerToken = authHeader.split(' ')[1];
+    }
+
+    // Determine if this is an admin request context
+    const isAdminContext =
+      preferredRole === 'admin' ||
+      url.includes('/api/admin') ||
+      url.includes('/admin') ||
+      referer.includes('/admin');
+
+    let token = '';
+
+    if (preferredRole === 'admin') {
+      token = adminToken || bearerToken;
+    } else if (preferredRole === 'customer') {
+      token = customerToken || bearerToken;
+    } else if (isAdminContext) {
+      // In admin context, prioritize admin_token
+      token = adminToken || bearerToken || customerToken;
+    } else {
+      // In general storefront context, prioritize customer_token, with admin_token as fallback
+      token = customerToken || bearerToken || adminToken;
     }
 
     if (!token) return null;
     const decoded = verifyToken(token);
     if (!decoded) return null;
 
-    // Enforce role separation:
-    // If route is NOT an admin route, reject admin tokens so admin sessions never hijack customer data
-    if (!isAdminRoute && decoded.role === 'admin') {
+    // Enforce role separation when requested
+    if (preferredRole === 'admin' && decoded.role !== 'admin') {
       return null;
     }
-
-    // If route IS an admin route, require admin role
-    if (isAdminRoute && decoded.role !== 'admin') {
+    if (preferredRole === 'customer' && decoded.role !== 'customer') {
+      return null;
+    }
+    if (isAdminContext && decoded.role !== 'admin') {
       return null;
     }
 

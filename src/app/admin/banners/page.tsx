@@ -2,20 +2,44 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { Plus, Trash2, Edit2, Image as ImageIcon, X } from 'lucide-react';
+import { Plus, Trash2, Edit2, Image as ImageIcon, X, Compass, Link as LinkIcon, ExternalLink, Sparkles, Check } from 'lucide-react';
 import { IBanner } from '@/types';
 import { useToast } from '@/context/ToastContext';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import ConfirmModal from '@/components/common/ConfirmModal';
 import Pagination from '@/components/common/Pagination';
 
+interface ICategoryOption {
+  _id: string;
+  name: string;
+  slug: string;
+}
+
+interface IProductOption {
+  _id: string;
+  name: string;
+  slug: string;
+  price: number;
+}
+
+const IMAGE_PRESETS = [
+  { label: '🏔️ Mountain MTB', url: 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=1600&auto=format&fit=crop&q=80' },
+  { label: '⚡ Road Speed', url: 'https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=1600&auto=format&fit=crop&q=80' },
+  { label: '👧 Kids Cycling', url: 'https://images.unsplash.com/photo-1517649763962-0c623266ddc0?w=1600&auto=format&fit=crop&q=80' },
+  { label: '🏙️ City Commute', url: 'https://images.unsplash.com/photo-1507035895480-2b3156c31fc8?w=1600&auto=format&fit=crop&q=80' },
+  { label: '🛠️ Workshop', url: 'https://images.unsplash.com/photo-1508974239320-0a029497e820?w=1600&auto=format&fit=crop&q=80' },
+];
+
 export default function AdminBannersPage() {
   const [banners, setBanners] = useState<IBanner[]>([]);
+  const [categories, setCategories] = useState<ICategoryOption[]>([]);
+  const [products, setProducts] = useState<IProductOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingBanner, setEditingBanner] = useState<IBanner | null>(null);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isCustomUrl, setIsCustomUrl] = useState(false);
   const itemsPerPage = 6;
   const { success, error } = useToast();
 
@@ -45,13 +69,34 @@ export default function AdminBannersPage() {
     }
   };
 
+  const fetchStoreOptions = async () => {
+    try {
+      const [catRes, prodRes] = await Promise.all([
+        fetch('/api/categories'),
+        fetch('/api/products?limit=100'),
+      ]);
+      const catData = await catRes.json();
+      if (catData.success && Array.isArray(catData.categories)) {
+        setCategories(catData.categories);
+      }
+      const prodData = await prodRes.json();
+      if (prodData.success && Array.isArray(prodData.products)) {
+        setProducts(prodData.products);
+      }
+    } catch (err) {
+      // Non-critical: presets still provide sensible defaults
+    }
+  };
+
   useEffect(() => {
     fetchBanners();
+    fetchStoreOptions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const openAddModal = () => {
     setEditingBanner(null);
+    setIsCustomUrl(false);
     setFormData({
       title: '',
       subtitle: '',
@@ -67,13 +112,24 @@ export default function AdminBannersPage() {
 
   const openEditModal = (b: IBanner) => {
     setEditingBanner(b);
+    // Check if the current ctaLink is an external URL or custom format
+    const link = b.ctaLink || '/shop';
+    const isStandard =
+      link === '/shop' ||
+      link.startsWith('/shop?') ||
+      link.startsWith('/product/') ||
+      link === '/about' ||
+      link === '/contact' ||
+      link === '/track-order';
+    setIsCustomUrl(!isStandard);
+
     setFormData({
       title: b.title,
       subtitle: b.subtitle || '',
       tag: b.tag || '',
       image: b.image,
       ctaText: b.ctaText || 'Shop Now',
-      ctaLink: b.ctaLink || '/shop',
+      ctaLink: link,
       position: b.position || 'hero',
       order: b.order?.toString() || '0',
     });
@@ -291,28 +347,190 @@ export default function AdminBannersPage() {
                   value={formData.image}
                   onChange={(e) => setFormData((p) => ({ ...p, image: e.target.value }))}
                   placeholder="https://images.unsplash.com/..."
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-xs font-medium"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-brand-500/20"
                 />
+                <div className="flex flex-wrap items-center gap-1.5 mt-2">
+                  <span className="text-[10px] text-slate-400 font-semibold mr-0.5">Quick Photos:</span>
+                  {IMAGE_PRESETS.map((preset) => (
+                    <button
+                      key={preset.label}
+                      type="button"
+                      onClick={() => setFormData((p) => ({ ...p, image: preset.url }))}
+                      className={`text-[10px] px-2 py-0.5 rounded-lg font-semibold border transition-all ${
+                        formData.image === preset.url
+                          ? 'bg-brand-50 border-brand-500 text-brand-700 shadow-xs'
+                          : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-300'
+                      }`}
+                    >
+                      {preset.label}
+                    </button>
+                  ))}
+                </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">CTA Text</label>
+              {/* Navigation Destination Picker (No coding needed) */}
+              <div className="bg-slate-50 border border-slate-200/90 rounded-2xl p-4 space-y-3.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                    <Compass className="w-4 h-4 text-brand-600" />
+                    Button Destination (Where it takes customer)
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setIsCustomUrl(!isCustomUrl)}
+                    className="text-[11px] text-brand-600 hover:text-brand-700 font-bold underline"
+                  >
+                    {isCustomUrl ? '← Select from Store Menu' : 'Type Custom Link →'}
+                  </button>
+                </div>
+
+                {!isCustomUrl ? (
+                  <div>
+                    <select
+                      value={formData.ctaLink}
+                      onChange={(e) => {
+                        const selectedUrl = e.target.value;
+                        if (selectedUrl === 'custom') {
+                          setIsCustomUrl(true);
+                          return;
+                        }
+                        // Auto-suggest button text if default or empty
+                        let suggestedText = formData.ctaText;
+                        if (!formData.ctaText || formData.ctaText === 'Shop Now') {
+                          if (selectedUrl.startsWith('/shop?category=')) {
+                            const catSlug = selectedUrl.replace('/shop?category=', '');
+                            const foundCat = categories.find((c) => c.slug === catSlug);
+                            if (foundCat) suggestedText = `Explore ${foundCat.name}`;
+                          } else if (selectedUrl.startsWith('/product/')) {
+                            suggestedText = 'Buy Now';
+                          } else if (selectedUrl === '/shop?onSale=true') {
+                            suggestedText = 'View Discount Deals';
+                          } else if (selectedUrl === '/about') {
+                            suggestedText = 'Our Heritage Story';
+                          } else if (selectedUrl === '/contact') {
+                            suggestedText = 'Visit Showroom';
+                          } else if (selectedUrl === '/track-order') {
+                            suggestedText = 'Track Order';
+                          }
+                        }
+
+                        setFormData((p) => ({
+                          ...p,
+                          ctaLink: selectedUrl,
+                          ctaText: suggestedText,
+                        }));
+                      }}
+                      className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500/20 shadow-xs"
+                    >
+                      <option value="/shop">🛒 All Cycles & Products Catalog (/shop)</option>
+
+                      <optgroup label="🚴 Cycle Categories">
+                        {categories.length > 0 ? (
+                          categories.map((cat) => (
+                            <option key={cat._id} value={`/shop?category=${cat.slug}`}>
+                              {cat.name} ({cat.slug})
+                            </option>
+                          ))
+                        ) : (
+                          <>
+                            <option value="/shop?category=road-bikes">Road Bikes (/shop?category=road-bikes)</option>
+                            <option value="/shop?category=mountain-bikes">Mountain Bikes (/shop?category=mountain-bikes)</option>
+                            <option value="/shop?category=kids-bikes">Kids Bikes (/shop?category=kids-bikes)</option>
+                            <option value="/shop?category=electric-bikes">Electric Bikes (/shop?category=electric-bikes)</option>
+                            <option value="/shop?category=spare-parts">Spare Parts & Accessories (/shop?category=spare-parts)</option>
+                          </>
+                        )}
+                      </optgroup>
+
+                      {products.length > 0 && (
+                        <optgroup label="🚲 Direct Cycle / Product Pages">
+                          {products.map((prod) => (
+                            <option key={prod._id} value={`/product/${prod.slug}`}>
+                              {prod.name} — ₹{prod.price?.toLocaleString('en-IN')}
+                            </option>
+                          ))}
+                        </optgroup>
+                      )}
+
+                      <optgroup label="🔥 Special Deals & Collections">
+                        <option value="/shop?onSale=true">On Sale / Discounted Deals (/shop?onSale=true)</option>
+                        <option value="/shop?sort=newest">New Arrivals (/shop?sort=newest)</option>
+                        <option value="/shop?sort=rating">Top Rated Cycles (/shop?sort=rating)</option>
+                      </optgroup>
+
+                      <optgroup label="📍 Key Store Information">
+                        <option value="/about">Sri Rama 50-Year Heritage Story (/about)</option>
+                        <option value="/contact">Showroom & Workshop Location (/contact)</option>
+                        <option value="/track-order">Track Customer Order (/track-order)</option>
+                      </optgroup>
+
+                      <optgroup label="⚙️ Custom Destination">
+                        <option value="custom">Type Custom / External URL...</option>
+                      </optgroup>
+                    </select>
+                  </div>
+                ) : (
+                  <div className="space-y-1">
+                    <div className="relative">
+                      <LinkIcon className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-3" />
+                      <input
+                        type="text"
+                        value={formData.ctaLink}
+                        onChange={(e) => setFormData((p) => ({ ...p, ctaLink: e.target.value }))}
+                        placeholder="e.g. /shop?category=road-bikes or https://..."
+                        className="w-full bg-white border border-slate-300 rounded-xl pl-8 pr-3 py-2 text-xs font-mono font-medium focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                      />
+                    </div>
+                    <p className="text-[10px] text-slate-400">
+                      Enter an internal route (starting with /) or an external link (https://).
+                    </p>
+                  </div>
+                )}
+
+                {/* Target Route Verification Pill */}
+                <div className="flex items-center justify-between px-3 py-1.5 bg-brand-50/70 border border-brand-200/80 rounded-xl text-[11px] text-brand-900">
+                  <span className="font-bold text-brand-700 flex items-center gap-1">
+                    <Check className="w-3.5 h-3.5 text-brand-600" />
+                    Target Destination:
+                  </span>
+                  <code className="bg-white px-2 py-0.5 rounded text-[11px] font-mono text-brand-800 border border-brand-100 shadow-2xs">
+                    {formData.ctaLink || '/shop'}
+                  </code>
+                </div>
+
+                {/* Button Label & Fast Suggestions */}
+                <div className="pt-2 border-t border-slate-200">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-xs font-bold text-slate-700">Button Label (Text on Button) *</label>
+                    <span className="text-[10px] text-slate-400">Displayed inside the button</span>
+                  </div>
                   <input
                     type="text"
+                    required
                     value={formData.ctaText}
                     onChange={(e) => setFormData((p) => ({ ...p, ctaText: e.target.value }))}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-xs font-medium"
+                    placeholder="e.g. Explore Bikes, Shop Now, Buy Now"
+                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-brand-500/20"
                   />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">CTA Link</label>
-                  <input
-                    type="text"
-                    value={formData.ctaLink}
-                    onChange={(e) => setFormData((p) => ({ ...p, ctaLink: e.target.value }))}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-xs font-medium"
-                  />
+                  <div className="flex flex-wrap items-center gap-1.5 mt-2">
+                    <span className="text-[10px] text-slate-400 font-semibold mr-0.5">Quick Labels:</span>
+                    {['Shop Now', 'Explore Bikes', 'Buy Now', 'View Deals', 'Visit Showroom', 'Our Story'].map(
+                      (label) => (
+                        <button
+                          key={label}
+                          type="button"
+                          onClick={() => setFormData((p) => ({ ...p, ctaText: label }))}
+                          className={`text-[10px] px-2 py-0.5 rounded-lg font-semibold border transition-colors ${
+                            formData.ctaText === label
+                              ? 'bg-slate-900 text-white border-slate-900'
+                              : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100'
+                          }`}
+                        >
+                          {label}
+                        </button>
+                      )
+                    )}
+                  </div>
                 </div>
               </div>
 
