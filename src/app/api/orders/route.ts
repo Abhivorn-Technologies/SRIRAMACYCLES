@@ -265,6 +265,7 @@ export async function POST(req: NextRequest) {
           message: 'Order placed successfully',
           orderNumber: order.orderNumber,
           orderId: order._id,
+          order: order,
         },
         { status: 201 }
       );
@@ -276,6 +277,10 @@ export async function POST(req: NextRequest) {
           message: 'Order placed successfully',
           orderNumber,
           orderId: orderNumber,
+          order: {
+            orderNumber,
+            pricing: { total },
+          },
         },
         { status: 201 }
       );

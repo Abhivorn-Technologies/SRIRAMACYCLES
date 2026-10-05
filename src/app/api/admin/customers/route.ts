@@ -114,9 +114,9 @@ export async function GET(req: NextRequest) {
 
           customerMap.set(key, {
             _id: `offline-${o._id}`,
-            name: o.customer.name,
-            email: o.customer.email?.includes('@pos.') ? 'Store Counter' : o.customer.email,
-            phone: o.customer.phone,
+            name: o.customer?.name || 'Customer',
+            email: o.customer?.email?.includes('@pos.') ? 'Store Counter' : (o.customer?.email || ''),
+            phone: o.customer?.phone || '',
             createdAt: o.createdAt,
             orderCount: matchOrders.length,
             posCount,

@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
     }
 
     const isAdminUser = user.role === 'admin';
-    const sessionMaxAge = 7 * 24 * 60 * 60; // 7 days session duration
+    const customerSessionMaxAge = 7 * 24 * 60 * 60; // 7 days session for customer storefront
 
     const token = signToken(
       {
@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
         role: user.role,
         name: user.name,
       },
-      '7d'
+      isAdminUser ? '12h' : '7d'
     );
 
     const response = NextResponse.json(
@@ -102,13 +102,12 @@ export async function POST(req: NextRequest) {
     );
 
     if (isAdminUser) {
-      // Admin console session ONLY
+      // Option 2: Browser Session ONLY cookie (omitting maxAge ensures it is automatically erased when the browser is closed)
       response.cookies.set('admin_token', token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
         path: '/',
-        maxAge: sessionMaxAge,
       });
     } else {
       // Customer storefront session
@@ -117,14 +116,14 @@ export async function POST(req: NextRequest) {
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
         path: '/',
-        maxAge: sessionMaxAge,
+        maxAge: customerSessionMaxAge,
       });
       response.cookies.set('auth_token', token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
         path: '/',
-        maxAge: sessionMaxAge,
+        maxAge: customerSessionMaxAge,
       });
     }
 
@@ -149,7 +148,7 @@ export async function POST(req: NextRequest) {
           role: 'admin',
           name: 'Sri Rama Administrator',
         },
-        '7d'
+        '12h'
       );
 
       const response = NextResponse.json(
@@ -173,7 +172,6 @@ export async function POST(req: NextRequest) {
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
         path: '/',
-        maxAge: 7 * 24 * 60 * 60,
       });
 
       return response;

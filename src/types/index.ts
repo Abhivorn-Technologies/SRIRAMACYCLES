@@ -152,6 +152,13 @@ export interface IOrder {
     estimatedDelivery?: string | Date;
     statusUpdates: IOrderStatusUpdate[];
   };
+  paymentDetails?: {
+    gateway?: string;
+    orderId?: string;
+    paymentId?: string;
+    signature?: string;
+    paidAt?: string | Date;
+  };
   notes?: string;
   createdAt: string;
   updatedAt: string;

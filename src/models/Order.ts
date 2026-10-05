@@ -52,7 +52,7 @@ export interface IOrderDocument extends Document {
 
 const OrderItemSchema = new Schema({
   product: {
-    type: Schema.Types.ObjectId,
+    type: Schema.Types.Mixed,
     ref: 'Product',
     required: true,
   },

@@ -11,18 +11,18 @@ export async function POST(req: NextRequest) {
 
   if (role === 'admin') {
     // Delete ONLY admin session cookie, preserving customer session
-    response.cookies.delete('admin_token');
+    response.cookies.set('admin_token', '', { path: '/', maxAge: 0, expires: new Date(0) });
   } else if (role === 'customer') {
     // Delete ONLY customer session cookies, preserving admin session
-    response.cookies.delete('customer_token');
-    response.cookies.delete('auth_token');
-    response.cookies.delete('token');
+    response.cookies.set('customer_token', '', { path: '/', maxAge: 0, expires: new Date(0) });
+    response.cookies.set('auth_token', '', { path: '/', maxAge: 0, expires: new Date(0) });
+    response.cookies.set('token', '', { path: '/', maxAge: 0, expires: new Date(0) });
   } else {
     // Delete all session cookies if not specified
-    response.cookies.delete('admin_token');
-    response.cookies.delete('customer_token');
-    response.cookies.delete('auth_token');
-    response.cookies.delete('token');
+    response.cookies.set('admin_token', '', { path: '/', maxAge: 0, expires: new Date(0) });
+    response.cookies.set('customer_token', '', { path: '/', maxAge: 0, expires: new Date(0) });
+    response.cookies.set('auth_token', '', { path: '/', maxAge: 0, expires: new Date(0) });
+    response.cookies.set('token', '', { path: '/', maxAge: 0, expires: new Date(0) });
   }
 
   return response;

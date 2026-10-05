@@ -276,7 +276,7 @@ function AdminOrdersContent() {
 
                       <td className="py-3.5 px-4">
                         <span
-                          className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
+                          className={`text-[10px] font-bold px-2 py-0.5 rounded-md inline-block ${
                             ord.paymentStatus === 'Paid'
                               ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                               : 'bg-amber-50 text-amber-700 border border-amber-200'
@@ -284,6 +284,11 @@ function AdminOrdersContent() {
                         >
                           {paymentDisplay} ({ord.paymentStatus})
                         </span>
+                        {ord.paymentDetails?.paymentId && (
+                          <span className="block text-[9px] font-mono text-slate-500 mt-0.5" title="Razorpay Payment ID">
+                            {ord.paymentDetails.paymentId}
+                          </span>
+                        )}
                       </td>
 
                       <td className="py-3.5 px-4">

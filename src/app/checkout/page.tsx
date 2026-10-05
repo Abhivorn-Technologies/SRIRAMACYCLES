@@ -388,10 +388,13 @@ function CheckoutContent() {
       const data = await res.json();
 
       if (data.success) {
+        const targetOrderNumber = data.order?.orderNumber || data.orderNumber;
+        const targetAmount = data.order?.pricing?.total || checkoutTotal;
+
         // 1. If Cash on Delivery, complete immediately
         if (paymentMethod === 'COD') {
           success('Order placed successfully! Redirecting...');
-          finishOrder(data.order.orderNumber);
+          finishOrder(targetOrderNumber);
           return;
         }
 
@@ -401,8 +404,8 @@ function CheckoutContent() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            orderNumber: data.order.orderNumber,
-            amount: data.order.pricing.total,
+            orderNumber: targetOrderNumber,
+            amount: targetAmount,
             customer: orderPayload.customer,
           }),
         });
@@ -433,7 +436,7 @@ function CheckoutContent() {
             amount: rzpData.amount,
             currency: rzpData.currency || 'INR',
             name: 'Sri Rama Cycle & Auto Spare Parts',
-            description: `Order #${data.order.orderNumber}`,
+            description: `Order #${targetOrderNumber}`,
             image: '/favicon.svg',
             order_id: rzpData.orderId,
             prefill: {
@@ -450,7 +453,7 @@ function CheckoutContent() {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({
-                    orderNumber: data.order.orderNumber,
+                    orderNumber: targetOrderNumber,
                     razorpay_order_id: response.razorpay_order_id,
                     razorpay_payment_id: response.razorpay_payment_id,
                     razorpay_signature: response.razorpay_signature,
@@ -459,20 +462,20 @@ function CheckoutContent() {
                 const verifyData = await verifyRes.json();
                 if (verifyData.success) {
                   success('Payment verified successfully! Redirecting...');
-                  finishOrder(data.order.orderNumber);
+                  finishOrder(targetOrderNumber);
                 } else {
                   error(verifyData.message || 'Payment verification failed');
-                  router.push(`/order-success/${data.order.orderNumber}`);
+                  router.push(`/order-success/${targetOrderNumber}`);
                 }
               } catch (vErr) {
                 error('Payment verification request failed');
-                router.push(`/order-success/${data.order.orderNumber}`);
+                router.push(`/order-success/${targetOrderNumber}`);
               }
             },
             modal: {
               ondismiss: function () {
                 info('Payment window was closed. Your order was created as Pending.');
-                router.push(`/order-success/${data.order.orderNumber}`);
+                router.push(`/order-success/${targetOrderNumber}`);
               },
             },
           };
@@ -481,18 +484,18 @@ function CheckoutContent() {
           rzp.open();
           return;
         } else {
-          // Demo / Test Mode when waiting for client production keys
+          // Demo / Test Mode fallback
           info('Online Payment Architecture Ready. Completing test verification...');
           await fetch('/api/payment/verify', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              orderNumber: data.order.orderNumber,
+              orderNumber: targetOrderNumber,
               isDemoMode: true,
             }),
           });
           success('Online payment confirmed! Redirecting...');
-          finishOrder(data.order.orderNumber);
+          finishOrder(targetOrderNumber);
           return;
         }
       } else {

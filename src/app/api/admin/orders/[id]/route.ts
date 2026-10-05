@@ -48,6 +48,16 @@ export async function PUT(
     }
 
     if (body.paymentStatus) {
+      // Audit & Security Policy: An order verified as 'Paid' cannot be altered or reverted
+      if (order.paymentStatus === 'Paid' && body.paymentStatus !== 'Paid') {
+        return NextResponse.json(
+          {
+            success: false,
+            message: 'Security Policy: An order verified as Paid cannot be reverted to any other payment status.',
+          },
+          { status: 400 }
+        );
+      }
       order.paymentStatus = body.paymentStatus;
     }
 

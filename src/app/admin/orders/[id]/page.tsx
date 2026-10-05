@@ -17,6 +17,8 @@ import {
   CheckCircle2,
   PackageCheck,
   Tag,
+  CreditCard,
+  Lock,
 } from 'lucide-react';
 import { IOrder, OrderStatusType } from '@/types';
 import { formatPrice, formatDate, formatDateTime } from '@/lib/utils';
@@ -177,19 +179,33 @@ export default function AdminOrderDetailPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                  Payment Status *
+                <label className="block text-xs font-bold text-slate-700 mb-1.5 flex items-center justify-between">
+                  <span>Payment Status *</span>
+                  {order.paymentStatus === 'Paid' && (
+                    <span className="text-[10px] text-emerald-700 font-bold flex items-center gap-1">
+                      <Lock className="w-2.5 h-2.5" /> Locked
+                    </span>
+                  )}
                 </label>
-                <select
-                  value={paymentStatus}
-                  onChange={(e) => setPaymentStatus(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
-                >
-                  <option value="Pending">Pending</option>
-                  <option value="Paid">Paid</option>
-                  <option value="Failed">Failed</option>
-                  <option value="Refunded">Refunded</option>
-                </select>
+                {order.paymentStatus === 'Paid' ? (
+                  <div className="w-full bg-emerald-50/80 border border-emerald-200/90 rounded-xl px-3 py-2 text-xs font-bold text-emerald-800 flex items-center justify-between">
+                    <span className="flex items-center gap-1.5">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                      Paid (Verified & Immutable)
+                    </span>
+                    <Lock className="w-3 h-3 text-emerald-600" />
+                  </div>
+                ) : (
+                  <select
+                    value={paymentStatus}
+                    onChange={(e) => setPaymentStatus(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                  >
+                    <option value="Pending">Pending</option>
+                    <option value="Paid">Paid</option>
+                    <option value="Failed">Failed</option>
+                  </select>
+                )}
               </div>
 
               <div>
@@ -271,6 +287,62 @@ export default function AdminOrderDetailPage() {
 
         {/* Right Column: Customer & Order Breakdown */}
         <div className="lg:col-span-5 flex flex-col gap-6">
+          {/* Payment & Gateway Verification */}
+          <div className="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col gap-3 text-xs">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <CreditCard className="w-4 h-4 text-emerald-600" />
+                <h3 className="text-sm font-black text-slate-900 uppercase tracking-tight">
+                  Payment Verification
+                </h3>
+              </div>
+              <span
+                className={`text-[10px] font-black uppercase px-2.5 py-1 rounded-full ${
+                  order.paymentStatus === 'Paid'
+                    ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                    : 'bg-amber-100 text-amber-800 border border-amber-300'
+                }`}
+              >
+                {order.paymentStatus === 'Paid' ? '✓ Payment Received' : '⏳ Pending Payment'}
+              </span>
+            </div>
+
+            <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+              <div className="flex justify-between items-center">
+                <span className="text-slate-500 font-medium">Method:</span>
+                <strong className="text-slate-900 font-bold">{order.paymentMethod}</strong>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-slate-500 font-medium">Gateway:</span>
+                <span className="text-slate-800 font-medium">
+                  {order.paymentDetails?.gateway || (order.paymentMethod === 'COD' ? 'Cash on Delivery' : 'Razorpay')}
+                </span>
+              </div>
+              {order.paymentDetails?.paymentId && (
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-500 font-medium">Razorpay Txn ID:</span>
+                  <code className="text-[11px] font-mono font-bold text-brand-600 bg-brand-50 px-1.5 py-0.5 rounded border border-brand-200">
+                    {order.paymentDetails.paymentId}
+                  </code>
+                </div>
+              )}
+              {order.paymentDetails?.orderId && (
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-500 font-medium">Razorpay Order ID:</span>
+                  <code className="text-[11px] font-mono text-slate-700 bg-white px-1.5 py-0.5 rounded border border-slate-200">
+                    {order.paymentDetails.orderId}
+                  </code>
+                </div>
+              )}
+              {order.paymentDetails?.paidAt && (
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-500 font-medium">Verified On:</span>
+                  <span className="text-slate-700 font-medium">{formatDateTime(order.paymentDetails.paidAt)}</span>
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* Customer & Address */}
           <div className="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col gap-4 text-xs">
             <h3 className="text-sm font-black text-slate-900 uppercase tracking-tight">
