@@ -6,13 +6,56 @@ import User from '@/models/User';
 import { extractAuthUser } from '@/lib/auth';
 import { generateOrderNumber } from '@/lib/utils';
 import { FREE_SHIPPING_THRESHOLD, STANDARD_SHIPPING_COST, TAX_RATE } from '@/lib/constants';
+import { verifyRazorpaySignature } from '@/lib/razorpay';
 
 export async function POST(req: NextRequest) {
   try {
     const auth = extractAuthUser(req);
     const body = await req.json();
 
-    const { customer, shippingAddress, items, paymentMethod, notes, couponCode } = body;
+    const { customer, shippingAddress, items, paymentMethod, notes, couponCode, paymentDetails } = body;
+
+    const isOnlinePayment = paymentMethod && paymentMethod !== 'COD';
+    let verifiedPaymentDetails: any = {
+      gateway: '',
+      orderId: '',
+      paymentId: '',
+      signature: '',
+    };
+
+    if (isOnlinePayment) {
+      if (
+        !paymentDetails?.razorpay_order_id ||
+        !paymentDetails?.razorpay_payment_id ||
+        !paymentDetails?.razorpay_signature
+      ) {
+        return NextResponse.json(
+          { success: false, message: 'Incomplete online payment credentials. Payment was not received.' },
+          { status: 400 }
+        );
+      }
+
+      const isValid = verifyRazorpaySignature({
+        orderId: paymentDetails.razorpay_order_id,
+        paymentId: paymentDetails.razorpay_payment_id,
+        signature: paymentDetails.razorpay_signature,
+      });
+
+      if (!isValid) {
+        return NextResponse.json(
+          { success: false, message: 'Cryptographic signature verification failed. Untrusted payment.' },
+          { status: 400 }
+        );
+      }
+
+      verifiedPaymentDetails = {
+        gateway: 'Razorpay',
+        orderId: paymentDetails.razorpay_order_id,
+        paymentId: paymentDetails.razorpay_payment_id,
+        signature: paymentDetails.razorpay_signature,
+        paidAt: new Date(),
+      };
+    }
 
     // Validation
     const customerName = (customer?.name || shippingAddress?.name || '').trim();
@@ -211,8 +254,9 @@ export async function POST(req: NextRequest) {
           total,
         },
         paymentMethod: paymentMethod || 'COD',
-        paymentStatus: paymentMethod === 'COD' ? 'Pending' : 'Paid',
+        paymentStatus: isOnlinePayment ? 'Paid' : 'Pending',
         orderStatus: 'Placed',
+        paymentDetails: verifiedPaymentDetails,
         tracking: {
           carrier: 'Srirama Express Courier',
           trackingNumber: `TRK-${orderNumber.replace('SRC-', '')}`,

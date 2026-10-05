@@ -19,6 +19,7 @@ import {
   Tag,
   CreditCard,
   Lock,
+  AlertTriangle,
 } from 'lucide-react';
 import { IOrder, OrderStatusType } from '@/types';
 import { formatPrice, formatDate, formatDateTime } from '@/lib/utils';
@@ -182,12 +183,15 @@ export default function AdminOrderDetailPage() {
                 <label className="block text-xs font-bold text-slate-700 mb-1.5 flex items-center justify-between">
                   <span>Payment Status *</span>
                   {order.paymentStatus === 'Paid' && (
-                    <span className="text-[10px] text-emerald-700 font-bold flex items-center gap-1">
-                      <Lock className="w-2.5 h-2.5" /> Locked
+                    <span className={`text-[10px] font-bold flex items-center gap-1 ${
+                      order.paymentDetails?.paymentId ? 'text-emerald-700' : 'text-amber-700'
+                    }`}>
+                      {order.paymentDetails?.paymentId ? <><Lock className="w-2.5 h-2.5" /> Locked</> : <><AlertTriangle className="w-2.5 h-2.5" /> Action Needed</>}
                     </span>
                   )}
                 </label>
-                {order.paymentStatus === 'Paid' ? (
+                {/* 1. Genuinely verified online payment with Razorpay paymentId or POS counter payment */}
+                {order.paymentStatus === 'Paid' && (order.paymentDetails?.paymentId || order.orderSource === 'POS') ? (
                   <div className="w-full bg-emerald-50/80 border border-emerald-200/90 rounded-xl px-3 py-2 text-xs font-bold text-emerald-800 flex items-center justify-between">
                     <span className="flex items-center gap-1.5">
                       <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
@@ -195,14 +199,34 @@ export default function AdminOrderDetailPage() {
                     </span>
                     <Lock className="w-3 h-3 text-emerald-600" />
                   </div>
+                ) : order.paymentStatus === 'Paid' && !order.paymentDetails?.paymentId ? (
+                  /* 2. Unverified: Marked Paid previously without a paymentId -> Allow admin to fix */
+                  <div className="flex flex-col gap-2">
+                    <div className="w-full bg-amber-50 border border-amber-300 rounded-xl px-3 py-2 text-xs font-bold text-amber-900 flex items-center justify-between">
+                      <span className="flex items-center gap-1.5">
+                        <AlertTriangle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                        Unverified (No Bank / Razorpay Txn ID)
+                      </span>
+                    </div>
+                    <select
+                      value={paymentStatus}
+                      onChange={(e) => setPaymentStatus(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                    >
+                      <option value="Pending">Revert to Pending (Unpaid)</option>
+                      <option value="Failed">Mark as Failed</option>
+                      <option value="Paid">Keep as Paid (Manual Store Override)</option>
+                    </select>
+                  </div>
                 ) : (
+                  /* 3. Normal Pending / Failed status -> can be updated */
                   <select
                     value={paymentStatus}
                     onChange={(e) => setPaymentStatus(e.target.value)}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
                   >
                     <option value="Pending">Pending</option>
-                    <option value="Paid">Paid</option>
+                    <option value="Paid">Paid (Cash / Store Received)</option>
                     <option value="Failed">Failed</option>
                   </select>
                 )}
@@ -298,12 +322,20 @@ export default function AdminOrderDetailPage() {
               </div>
               <span
                 className={`text-[10px] font-black uppercase px-2.5 py-1 rounded-full ${
-                  order.paymentStatus === 'Paid'
+                  order.paymentDetails?.paymentId || order.orderSource === 'POS'
                     ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
-                    : 'bg-amber-100 text-amber-800 border border-amber-300'
+                    : order.paymentStatus === 'Paid'
+                    ? 'bg-amber-100 text-amber-800 border border-amber-300'
+                    : 'bg-slate-100 text-slate-700 border border-slate-300'
                 }`}
               >
-                {order.paymentStatus === 'Paid' ? '✓ Payment Received' : '⏳ Pending Payment'}
+                {order.paymentDetails?.paymentId
+                  ? '✓ Verified with Bank'
+                  : order.orderSource === 'POS'
+                  ? '✓ Counter Sale'
+                  : order.paymentStatus === 'Paid'
+                  ? '⚠️ Unverified (No Bank Txn ID)'
+                  : '⏳ Pending Payment'}
               </span>
             </div>
 
@@ -318,14 +350,18 @@ export default function AdminOrderDetailPage() {
                   {order.paymentDetails?.gateway || (order.paymentMethod === 'COD' ? 'Cash on Delivery' : 'Razorpay')}
                 </span>
               </div>
-              {order.paymentDetails?.paymentId && (
+              {order.paymentDetails?.paymentId ? (
                 <div className="flex justify-between items-center">
                   <span className="text-slate-500 font-medium">Razorpay Txn ID:</span>
                   <code className="text-[11px] font-mono font-bold text-brand-600 bg-brand-50 px-1.5 py-0.5 rounded border border-brand-200">
                     {order.paymentDetails.paymentId}
                   </code>
                 </div>
-              )}
+              ) : order.paymentMethod !== 'COD' && order.orderSource !== 'POS' ? (
+                <div className="p-2 bg-amber-50/80 rounded-lg border border-amber-200 text-amber-900 text-[11px]">
+                  ⚠️ <strong>No Transaction ID:</strong> Customer did not complete Razorpay payment.
+                </div>
+              ) : null}
               {order.paymentDetails?.orderId && (
                 <div className="flex justify-between items-center">
                   <span className="text-slate-500 font-medium">Razorpay Order ID:</span>

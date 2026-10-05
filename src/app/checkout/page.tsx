@@ -379,131 +379,128 @@ function CheckoutContent() {
         couponCode: activeCoupon || undefined,
       };
 
-      const res = await fetch('/api/orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(orderPayload),
-      });
-
-      const data = await res.json();
-
-      if (data.success) {
-        const targetOrderNumber = data.order?.orderNumber || data.orderNumber;
-        const targetAmount = data.order?.pricing?.total || checkoutTotal;
-
-        // 1. If Cash on Delivery, complete immediately
-        if (paymentMethod === 'COD') {
-          success('Order placed successfully! Redirecting...');
-          finishOrder(targetOrderNumber);
-          return;
-        }
-
-        // 2. If Online Payment (UPI / Card / Net Banking), initiate Razorpay
-        info('Connecting to secure payment gateway...');
-        const rzpOrderRes = await fetch('/api/payment/create-order', {
+      // 1. If Cash on Delivery, place order directly in DB
+      if (paymentMethod === 'COD') {
+        const res = await fetch('/api/orders', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            orderNumber: targetOrderNumber,
-            amount: targetAmount,
-            customer: orderPayload.customer,
-          }),
+          body: JSON.stringify(orderPayload),
         });
 
-        const rzpData = await rzpOrderRes.json();
+        const data = await res.json();
+        if (data.success) {
+          success('Order placed successfully! Redirecting...');
+          const targetOrderNumber = data.order?.orderNumber || data.orderNumber;
+          finishOrder(targetOrderNumber);
+        } else {
+          error(data.message || 'Failed to place order. Please try again.');
+          setLoading(false);
+        }
+        return;
+      }
 
-        if (rzpData.success && rzpData.isLiveGateway) {
-          // Dynamic script loader for Razorpay checkout.js
-          const loadScript = () =>
-            new Promise<boolean>((resolve) => {
-              if ((window as any).Razorpay) return resolve(true);
-              const script = document.createElement('script');
-              script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-              script.onload = () => resolve(true);
-              script.onerror = () => resolve(false);
-              document.body.appendChild(script);
+      // 2. If Online Payment (UPI / Card / Net Banking): Initiate Razorpay FIRST!
+      // No order is created in DB yet, ensuring zero unpaid clutter in Admin if payment is cancelled.
+      info('Connecting to secure payment gateway...');
+      const rzpOrderRes = await fetch('/api/payment/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: checkoutTotal,
+          customer: orderPayload.customer,
+        }),
+      });
+
+      const rzpData = await rzpOrderRes.json();
+
+      if (!rzpData.success || !rzpData.orderId) {
+        error(rzpData.message || 'Unable to connect to payment gateway. Please choose Cash on Delivery or try again.');
+        setLoading(false);
+        return;
+      }
+
+      // Dynamic script loader for Razorpay checkout.js
+      const loadScript = () =>
+        new Promise<boolean>((resolve) => {
+          if ((window as any).Razorpay) return resolve(true);
+          const script = document.createElement('script');
+          script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+          script.onload = () => resolve(true);
+          script.onerror = () => resolve(false);
+          document.body.appendChild(script);
+        });
+
+      const loaded = await loadScript();
+      if (!loaded) {
+        error('Failed to load Razorpay payment SDK. Please try again.');
+        setLoading(false);
+        return;
+      }
+
+      const options = {
+        key: rzpData.keyId,
+        amount: rzpData.amount,
+        currency: rzpData.currency || 'INR',
+        name: 'Sri Rama Cycle & Auto Spare Parts',
+        description: 'Bicycle & Spares Order Payment',
+        image: '/favicon.svg',
+        order_id: rzpData.orderId,
+        prefill: {
+          name: customerName,
+          contact: customerPhone,
+          email: customerEmail,
+        },
+        theme: {
+          color: '#dc2626',
+        },
+        handler: async function (response: any) {
+          // PAYMENT WAS SUCCESSFUL ON RAZORPAY! Now create and verify the order in DB!
+          try {
+            info('Payment received! Finalizing your order...');
+            const finalOrderRes = await fetch('/api/orders', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                ...orderPayload,
+                paymentDetails: {
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature: response.razorpay_signature,
+                },
+              }),
             });
 
-          const loaded = await loadScript();
-          if (!loaded) {
-            error('Failed to load Razorpay payment SDK. Please try again.');
+            const finalOrderData = await finalOrderRes.json();
+
+            if (finalOrderData.success) {
+              success('Payment verified & Order placed successfully! Redirecting...');
+              const targetOrderNumber = finalOrderData.order?.orderNumber || finalOrderData.orderNumber;
+              finishOrder(targetOrderNumber);
+            } else {
+              error(finalOrderData.message || 'Order confirmation failed. Please contact store support.');
+              setLoading(false);
+            }
+          } catch (vErr) {
+            error('Payment received but order registration failed. Please contact support.');
             setLoading(false);
-            return;
           }
+        },
+        modal: {
+          ondismiss: function () {
+            error('Payment was cancelled or closed. Your account was NOT charged, and no order was placed.');
+            setLoading(false);
+          },
+        },
+      };
 
-          const options = {
-            key: rzpData.keyId,
-            amount: rzpData.amount,
-            currency: rzpData.currency || 'INR',
-            name: 'Sri Rama Cycle & Auto Spare Parts',
-            description: `Order #${targetOrderNumber}`,
-            image: '/favicon.svg',
-            order_id: rzpData.orderId,
-            prefill: {
-              name: customerName,
-              contact: customerPhone,
-              email: customerEmail,
-            },
-            theme: {
-              color: '#dc2626',
-            },
-            handler: async function (response: any) {
-              try {
-                const verifyRes = await fetch('/api/payment/verify', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    orderNumber: targetOrderNumber,
-                    razorpay_order_id: response.razorpay_order_id,
-                    razorpay_payment_id: response.razorpay_payment_id,
-                    razorpay_signature: response.razorpay_signature,
-                  }),
-                });
-                const verifyData = await verifyRes.json();
-                if (verifyData.success) {
-                  success('Payment verified successfully! Redirecting...');
-                  finishOrder(targetOrderNumber);
-                } else {
-                  error(verifyData.message || 'Payment verification failed');
-                  router.push(`/order-success/${targetOrderNumber}`);
-                }
-              } catch (vErr) {
-                error('Payment verification request failed');
-                router.push(`/order-success/${targetOrderNumber}`);
-              }
-            },
-            modal: {
-              ondismiss: function () {
-                info('Payment window was closed. Your order was created as Pending.');
-                router.push(`/order-success/${targetOrderNumber}`);
-              },
-            },
-          };
-
-          const rzp = new (window as any).Razorpay(options);
-          rzp.open();
-          return;
-        } else {
-          // Demo / Test Mode fallback
-          info('Online Payment Architecture Ready. Completing test verification...');
-          await fetch('/api/payment/verify', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              orderNumber: targetOrderNumber,
-              isDemoMode: true,
-            }),
-          });
-          success('Online payment confirmed! Redirecting...');
-          finishOrder(targetOrderNumber);
-          return;
-        }
-      } else {
-        error(data.message || 'Failed to place order. Please try again.');
-      }
+      const rzp = new (window as any).Razorpay(options);
+      rzp.on('payment.failed', function (resp: any) {
+        error(resp.error?.description || 'Payment was declined by your bank/UPI. Please try again or choose Cash on Delivery.');
+        setLoading(false);
+      });
+      rzp.open();
     } catch (err) {
       error('An unexpected error occurred while placing order');
-    } finally {
       setLoading(false);
     }
   };

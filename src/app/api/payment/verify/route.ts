@@ -33,32 +33,45 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const razorpay = getRazorpayClient();
-
-    // Verify cryptographic signature if live gateway is configured
-    if (razorpay && !isDemoMode) {
-      const isValid = verifyRazorpaySignature({
-        orderId: razorpay_order_id,
-        paymentId: razorpay_payment_id,
-        signature: razorpay_signature,
-      });
-
-      if (!isValid) {
-        return NextResponse.json(
-          { success: false, message: 'Invalid payment signature. Verification failed.' },
-          { status: 400 }
-        );
-      }
+    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+      return NextResponse.json(
+        { success: false, message: 'Incomplete payment credentials received from gateway.' },
+        { status: 400 }
+      );
     }
 
-    // Mark order as Paid and Confirmed
+    const razorpay = getRazorpayClient();
+    if (!razorpay) {
+      return NextResponse.json(
+        { success: false, message: 'Payment gateway configuration missing.' },
+        { status: 500 }
+      );
+    }
+
+    // Verify cryptographic HMAC SHA256 signature
+    const isValid = verifyRazorpaySignature({
+      orderId: razorpay_order_id,
+      paymentId: razorpay_payment_id,
+      signature: razorpay_signature,
+    });
+
+    if (!isValid) {
+      order.paymentStatus = 'Failed';
+      await order.save();
+      return NextResponse.json(
+        { success: false, message: 'Cryptographic signature verification failed. Untrusted payment.' },
+        { status: 400 }
+      );
+    }
+
+    // Mark order as Paid with verified transaction details
+    // Note: orderStatus remains 'Placed' so store admin can review and confirm manually!
     order.paymentStatus = 'Paid';
-    order.orderStatus = 'Confirmed';
     order.paymentDetails = {
-      gateway: isDemoMode ? 'Razorpay (Test/Demo)' : 'Razorpay',
-      orderId: razorpay_order_id || 'manual_test',
-      paymentId: razorpay_payment_id || `pay_${Date.now()}`,
-      signature: razorpay_signature || '',
+      gateway: 'Razorpay',
+      orderId: razorpay_order_id,
+      paymentId: razorpay_payment_id,
+      signature: razorpay_signature,
       paidAt: new Date(),
     };
 
@@ -66,8 +79,8 @@ export async function POST(req: NextRequest) {
     order.tracking = order.tracking || { carrier: 'Srirama Express Courier', trackingNumber: '', statusUpdates: [] };
     order.tracking.statusUpdates = order.tracking.statusUpdates || [];
     order.tracking.statusUpdates.push({
-      status: 'Confirmed',
-      message: `Online payment of ₹${order.pricing.total.toLocaleString('en-IN')} verified successfully via Razorpay.`,
+      status: 'Payment Received',
+      message: `Online payment of ₹${order.pricing.total.toLocaleString('en-IN')} verified successfully via Razorpay (Txn ID: ${razorpay_payment_id}). Ready for store confirmation.`,
       timestamp: new Date(),
     });
 
@@ -75,7 +88,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Payment verified and order confirmed successfully',
+      message: 'Payment verified successfully. Order is placed and awaiting store confirmation.',
       orderNumber: order.orderNumber,
       paymentId: order.paymentDetails.paymentId,
     });

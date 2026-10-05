@@ -48,12 +48,16 @@ export async function PUT(
     }
 
     if (body.paymentStatus) {
-      // Audit & Security Policy: An order verified as 'Paid' cannot be altered or reverted
-      if (order.paymentStatus === 'Paid' && body.paymentStatus !== 'Paid') {
+      // Audit & Security Policy: Only genuinely verified payments with a valid paymentId or POS receipt are locked
+      const hasRealPaymentId = order.paymentDetails?.paymentId && order.paymentDetails.paymentId.trim() !== '';
+      const isPosPaid = order.orderSource === 'POS' && order.posDetails?.paymentMode;
+      const isGenuinelyVerifiedPaid = order.paymentStatus === 'Paid' && (hasRealPaymentId || isPosPaid);
+
+      if (isGenuinelyVerifiedPaid && body.paymentStatus !== 'Paid') {
         return NextResponse.json(
           {
             success: false,
-            message: 'Security Policy: An order verified as Paid cannot be reverted to any other payment status.',
+            message: 'Security Policy: An order with a verified payment ID cannot be altered or reverted.',
           },
           { status: 400 }
         );
