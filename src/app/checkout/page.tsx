@@ -89,8 +89,7 @@ function CheckoutContent() {
   }, [isBuyNow, buyNowDiscount, discount]);
 
   const discountedSubtotal = Math.max(0, checkoutSubtotal - checkoutDiscount);
-  const checkoutShipping =
-    discountedSubtotal >= 999 || discountedSubtotal === 0 ? 0 : 99;
+  const checkoutShipping = 0; // 100% Free delivery on all orders
   const checkoutTotal = discountedSubtotal + checkoutShipping;
 
   const handleUpdateBuyNowQty = (newQty: number) => {
@@ -788,7 +787,7 @@ function CheckoutContent() {
                 })}
 
                 {/* Price Breakdown */}
-                <div className="pt-2 border-t border-slate-200/60 flex flex-col gap-1 text-[11px] text-slate-600">
+                <div className="pt-2 border-t border-slate-200/60 flex flex-col gap-1.5 text-[11px] text-slate-600">
                   <div className="flex justify-between">
                     <span>Subtotal</span>
                     <span>{formatPrice(checkoutSubtotal)}</span>
@@ -799,19 +798,32 @@ function CheckoutContent() {
                       <span>-{formatPrice(checkoutDiscount)}</span>
                     </div>
                   )}
-                  <div className="flex justify-between">
-                    <span>Delivery Fee</span>
-                    <span className="text-emerald-600 font-bold">
-                      {checkoutShipping === 0 ? 'FREE' : formatPrice(checkoutShipping)}
+                  <div className="flex justify-between items-center">
+                    <span>Doorstep Delivery</span>
+                    <span className="text-emerald-600 font-bold flex items-center gap-1.5">
+                      <span className="line-through text-slate-400 font-normal text-[10px]">₹149</span>
+                      <span className="bg-emerald-100 text-emerald-800 text-[10px] px-1.5 py-0.5 rounded-md font-extrabold">FREE</span>
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center bg-slate-100/70 p-2 rounded-xl border border-slate-200/60 text-slate-700 text-[10px]">
+                    <span className="flex items-center gap-1 font-semibold">
+                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                      <span>GST Charges</span>
+                    </span>
+                    <span className="font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/60">
+                      Included in Price
                     </span>
                   </div>
                   <div className="flex justify-between text-amber-700 font-bold">
                     <span>Estimated Delivery</span>
                     <span>5 Working Days</span>
                   </div>
-                  <div className="flex justify-between font-bold text-slate-900 pt-1 text-xs">
-                    <span>Total Amount</span>
-                    <span>{formatPrice(checkoutTotal)}</span>
+                  <div className="flex justify-between items-baseline font-bold text-slate-900 pt-1.5 border-t border-slate-200/60">
+                    <div className="flex flex-col">
+                      <span className="text-xs">Total Amount</span>
+                      <span className="text-[10px] text-emerald-600 font-normal">All taxes & shipping included</span>
+                    </div>
+                    <span className="text-sm font-black text-brand-600">{formatPrice(checkoutTotal)}</span>
                   </div>
                 </div>
               </div>

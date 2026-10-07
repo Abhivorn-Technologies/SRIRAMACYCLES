@@ -222,10 +222,8 @@ export default function OrderDetailPage() {
               </span>
             </div>
             <div className="w-full sm:w-64 flex justify-between text-slate-600">
-              <span>GST Tax (12%):</span>
-              <span className="font-semibold text-slate-900">
-                {formatPrice(order.pricing.tax)}
-              </span>
+              <span>GST Charges:</span>
+              <span className="font-semibold text-emerald-700">Included in Price</span>
             </div>
             <div className="w-full sm:w-64 flex justify-between text-sm font-black text-slate-900 pt-2 border-t border-slate-200">
               <span>Grand Total:</span>

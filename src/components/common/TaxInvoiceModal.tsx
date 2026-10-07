@@ -160,9 +160,9 @@ export default function TaxInvoiceModal({ order, isOpen, onClose }: ITaxInvoiceM
           <div className="flex flex-col sm:flex-row items-start justify-between gap-6 pt-4 border-t border-slate-200">
             <div className="text-xs text-slate-500 max-w-sm flex flex-col gap-1">
               <p className="font-bold text-slate-700">Terms & Conditions:</p>
-              <p>• Prices are inclusive of all applicable Taxes & GST (12% / 18%).</p>
+              <p>• Prices are inclusive of all applicable Taxes & GST.</p>
               <p>• 1-Year Frame Warranty valid against manufacturing defects.</p>
-              <p>• Doorstep delivery charges applicable as displayed during checkout.</p>
+              <p>• Free doorstep delivery on all orders.</p>
             </div>
 
             <div className="w-full sm:w-72 flex flex-col gap-1.5 text-xs text-slate-700 bg-slate-50 p-4 rounded-2xl border border-slate-200">
@@ -181,6 +181,10 @@ export default function TaxInvoiceModal({ order, isOpen, onClose }: ITaxInvoiceM
                 <span className="text-emerald-700 font-bold">
                   {order.pricing.shipping === 0 ? 'FREE' : formatPrice(order.pricing.shipping)}
                 </span>
+              </div>
+              <div className="flex justify-between">
+                <span>GST Charges</span>
+                <span className="font-semibold text-emerald-700">Included in Price</span>
               </div>
               <div className="flex justify-between text-[11px] text-amber-800 font-bold">
                 <span>Estimated Delivery Timeframe</span>

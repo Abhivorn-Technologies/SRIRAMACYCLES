@@ -223,12 +223,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }
 
   const discountedSubtotal = Math.max(0, subtotal - discount);
-
-  const shipping =
-    discountedSubtotal >= FREE_SHIPPING_THRESHOLD || discountedSubtotal === 0
-      ? 0
-      : STANDARD_SHIPPING_COST;
-
+  const shipping = 0; // 100% Free delivery on all orders
   const tax = 0; // Prices are inclusive of GST
   const total = discountedSubtotal + shipping;
 

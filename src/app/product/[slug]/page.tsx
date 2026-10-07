@@ -351,6 +351,18 @@ export default function ProductDetailPage() {
                 )}
               </div>
 
+              {/* Tax & Delivery Highlight */}
+              <div className="mt-2.5 flex flex-wrap items-center gap-2 text-[11px] font-semibold">
+                <span className="flex items-center gap-1 bg-emerald-50 border border-emerald-200/80 text-emerald-800 px-2.5 py-0.5 rounded-full">
+                  <Truck className="w-3.5 h-3.5 text-emerald-600" />
+                  Free Doorstep Delivery
+                </span>
+                <span className="flex items-center gap-1 bg-slate-100 border border-slate-200 text-slate-700 px-2.5 py-0.5 rounded-full">
+                  <ShieldCheck className="w-3.5 h-3.5 text-slate-600" />
+                  Inclusive of GST
+                </span>
+              </div>
+
               {/* Stock Status */}
               <div className="mt-4 flex items-center gap-2">
                 {product.stock > 0 ? (

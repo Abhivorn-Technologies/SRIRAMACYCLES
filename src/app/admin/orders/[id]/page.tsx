@@ -496,8 +496,8 @@ export default function AdminOrderDetailPage() {
                 <span>{order.pricing.shipping === 0 ? 'FREE' : formatPrice(order.pricing.shipping)}</span>
               </div>
               <div className="flex justify-between text-slate-500">
-                <span>GST:</span>
-                <span>{formatPrice(order.pricing.tax)}</span>
+                <span>GST Charges:</span>
+                <span className="font-semibold text-emerald-700">Included in Price</span>
               </div>
               <div className="flex justify-between text-sm font-black text-slate-900 pt-2 border-t border-slate-200">
                 <span>Grand Total:</span>

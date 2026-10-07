@@ -104,29 +104,25 @@ export default function CartPage() {
           </button>
         </div>
 
-        {/* Free Shipping Progress Alert */}
-        <div className="bg-white p-4 rounded-2xl border border-slate-200/80 mb-8 shadow-xs">
-          <div className="flex items-center justify-between text-xs font-bold text-slate-800 mb-2">
-            <span className="flex items-center gap-1.5">
-              <Truck className="w-4 h-4 text-brand-600" />
-              {amountRemainingForFreeShipping === 0 ? (
-                <span className="text-emerald-600 font-bold">
-                  🎉 Congratulations! You unlocked Free Delivery!
-                </span>
-              ) : (
-                <span>
-                  Add {formatPrice(amountRemainingForFreeShipping)} more to qualify for{' '}
-                  <strong className="text-brand-600">FREE Delivery</strong>
-                </span>
-              )}
-            </span>
-            <span>{freeShippingProgress}%</span>
+        {/* Free Shipping & Inclusive GST Banner */}
+        <div className="bg-emerald-50/70 border border-emerald-200/80 p-4 rounded-2xl mb-8 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0">
+              <Truck className="w-5 h-5 text-emerald-700" />
+            </div>
+            <div>
+              <p className="text-xs font-bold text-emerald-950 flex items-center gap-1.5">
+                <span>100% Free Doorstep Delivery On All Orders!</span>
+                <span className="bg-emerald-600 text-white text-[10px] font-extrabold px-1.5 py-0.5 rounded-md">FREE</span>
+              </p>
+              <p className="text-[11px] text-emerald-700">
+                Arrives 95% assembled with complimentary toolkit • All prices are inclusive of GST
+              </p>
+            </div>
           </div>
-          <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-            <div
-              className="bg-brand-600 h-2 rounded-full transition-all duration-500"
-              style={{ width: `${freeShippingProgress}%` }}
-            />
+          <div className="flex items-center gap-2 text-xs font-bold text-emerald-800 shrink-0 self-start sm:self-auto">
+            <ShieldCheck className="w-4 h-4 text-emerald-600" />
+            <span>Zero Hidden Charges</span>
           </div>
         </div>
 
@@ -354,19 +350,30 @@ export default function CartPage() {
                   </div>
                 )}
 
-                <div className="flex justify-between text-slate-600">
+                <div className="flex justify-between items-center text-slate-600">
                   <span>Estimated Shipping</span>
-                  <span className="font-semibold text-slate-900">
-                    {shipping === 0 ? (
-                      <span className="text-emerald-600 font-bold">FREE</span>
-                    ) : (
-                      formatPrice(shipping)
-                    )}
+                  <span className="font-semibold text-slate-900 flex items-center gap-1.5">
+                    <span className="line-through text-slate-400 font-normal text-[10px]">₹149</span>
+                    <span className="bg-emerald-100 text-emerald-800 text-[10px] px-1.5 py-0.5 rounded-md font-extrabold">FREE</span>
                   </span>
                 </div>
 
-                <div className="flex justify-between text-base font-black text-slate-900 pt-3 border-t border-slate-100">
-                  <span>Grand Total</span>
+                {/* GST Charges Included in price */}
+                <div className="flex justify-between items-center bg-slate-50 p-2 rounded-xl border border-slate-200/60 text-slate-700 text-[11px]">
+                  <span className="flex items-center gap-1.5 font-medium">
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <span>GST Charges</span>
+                  </span>
+                  <span className="font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/60 text-[11px]">
+                    Included in Price
+                  </span>
+                </div>
+
+                <div className="flex justify-between items-baseline text-base font-black text-slate-900 pt-3 border-t border-slate-100">
+                  <div className="flex flex-col">
+                    <span>Grand Total</span>
+                    <span className="text-[10px] font-normal text-emerald-600">Inclusive of all taxes & free delivery</span>
+                  </div>
                   <span className="text-brand-600">{formatPrice(total)}</span>
                 </div>
               </div>

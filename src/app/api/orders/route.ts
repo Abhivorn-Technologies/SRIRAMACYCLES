@@ -153,12 +153,9 @@ export async function POST(req: NextRequest) {
     }
 
     const discountedSubtotal = subtotal - discount;
-    const shipping =
-      discountedSubtotal >= FREE_SHIPPING_THRESHOLD || discountedSubtotal === 0
-        ? 0
-        : STANDARD_SHIPPING_COST;
-    const tax = Math.round(discountedSubtotal * TAX_RATE);
-    const total = discountedSubtotal + shipping + tax;
+    const shipping = 0; // 100% Free delivery on all orders
+    const tax = 0; // Prices are inclusive of GST
+    const total = discountedSubtotal + shipping;
 
     const orderNumber = generateOrderNumber();
 

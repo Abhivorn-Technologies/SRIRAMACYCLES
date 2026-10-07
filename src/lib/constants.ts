@@ -6,8 +6,8 @@ export const APP_DESCRIPTION =
   'Sri Rama Cycle and Auto Spare Parts (Kazipet, Hanumakonda) - Leading store since 1976 for premium road cycles, mountain cycles, standard cycles, disc brake cycles, auto spare parts, and expert service.';
 
 export const CURRENCY_SYMBOL = '₹';
-export const FREE_SHIPPING_THRESHOLD = 999;
-export const STANDARD_SHIPPING_COST = 149;
+export const FREE_SHIPPING_THRESHOLD = 0; // 100% Free shipping on all orders
+export const STANDARD_SHIPPING_COST = 0; // Completely free delivery
 export const TAX_RATE = 0; // Prices are inclusive of GST
 
 export const NAV_LINKS = [
