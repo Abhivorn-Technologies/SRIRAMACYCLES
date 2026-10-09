@@ -18,6 +18,7 @@ import {
 import { IOrder, OrderStatusType } from '@/types';
 import { formatPrice, formatDate, formatDateTime } from '@/lib/utils';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
+import { STORE_CONTACT } from '@/lib/constants';
 
 const TRACKING_STEPS: { status: OrderStatusType; label: string; description: string }[] = [
   { status: 'Placed', label: 'Order Placed', description: 'Order received and logged in system' },
@@ -348,7 +349,7 @@ function TrackOrderContent() {
             <h3 className="text-base font-bold text-slate-900">Order Not Found</h3>
             <p className="text-xs text-slate-500 max-w-sm mt-1 mb-4">{errorMessage}</p>
             <p className="text-[11px] text-slate-400">
-              Need assistance? Contact support at +91 98765 43210 or support@sriramacycles.com
+              Need assistance? Contact support at {STORE_CONTACT.phone} or {STORE_CONTACT.supportEmail}
             </p>
           </div>
         )}
