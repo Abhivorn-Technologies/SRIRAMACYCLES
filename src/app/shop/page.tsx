@@ -11,8 +11,10 @@ import FilterSidebar from '@/components/store/FilterSidebar';
 import QuickViewModal from '@/components/store/QuickViewModal';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Pagination from '@/components/common/Pagination';
+import { useLanguage } from '@/context/LanguageContext';
 
 function ShopContent() {
+  const { t } = useLanguage();
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -131,23 +133,23 @@ function ShopContent() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50/50 py-10">
+    <div className="min-h-screen bg-slate-50/50 dark:bg-slate-950 py-10 transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Title & Integrated Controls */}
-        <div className="mb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-200/80 pb-6">
+        <div className="mb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-200/80 dark:border-slate-800 pb-6">
           <div>
-            <span className="text-xs font-bold text-brand-600 uppercase tracking-widest">
-              Srirama Collection
+            <span className="text-xs font-bold text-brand-600 dark:text-brand-400 uppercase tracking-widest">
+              {t('shop.title')}
             </span>
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 mt-1">
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-white mt-1">
               {selectedCategory
                 ? categories.find((c) => c.slug === selectedCategory)?.name || 'Filtered Cycles'
                 : searchQuery
                   ? `Search: "${searchQuery}"`
-                  : 'All Cycles & Accessories'}
+                  : t('shop.title')}
             </h1>
-            <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-              Showing {products.length} of {totalCount} items
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+              {t('shop.showing_results')} {products.length} {t('shop.products_count')}
             </p>
           </div>
 
@@ -155,27 +157,27 @@ function ShopContent() {
             {/* Mobile Filter Toggle Button */}
             <button
               onClick={() => setIsMobileFilterOpen(true)}
-              className="lg:hidden flex items-center gap-2 bg-brand-600 text-white text-xs font-bold py-2 px-3.5 rounded-xl shadow-xs"
+              className="lg:hidden flex items-center gap-2 bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold py-2 px-3.5 rounded-xl shadow-xs cursor-pointer"
             >
               <SlidersHorizontal className="w-3.5 h-3.5" />
-              <span>Filters</span>
+              <span>{t('shop.filters')}</span>
             </button>
 
             {/* Compact Sort Dropdown */}
-            <div className="flex items-center gap-2 bg-white border border-slate-200/90 rounded-xl px-3 py-1.5 shadow-2xs">
-              <span className="text-xs text-slate-500 font-semibold whitespace-nowrap">Sort:</span>
+            <div className="flex items-center gap-2 bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-xl px-3 py-1.5 shadow-2xs">
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold whitespace-nowrap">{t('shop.sort_by')}:</span>
               <select
                 value={sortBy}
                 onChange={(e) => {
                   setSortBy(e.target.value);
                   setPage(1);
                 }}
-                className="bg-transparent text-xs font-bold text-slate-800 focus:outline-none cursor-pointer"
+                className="bg-transparent text-xs font-bold text-slate-800 dark:text-slate-200 focus:outline-none cursor-pointer"
               >
-                <option value="newest">Newest Arrivals</option>
-                <option value="popular">Popular & Best Rated</option>
-                <option value="price-asc">Price: Low to High</option>
-                <option value="price-desc">Price: High to Low</option>
+                <option value="newest" className="dark:bg-slate-900">{t('shop.sort_newest')}</option>
+                <option value="popular" className="dark:bg-slate-900">{t('shop.sort_popular')}</option>
+                <option value="price-asc" className="dark:bg-slate-900">{t('shop.sort_price_asc')}</option>
+                <option value="price-desc" className="dark:bg-slate-900">{t('shop.sort_price_desc')}</option>
               </select>
             </div>
           </div>
@@ -185,7 +187,7 @@ function ShopContent() {
         {(selectedCategory || selectedBrand || searchQuery || isFeaturedOnly || isBestSellerOnly) && (
           <div className="flex flex-wrap items-center gap-2 mb-6 -mt-2">
             {isFeaturedOnly && (
-              <span className="inline-flex items-center gap-1.5 bg-amber-50 border border-amber-300 text-amber-900 text-xs font-semibold px-3 py-1 rounded-full">
+              <span className="inline-flex items-center gap-1.5 bg-amber-50 dark:bg-amber-950/60 border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-300 text-xs font-semibold px-3 py-1 rounded-full">
                 Featured Cycles
                 <button
                   onClick={() => {
@@ -199,7 +201,7 @@ function ShopContent() {
               </span>
             )}
             {isBestSellerOnly && (
-              <span className="inline-flex items-center gap-1.5 bg-brand-50 border border-brand-300 text-brand-800 text-xs font-semibold px-3 py-1 rounded-full">
+              <span className="inline-flex items-center gap-1.5 bg-brand-50 dark:bg-brand-950/60 border border-brand-300 dark:border-brand-800 text-brand-800 dark:text-brand-300 text-xs font-semibold px-3 py-1 rounded-full">
                 Best Sellers
                 <button
                   onClick={() => {
@@ -213,7 +215,7 @@ function ShopContent() {
               </span>
             )}
             {selectedCategory && (
-              <span className="inline-flex items-center gap-1.5 bg-brand-50 border border-brand-200 text-brand-700 text-xs font-semibold px-3 py-1 rounded-full">
+              <span className="inline-flex items-center gap-1.5 bg-brand-50 dark:bg-brand-950/60 border border-brand-200 dark:border-brand-800 text-brand-700 dark:text-brand-300 text-xs font-semibold px-3 py-1 rounded-full">
                 Category: {selectedCategory}
                 <button onClick={() => handleCategorySelect('')} className="hover:text-brand-900 font-bold ml-0.5">
                   ×
@@ -221,7 +223,7 @@ function ShopContent() {
               </span>
             )}
             {selectedBrand && (
-              <span className="inline-flex items-center gap-1.5 bg-brand-50 border border-brand-200 text-brand-700 text-xs font-semibold px-3 py-1 rounded-full">
+              <span className="inline-flex items-center gap-1.5 bg-brand-50 dark:bg-brand-950/60 border border-brand-200 dark:border-brand-800 text-brand-700 dark:text-brand-300 text-xs font-semibold px-3 py-1 rounded-full">
                 Brand: {selectedBrand}
                 <button onClick={() => setSelectedBrand('')} className="hover:text-brand-900 font-bold ml-0.5">
                   ×
@@ -229,7 +231,7 @@ function ShopContent() {
               </span>
             )}
             {searchQuery && (
-              <span className="inline-flex items-center gap-1.5 bg-slate-100 border border-slate-200 text-slate-700 text-xs font-semibold px-3 py-1 rounded-full">
+              <span className="inline-flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold px-3 py-1 rounded-full">
                 Search: "{searchQuery}"
                 <button onClick={() => setSearchQuery('')} className="hover:text-slate-900 font-bold ml-0.5">
                   ×
@@ -238,9 +240,9 @@ function ShopContent() {
             )}
             <button
               onClick={handleResetFilters}
-              className="text-xs text-rose-600 hover:text-rose-700 font-bold ml-1"
+              className="text-xs text-rose-600 dark:text-rose-400 hover:text-rose-700 font-bold ml-1 cursor-pointer"
             >
-              Reset All
+              {t('shop.reset_filters')}
             </button>
           </div>
         )}
@@ -277,9 +279,9 @@ function ShopContent() {
           {/* Products Grid Area */}
           <div className="flex-1">
             {loading ? (
-              <div className="py-24 flex flex-col items-center justify-center gap-4 bg-white rounded-2xl border border-slate-200/80">
+              <div className="py-24 flex flex-col items-center justify-center gap-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800">
                 <LoadingSpinner size="lg" />
-                <p className="text-xs font-semibold text-slate-500">Loading catalog...</p>
+                <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Loading catalog...</p>
               </div>
             ) : products.length > 0 ? (
               <>
@@ -304,27 +306,27 @@ function ShopContent() {
                       setPage(p);
                       window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
-                    itemLabel="products"
-                    className="rounded-2xl border border-slate-200/80 shadow-xs"
+                    itemLabel={t('shop.products_count')}
+                    className="rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs dark:bg-slate-900"
                   />
                 </div>
               </>
             ) : (
               /* Empty State */
-              <div className="bg-white rounded-3xl border border-slate-200/80 p-12 text-center flex flex-col items-center justify-center max-w-lg mx-auto my-12">
-                <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 mb-4">
+              <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 p-12 text-center flex flex-col items-center justify-center max-w-lg mx-auto my-12">
+                <div className="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 dark:text-slate-500 mb-4">
                   <PackageSearch className="w-8 h-8" />
                 </div>
-                <h3 className="text-lg font-bold text-slate-900">No Cycles Found</h3>
-                <p className="text-xs text-slate-500 max-w-xs mt-1 mb-6">
-                  We couldn't find any products matching your active filters. Try adjusting your search or clearing filters.
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white">{t('shop.no_products_found')}</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 max-w-xs mt-1 mb-6">
+                  {t('shop.subtitle')}
                 </p>
                 <button
                   onClick={handleResetFilters}
-                  className="bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold py-2.5 px-6 rounded-xl flex items-center gap-2 transition-colors shadow-sm"
+                  className="bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold py-2.5 px-6 rounded-xl flex items-center gap-2 transition-colors shadow-sm cursor-pointer"
                 >
                   <RefreshCw className="w-4 h-4" />
-                  Reset All Filters
+                  {t('shop.clear_filters')}
                 </button>
               </div>
             )}

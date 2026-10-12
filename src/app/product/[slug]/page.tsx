@@ -29,10 +29,12 @@ import { useToast } from '@/context/ToastContext';
 import RatingStars from '@/components/store/RatingStars';
 import ProductCard from '@/components/store/ProductCard';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
+import { useLanguage } from '@/context/LanguageContext';
 
 export const dynamic = 'force-dynamic';
 
 export default function ProductDetailPage() {
+  const { t } = useLanguage();
   const params = useParams();
   const router = useRouter();
   const slug = params.slug as string;
@@ -474,15 +476,15 @@ export default function ProductDetailPage() {
                   <button
                     onClick={() => addToCart(product, quantity, selectedSize, selectedColor)}
                     disabled={product.stock <= 0}
-                    className="flex-1 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white text-sm font-bold py-3.5 px-6 rounded-2xl flex items-center justify-center gap-2 transition-colors shadow-md active:scale-95"
+                    className="flex-1 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white text-sm font-bold py-3.5 px-6 rounded-2xl flex items-center justify-center gap-2 transition-colors shadow-md active:scale-95 cursor-pointer"
                   >
                     <ShoppingBag className="w-4 h-4" />
-                    {product.stock <= 0 ? 'Out of Stock' : 'Add to Cart'}
+                    {product.stock <= 0 ? t('shop.out_of_stock') : t('shop.add_to_cart')}
                   </button>
 
                   <button
                     onClick={() => toggleWishlist(product)}
-                    className={`w-14 h-14 rounded-2xl flex items-center justify-center border transition-all ${
+                    className={`w-14 h-14 rounded-2xl flex items-center justify-center border transition-all cursor-pointer ${
                       isLiked
                         ? 'bg-rose-50 text-rose-600 border-rose-200 shadow-xs'
                         : 'bg-white hover:bg-slate-50 text-slate-600 border-slate-200'
@@ -497,10 +499,10 @@ export default function ProductDetailPage() {
                 <button
                   onClick={handleBuyNow}
                   disabled={product.stock <= 0}
-                  className="w-full bg-brand-600 hover:bg-brand-500 disabled:bg-slate-300 text-white text-sm font-extrabold py-3.5 rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-brand-600/20 transition-all active:scale-95"
+                  className="w-full bg-brand-600 hover:bg-brand-500 disabled:bg-slate-300 text-white text-sm font-extrabold py-3.5 rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-brand-600/20 transition-all active:scale-95 cursor-pointer"
                 >
                   <Zap className="w-4 h-4 fill-white" />
-                  Instant Buy Now
+                  {t('shop.buy_now')}
                 </button>
               </div>
 

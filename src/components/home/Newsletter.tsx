@@ -2,8 +2,10 @@
 
 import React, { useState } from 'react';
 import { Send, CheckCircle2 } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function Newsletter() {
+  const { t } = useLanguage();
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
 
@@ -16,7 +18,7 @@ export default function Newsletter() {
   };
 
   return (
-    <section className="py-16 bg-white">
+    <section className="py-16 bg-white dark:bg-slate-950 transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-gradient-to-r from-brand-950 via-brand-900 to-accent-950 rounded-3xl p-8 sm:p-12 lg:p-16 text-white text-center flex flex-col items-center justify-center relative overflow-hidden shadow-2xl border border-brand-800/50">
           {/* Decorative background blurs */}
@@ -24,19 +26,19 @@ export default function Newsletter() {
           <div className="absolute -bottom-24 -left-24 w-80 h-80 bg-brand-500/20 rounded-full blur-3xl pointer-events-none" />
 
           <span className="text-xs font-bold text-brand-300 uppercase tracking-widest mb-2">
-            The Srirama Cycling Community
+            {t('news.community')}
           </span>
           <h2 className="text-2xl sm:text-4xl font-black tracking-tight max-w-xl">
-            Get 10% Off Your First Ride & Exclusive Community Perks
+            {t('news.title')}
           </h2>
           <p className="text-xs sm:text-sm text-slate-300 max-w-md mt-2 mb-8">
-            Subscribe for early bird access to new cycle drops, maintenance tips, and cycling route guides.
+            {t('news.desc')}
           </p>
 
           {subscribed ? (
             <div className="bg-white/10 border border-white/20 backdrop-blur-md rounded-2xl p-4 flex items-center gap-3 text-emerald-300 text-sm font-semibold animate-in zoom-in">
               <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-              <span>Thank you for subscribing! Your discount coupon is RIDE10.</span>
+              <span>{t('news.success')}</span>
             </div>
           ) : (
             <form
@@ -46,7 +48,7 @@ export default function Newsletter() {
               <input
                 type="email"
                 required
-                placeholder="Enter your email address..."
+                placeholder={t('news.placeholder')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="flex-1 bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-white/40 backdrop-blur-sm"
@@ -55,7 +57,7 @@ export default function Newsletter() {
                 type="submit"
                 className="bg-white hover:bg-slate-100 text-slate-900 text-sm font-bold px-6 py-3 rounded-xl flex items-center justify-center gap-2 transition-colors shadow-md active:scale-95"
               >
-                <span>Subscribe</span>
+                <span>{t('news.subscribe_btn')}</span>
                 <Send className="w-4 h-4 text-brand-600" />
               </button>
             </form>

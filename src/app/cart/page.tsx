@@ -17,8 +17,10 @@ import {
 import { useCart } from '@/context/CartContext';
 import { formatPrice } from '@/lib/utils';
 import { FREE_SHIPPING_THRESHOLD } from '@/lib/constants';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function CartPage() {
+  const { t } = useLanguage();
   const {
     cart,
     subtotal,
@@ -65,19 +67,19 @@ export default function CartPage() {
 
   if (cart.length === 0) {
     return (
-      <div className="min-h-[70vh] flex flex-col items-center justify-center px-4 py-16 text-center bg-white">
-        <div className="w-20 h-20 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 mb-6">
+      <div className="min-h-[70vh] flex flex-col items-center justify-center px-4 py-16 text-center bg-white dark:bg-slate-950 transition-colors duration-200">
+        <div className="w-20 h-20 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 dark:text-slate-500 mb-6">
           <ShoppingBag className="w-10 h-10" />
         </div>
-        <h2 className="text-2xl font-black text-slate-900">Your Shopping Cart is Empty</h2>
-        <p className="text-xs sm:text-sm text-slate-500 max-w-sm mt-2 mb-8">
-          Explore our premium range of road cycles, mountain cycles, standard cycles, and accessories to start your adventure.
+        <h2 className="text-2xl font-black text-slate-900 dark:text-white">{t('cart.empty_title')}</h2>
+        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-sm mt-2 mb-8">
+          {t('cart.empty_desc')}
         </p>
         <Link
           href="/shop"
-          className="bg-brand-600 hover:bg-brand-500 text-white font-bold text-sm py-3.5 px-8 rounded-2xl flex items-center gap-2 shadow-lg shadow-brand-600/20 transition-all active:scale-95"
+          className="bg-brand-600 hover:bg-brand-500 text-white font-bold text-sm py-3.5 px-8 rounded-2xl flex items-center gap-2 shadow-lg shadow-brand-600/20 transition-all active:scale-95 cursor-pointer"
         >
-          <span>Explore Srirama Shop</span>
+          <span>{t('cart.explore_shop')}</span>
           <ArrowRight className="w-4 h-4" />
         </Link>
       </div>
@@ -85,22 +87,22 @@ export default function CartPage() {
   }
 
   return (
-    <div className="bg-slate-50/50 min-h-screen py-10">
+    <div className="bg-slate-50/50 dark:bg-slate-950 min-h-screen py-10 transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-              Shopping Cart ({cart.reduce((a, b) => a + b.quantity, 0)} items)
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+              {t('cart.title')} ({cart.reduce((a, b) => a + b.quantity, 0)} {t('cart.items')})
             </h1>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Review your items and proceed to secure checkout
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              {t('cart.subtitle')}
             </p>
           </div>
           <button
             onClick={clearCart}
-            className="text-xs text-rose-600 hover:text-rose-800 font-bold"
+            className="text-xs text-rose-600 dark:text-rose-400 hover:text-rose-800 font-bold cursor-pointer"
           >
-            Clear Entire Cart
+            {t('cart.clear_cart')}
           </button>
         </div>
 
@@ -256,34 +258,34 @@ export default function CartPage() {
             <div className="pt-2">
               <Link
                 href="/shop"
-                className="text-xs font-bold text-brand-600 hover:text-brand-800 flex items-center gap-1.5"
+                className="text-xs font-bold text-brand-600 dark:text-brand-400 hover:text-brand-800 dark:hover:text-brand-300 flex items-center gap-1.5 cursor-pointer"
               >
-                &larr; Continue Shopping
+                &larr; {t('cart.continue_shopping')}
               </Link>
             </div>
           </div>
 
           {/* Order Summary Column */}
           <div className="lg:col-span-4 flex flex-col gap-4">
-            <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col gap-5">
-              <h2 className="text-base font-black text-slate-900 uppercase tracking-tight">
-                Order Summary
+            <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col gap-5">
+              <h2 className="text-base font-black text-slate-900 dark:text-white uppercase tracking-tight">
+                {t('cart.order_summary')}
               </h2>
 
               {/* Coupon Code Section */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                   Have a Coupon / Promo Code?
                 </label>
                 {appliedCoupon ? (
-                  <div className="flex items-center justify-between p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs">
-                    <span className="flex items-center gap-1.5 font-bold text-emerald-800">
-                      <Tag className="w-3.5 h-3.5 text-emerald-600" />
+                  <div className="flex items-center justify-between p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-xs">
+                    <span className="flex items-center gap-1.5 font-bold text-emerald-800 dark:text-emerald-300">
+                      <Tag className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                       {appliedCoupon} applied (-{formatPrice(discount)})
                     </span>
                     <button
                       onClick={removeCoupon}
-                      className="text-rose-600 font-bold hover:underline"
+                      className="text-rose-600 dark:text-rose-400 font-bold hover:underline cursor-pointer"
                     >
                       Remove
                     </button>
@@ -293,33 +295,33 @@ export default function CartPage() {
                     <div className="flex gap-2">
                       <input
                         type="text"
-                        placeholder="Enter coupon code"
+                        placeholder={t('cart.coupon_placeholder')}
                         value={couponInput}
                         onChange={(e) => setCouponInput(e.target.value)}
-                        className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs uppercase font-medium focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                        className="flex-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-3 py-2 text-xs uppercase font-medium focus:outline-none focus:ring-2 focus:ring-brand-500/20"
                       />
                       <button
                         type="submit"
-                        className="bg-slate-900 hover:bg-brand-600 text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors"
+                        className="bg-slate-900 dark:bg-slate-700 hover:bg-brand-600 text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors cursor-pointer"
                       >
-                        Apply
+                        {t('cart.apply_coupon')}
                       </button>
                     </div>
 
                     {/* Available Offers Created from Admin */}
                     {activeOffers.length > 0 && (
                       <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Available Offers:</span>
+                        <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Available Offers:</span>
                         {activeOffers.map((offer) => (
                           <button
                             key={offer.code}
                             type="button"
                             onClick={() => applyCoupon(offer.code)}
-                            className="inline-flex items-center gap-1 text-[10px] font-bold bg-brand-50 border border-brand-200/80 text-brand-700 hover:bg-brand-100 hover:border-brand-300 px-2 py-0.5 rounded-lg transition-colors"
+                            className="inline-flex items-center gap-1 text-[10px] font-bold bg-brand-50 dark:bg-brand-950/60 border border-brand-200/80 dark:border-brand-800 text-brand-700 dark:text-brand-300 hover:bg-brand-100 hover:border-brand-300 px-2 py-0.5 rounded-lg transition-colors cursor-pointer"
                           >
-                            <Sparkles className="w-2.5 h-2.5 text-brand-600" />
+                            <Sparkles className="w-2.5 h-2.5 text-brand-600 dark:text-brand-400" />
                             <span>{offer.code}</span>
-                            <span className="text-slate-500 font-normal">
+                            <span className="text-slate-500 dark:text-slate-400 font-normal">
                               ({offer.discountType === 'percentage' ? `${offer.discountValue}% OFF` : `₹${offer.discountValue} OFF`})
                             </span>
                           </button>
@@ -331,65 +333,65 @@ export default function CartPage() {
               </div>
 
               {/* Estimated Delivery Notice */}
-              <div className="flex items-center gap-2 p-3 bg-amber-50 border border-amber-200/90 rounded-xl text-xs text-amber-900 font-bold">
+              <div className="flex items-center gap-2 p-3 bg-amber-50 dark:bg-amber-950/60 border border-amber-200/90 dark:border-amber-800 rounded-xl text-xs text-amber-900 dark:text-amber-300 font-bold">
                 <Truck className="w-4 h-4 text-amber-600 shrink-0" />
                 <span>Estimated Delivery: <strong>5 Working Days</strong></span>
               </div>
 
               {/* Price Breakdown */}
-              <div className="flex flex-col gap-2.5 pt-4 border-t border-slate-100 text-xs">
-                <div className="flex justify-between text-slate-600">
-                  <span>Subtotal</span>
-                  <span className="font-semibold text-slate-900">{formatPrice(subtotal)}</span>
+              <div className="flex flex-col gap-2.5 pt-4 border-t border-slate-100 dark:border-slate-800 text-xs">
+                <div className="flex justify-between text-slate-600 dark:text-slate-300">
+                  <span>{t('cart.subtotal')}</span>
+                  <span className="font-semibold text-slate-900 dark:text-white">{formatPrice(subtotal)}</span>
                 </div>
 
                 {discount > 0 && (
-                  <div className="flex justify-between text-emerald-600 font-medium">
-                    <span>Coupon Discount</span>
+                  <div className="flex justify-between text-emerald-600 dark:text-emerald-400 font-medium">
+                    <span>{t('cart.discount')}</span>
                     <span>-{formatPrice(discount)}</span>
                   </div>
                 )}
 
-                <div className="flex justify-between items-center text-slate-600">
-                  <span>Estimated Shipping</span>
-                  <span className="font-semibold text-slate-900 flex items-center gap-1.5">
+                <div className="flex justify-between items-center text-slate-600 dark:text-slate-300">
+                  <span>{t('cart.shipping')}</span>
+                  <span className="font-semibold text-slate-900 dark:text-white flex items-center gap-1.5">
                     <span className="line-through text-slate-400 font-normal text-[10px]">₹149</span>
-                    <span className="bg-emerald-100 text-emerald-800 text-[10px] px-1.5 py-0.5 rounded-md font-extrabold">FREE</span>
+                    <span className="bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-400 text-[10px] px-1.5 py-0.5 rounded-md font-extrabold">{t('cart.free_shipping')}</span>
                   </span>
                 </div>
 
                 {/* GST Charges Included in price */}
-                <div className="flex justify-between items-center bg-slate-50 p-2 rounded-xl border border-slate-200/60 text-slate-700 text-[11px]">
+                <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-800/60 p-2 rounded-xl border border-slate-200/60 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-[11px]">
                   <span className="flex items-center gap-1.5 font-medium">
                     <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                     <span>GST Charges</span>
                   </span>
-                  <span className="font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/60 text-[11px]">
+                  <span className="font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-200/60 dark:border-emerald-800 text-[11px]">
                     Included in Price
                   </span>
                 </div>
 
-                <div className="flex justify-between items-baseline text-base font-black text-slate-900 pt-3 border-t border-slate-100">
+                <div className="flex justify-between items-baseline text-base font-black text-slate-900 dark:text-white pt-3 border-t border-slate-100 dark:border-slate-800">
                   <div className="flex flex-col">
-                    <span>Grand Total</span>
-                    <span className="text-[10px] font-normal text-emerald-600">Inclusive of all taxes & free delivery</span>
+                    <span>{t('cart.estimated_total')}</span>
+                    <span className="text-[10px] font-normal text-emerald-600 dark:text-emerald-400">Inclusive of all taxes & free delivery</span>
                   </div>
-                  <span className="text-brand-600">{formatPrice(total)}</span>
+                  <span className="text-brand-600 dark:text-brand-400">{formatPrice(total)}</span>
                 </div>
               </div>
 
               {/* Checkout CTA */}
               <Link
                 href="/checkout"
-                className="w-full bg-brand-600 hover:bg-brand-500 text-white font-bold text-sm py-4 rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-brand-600/25 transition-all active:scale-95 text-center"
+                className="w-full bg-brand-600 hover:bg-brand-500 text-white font-bold text-sm py-4 rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-brand-600/25 transition-all active:scale-95 text-center cursor-pointer"
               >
-                <span>Proceed to Checkout</span>
+                <span>{t('cart.checkout_btn')}</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
 
             {/* Security Guarantee Box */}
-            <div className="p-4 rounded-2xl bg-white border border-slate-200/80 flex items-center gap-3 text-xs text-slate-600">
+            <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 flex items-center gap-3 text-xs text-slate-600 dark:text-slate-300">
               <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0" />
               <span>Safe & Encrypted 256-bit SSL Checkout with doorstep warranty card.</span>
             </div>

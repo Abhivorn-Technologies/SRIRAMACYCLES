@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Quote, CheckCircle2, MapPin, Sparkles, ChevronLeft, ChevronRight, Star } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 import RatingStars from '../store/RatingStars';
 
 const TELANGANA_REVIEWS = [
@@ -62,6 +63,7 @@ const TELANGANA_REVIEWS = [
 ];
 
 export default function CustomerReviews() {
+  const { t } = useLanguage();
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
@@ -83,7 +85,7 @@ export default function CustomerReviews() {
   };
 
   return (
-    <section className="py-16 sm:py-24 bg-slate-50 border-t border-slate-200/70 relative overflow-hidden">
+    <section className="py-16 sm:py-24 bg-slate-50 dark:bg-slate-900/40 border-t border-slate-200/70 dark:border-slate-800 relative overflow-hidden transition-colors duration-200">
       {/* Background Soft Red Radial Glow */}
       <div className="absolute top-0 right-1/4 w-96 h-96 bg-brand-500/5 rounded-full blur-3xl pointer-events-none" />
 
@@ -91,21 +93,21 @@ export default function CustomerReviews() {
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <span className="inline-flex items-center gap-1.5 text-xs font-black text-brand-600 uppercase tracking-widest bg-brand-50 border border-brand-200/60 px-3 py-1 rounded-full shadow-2xs">
-                <Sparkles className="w-3.5 h-3.5 text-brand-600" />
-                Verified Telangana Rider Reviews
+              <span className="inline-flex items-center gap-1.5 text-xs font-black text-brand-600 dark:text-brand-400 uppercase tracking-widest bg-brand-50 dark:bg-brand-950/60 border border-brand-200/60 dark:border-brand-900/50 px-3 py-1 rounded-full shadow-2xs">
+                <Sparkles className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />
+                {t('reviews.badge')}
               </span>
-              <span className="inline-flex items-center gap-1 text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200/60 px-2.5 py-1 rounded-full shadow-2xs">
+              <span className="inline-flex items-center gap-1 text-xs font-bold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 border border-amber-200/60 dark:border-amber-900/50 px-2.5 py-1 rounded-full shadow-2xs">
                 <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
                 4.9 / 5.0 Rating
               </span>
             </div>
 
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-slate-950 mt-1">
-              Trusted Across Hanumakonda & Warangal
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-slate-950 dark:text-white mt-1">
+              {t('reviews.title')}
             </h2>
-            <p className="text-xs sm:text-sm text-slate-600 font-medium mt-1">
-              Real feedback from local cyclists, fitness enthusiasts, and daily commuters in Kazipet & Tri-City.
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium mt-1">
+              {t('reviews.subtitle')}
             </p>
           </div>
 
@@ -113,14 +115,14 @@ export default function CustomerReviews() {
           <div className="flex items-center gap-3 self-end">
             <button
               onClick={handlePrev}
-              className="w-10 h-10 rounded-2xl bg-white border border-slate-200 hover:border-brand-500 text-slate-700 hover:text-brand-600 flex items-center justify-center transition-all shadow-2xs hover:shadow-md active:scale-95 cursor-pointer"
+              className="w-10 h-10 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-brand-500 text-slate-700 dark:text-slate-300 hover:text-brand-600 flex items-center justify-center transition-all shadow-2xs hover:shadow-md active:scale-95 cursor-pointer"
               aria-label="Previous Review"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
             <button
               onClick={handleNext}
-              className="w-10 h-10 rounded-2xl bg-white border border-slate-200 hover:border-brand-500 text-slate-700 hover:text-brand-600 flex items-center justify-center transition-all shadow-2xs hover:shadow-md active:scale-95 cursor-pointer"
+              className="w-10 h-10 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-brand-500 text-slate-700 dark:text-slate-300 hover:text-brand-600 flex items-center justify-center transition-all shadow-2xs hover:shadow-md active:scale-95 cursor-pointer"
               aria-label="Next Review"
             >
               <ChevronRight className="w-5 h-5" />
@@ -144,32 +146,32 @@ export default function CustomerReviews() {
             {TELANGANA_REVIEWS.concat(TELANGANA_REVIEWS).map((rev, idx) => (
               <div
                 key={idx}
-                className="w-[310px] sm:w-[350px] md:w-[370px] shrink-0 bg-white p-6 sm:p-7 rounded-3xl border border-slate-200/90 shadow-2xs flex flex-col justify-between gap-6 card-hover-lift hover:border-brand-500/60 hover:shadow-card-hover hover:shadow-brand-600/10 transition-all duration-300"
+                className="w-[310px] sm:w-[350px] md:w-[370px] shrink-0 bg-white dark:bg-slate-900 p-6 sm:p-7 rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-2xs flex flex-col justify-between gap-6 card-hover-lift hover:border-brand-500/60 dark:hover:border-brand-500/60 hover:shadow-card-hover hover:shadow-brand-600/10 transition-all duration-300"
               >
                 <div className="flex flex-col gap-3">
                   <div className="flex items-center justify-between">
                     <RatingStars rating={rev.rating} size="sm" />
-                    <Quote className="w-6 h-6 text-brand-300/80" />
+                    <Quote className="w-6 h-6 text-brand-300/80 dark:text-brand-600/50" />
                   </div>
-                  <p className="text-xs sm:text-sm text-slate-800 leading-relaxed font-medium italic">
+                  <p className="text-xs sm:text-sm text-slate-800 dark:text-slate-200 leading-relaxed font-medium italic">
                     &ldquo;{rev.comment}&rdquo;
                   </p>
                 </div>
 
-                <div className="pt-4 border-t border-slate-100 flex flex-col gap-2">
+                <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-2">
                   <div className="flex items-center justify-between">
-                    <h4 className="text-sm font-black text-slate-950 flex items-center gap-1.5">
+                    <h4 className="text-sm font-black text-slate-950 dark:text-white flex items-center gap-1.5">
                       <span>{rev.name}</span>
-                      <CheckCircle2 className="w-4 h-4 text-brand-600 shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-brand-600 dark:text-brand-400 shrink-0" />
                     </h4>
                     <span className="text-[10px] font-extrabold text-slate-400">{rev.date}</span>
                   </div>
                   <div className="flex items-center justify-between text-[11px] font-semibold gap-2">
-                    <span className="flex items-center gap-1 text-slate-600 truncate">
-                      <MapPin className="w-3.5 h-3.5 text-brand-600 shrink-0" />
+                    <span className="flex items-center gap-1 text-slate-600 dark:text-slate-400 truncate">
+                      <MapPin className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400 shrink-0" />
                       <span className="truncate">{rev.location}</span>
                     </span>
-                    <span className="text-brand-700 font-extrabold bg-brand-50 px-2 py-0.5 rounded-md border border-brand-200/60 truncate shrink-0 max-w-[150px]">
+                    <span className="text-brand-700 dark:text-brand-400 font-extrabold bg-brand-50 dark:bg-brand-950/60 px-2 py-0.5 rounded-md border border-brand-200/60 dark:border-brand-900/50 truncate shrink-0 max-w-[150px]">
                       {rev.cycle || (rev as any).bike}
                     </span>
                   </div>
@@ -188,7 +190,7 @@ export default function CustomerReviews() {
               className={`h-2.5 rounded-full transition-all duration-300 cursor-pointer ${
                 activeIndex % TELANGANA_REVIEWS.length === i
                   ? 'w-8 bg-brand-600 shadow-xs shadow-brand-600/50'
-                  : 'w-2.5 bg-slate-300 hover:bg-slate-400'
+                  : 'w-2.5 bg-slate-300 dark:bg-slate-700 hover:bg-slate-400'
               }`}
               aria-label={`Go to slide ${i + 1}`}
             />

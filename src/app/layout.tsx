@@ -4,6 +4,8 @@ import { AuthProvider } from '@/context/AuthContext';
 import { CartProvider } from '@/context/CartContext';
 import { WishlistProvider } from '@/context/WishlistContext';
 import { ToastProvider } from '@/context/ToastContext';
+import { ThemeProvider } from '@/context/ThemeContext';
+import { LanguageProvider } from '@/context/LanguageContext';
 import StorefrontLayout from '@/components/layout/StorefrontLayout';
 import { APP_NAME, APP_DESCRIPTION } from '@/lib/constants';
 
@@ -59,16 +61,40 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="scroll-smooth" suppressHydrationWarning>
-      <body className="min-h-screen flex flex-col bg-white text-slate-900 selection:bg-brand-500 selection:text-white" suppressHydrationWarning>
-        <ToastProvider>
-          <AuthProvider>
-            <CartProvider>
-              <WishlistProvider>
-                <StorefrontLayout>{children}</StorefrontLayout>
-              </WishlistProvider>
-            </CartProvider>
-          </AuthProvider>
-        </ToastProvider>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                const theme = localStorage.getItem('sr_theme');
+                if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                  document.documentElement.classList.add('dark');
+                } else {
+                  document.documentElement.classList.remove('dark');
+                }
+                const lang = localStorage.getItem('sr_lang');
+                if (lang) {
+                  document.documentElement.lang = lang;
+                }
+              } catch (_) {}
+            `,
+          }}
+        />
+      </head>
+      <body className="min-h-screen flex flex-col bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 selection:bg-brand-500 selection:text-white transition-colors duration-200" suppressHydrationWarning>
+        <ThemeProvider>
+          <LanguageProvider>
+            <ToastProvider>
+              <AuthProvider>
+                <CartProvider>
+                  <WishlistProvider>
+                    <StorefrontLayout>{children}</StorefrontLayout>
+                  </WishlistProvider>
+                </CartProvider>
+              </AuthProvider>
+            </ToastProvider>
+          </LanguageProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

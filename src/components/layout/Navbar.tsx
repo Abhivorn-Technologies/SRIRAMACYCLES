@@ -16,10 +16,14 @@ import {
   LogOut,
   PackageCheck,
   LayoutDashboard,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
 import { useAuth } from '@/context/AuthContext';
+import { useTheme } from '@/context/ThemeContext';
+import { useLanguage } from '@/context/LanguageContext';
 import { APP_NAME, STORE_CONTACT } from '@/lib/constants';
 
 export default function Navbar() {
@@ -28,6 +32,8 @@ export default function Navbar() {
   const { cartCount } = useCart();
   const { wishlistCount } = useWishlist();
   const { user, isAdmin, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
+  const { t } = useLanguage();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -61,20 +67,21 @@ export default function Navbar() {
   };
 
   const navLinks = [
-    { name: 'Home', href: '/' },
-    { name: 'Shop', href: '/shop' },
-    { name: 'About Us', href: '/about' },
-    { name: 'Track Order', href: '/track-order' },
-    { name: 'Contact Us', href: '/contact' },
+    { name: t('nav.home'), href: '/' },
+    { name: t('nav.shop'), href: '/shop' },
+    { name: t('nav.about'), href: '/about' },
+    { name: t('nav.track_order'), href: '/track-order' },
+    { name: t('nav.contact'), href: '/contact' },
   ];
 
   return (
     <header
       className={`sticky top-0 z-40 w-full glass-nav transition-all duration-200 border-b ${
-        isScrolled ? 'border-slate-200/90 shadow-subtle' : 'border-slate-100'
+        isScrolled
+          ? 'border-slate-200/90 dark:border-slate-800 shadow-subtle'
+          : 'border-slate-100 dark:border-slate-800/80'
       }`}
     >
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-24 sm:h-28 md:h-30 gap-6">
           {/* Logo */}
@@ -101,8 +108,8 @@ export default function Navbar() {
                   href={link.href}
                   className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition-colors ${
                     isActive
-                      ? 'text-brand-600 bg-brand-50/80'
-                      : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100/70'
+                      ? 'text-brand-600 dark:text-brand-400 bg-brand-50/80 dark:bg-brand-950/50'
+                      : 'text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-slate-800/70'
                   }`}
                 >
                   {link.name}
@@ -111,26 +118,41 @@ export default function Navbar() {
             })}
           </nav>
 
-          {/* Right Action Icons (Search, Wishlist, Cart, Profile) */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          {/* Right Action Icons (Theme, Search, Wishlist, Cart, Profile) */}
+          <div className="flex items-center gap-1.5 sm:gap-2.5">
+
+            {/* Theme Toggle Button */}
+            <button
+              onClick={toggleTheme}
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors border border-transparent hover:border-slate-200 dark:hover:border-slate-700 group"
+              aria-label={theme === 'dark' ? t('nav.light_mode') : t('nav.dark_mode')}
+              title={theme === 'dark' ? t('nav.light_mode') : t('nav.dark_mode')}
+            >
+              {theme === 'dark' ? (
+                <Sun className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400 group-hover:rotate-45 transition-transform duration-300" />
+              ) : (
+                <Moon className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600 group-hover:-rotate-12 transition-transform duration-300" />
+              )}
+            </button>
+
             {/* Search Trigger */}
             <button
               onClick={() => setIsSearchOpen(!isSearchOpen)}
-              className="w-10 h-10 rounded-xl flex items-center justify-center text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors"
-              aria-label="Search products"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              aria-label={t('nav.search')}
             >
-              <Search className="w-5 h-5" />
+              <Search className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
 
             {/* Wishlist */}
             <Link
               href="/wishlist"
-              className="relative w-10 h-10 rounded-xl flex items-center justify-center text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors"
-              aria-label="Wishlist"
+              className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              aria-label={t('nav.wishlist')}
             >
-              <Heart className="w-5 h-5" />
+              <Heart className="w-4 h-4 sm:w-5 sm:h-5" />
               {wishlistCount > 0 && (
-                <span className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-accent-600 text-white text-[10px] font-bold flex items-center justify-center animate-in zoom-in">
+                <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-accent-600 text-white text-[10px] font-bold flex items-center justify-center animate-in zoom-in">
                   {wishlistCount}
                 </span>
               )}
@@ -139,12 +161,12 @@ export default function Navbar() {
             {/* Cart */}
             <Link
               href="/cart"
-              className="relative w-10 h-10 rounded-xl flex items-center justify-center text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors"
-              aria-label="Shopping Cart"
+              className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              aria-label={t('nav.cart')}
             >
-              <ShoppingBag className="w-5 h-5" />
+              <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5" />
               {cartCount > 0 && (
-                <span className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-brand-600 text-white text-[10px] font-bold flex items-center justify-center animate-in zoom-in">
+                <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-brand-600 text-white text-[10px] font-bold flex items-center justify-center animate-in zoom-in">
                   {cartCount}
                 </span>
               )}
@@ -155,44 +177,47 @@ export default function Navbar() {
               {user ? (
                 <div>
                   <button
-                    onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
-                    className="flex items-center gap-2 py-1.5 px-3 rounded-xl border border-slate-200/90 hover:border-brand-200 bg-white hover:bg-slate-50 text-slate-800 text-xs font-semibold shadow-xs transition-colors"
+                    onClick={() => {
+                      setIsUserDropdownOpen(!isUserDropdownOpen);
+                      setIsLangDropdownOpen(false);
+                    }}
+                    className="flex items-center gap-2 py-1.5 px-3 rounded-xl border border-slate-200/90 dark:border-slate-700 hover:border-brand-200 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-100 text-xs font-semibold shadow-xs transition-colors"
                   >
-                    <div className="w-6 h-6 rounded-full bg-brand-50 border border-brand-200 text-brand-700 font-bold flex items-center justify-center text-xs">
-                      <UserIcon className="w-3.5 h-3.5 text-brand-700" />
+                    <div className="w-6 h-6 rounded-full bg-brand-50 dark:bg-brand-950/70 border border-brand-200 dark:border-brand-800 text-brand-700 dark:text-brand-400 font-bold flex items-center justify-center text-xs">
+                      <UserIcon className="w-3.5 h-3.5 text-brand-700 dark:text-brand-400" />
                     </div>
-                    <span className="hidden sm:inline font-bold text-slate-800 text-xs">Account</span>
+                    <span className="hidden sm:inline font-bold text-xs">{t('nav.account')}</span>
                     <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
                   </button>
 
                   {/* Dropdown Menu */}
                   {isUserDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-slate-200/80 py-2 z-50 animate-in fade-in zoom-in-95 duration-150">
+                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200/80 dark:border-slate-800 py-2 z-50 animate-in fade-in zoom-in-95 duration-150">
                       <Link
                         href="/account/orders"
                         onClick={() => setIsUserDropdownOpen(false)}
-                        className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-brand-700 transition-colors"
+                        className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-brand-700 dark:hover:text-brand-400 transition-colors"
                       >
                         <PackageCheck className="w-4 h-4 text-slate-400" />
-                        My Orders
+                        {t('nav.my_orders')}
                       </Link>
                       <Link
                         href="/account"
                         onClick={() => setIsUserDropdownOpen(false)}
-                        className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-brand-700 transition-colors"
+                        className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-brand-700 dark:hover:text-brand-400 transition-colors"
                       >
                         <UserIcon className="w-4 h-4 text-slate-400" />
-                        Account Settings
+                        {t('nav.account_settings')}
                       </Link>
                       <button
                         onClick={() => {
                           setIsUserDropdownOpen(false);
                           logout();
                         }}
-                        className="w-full text-left flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-rose-600 hover:bg-rose-50 border-t border-slate-100 transition-colors"
+                        className="w-full text-left flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 border-t border-slate-100 dark:border-slate-800 transition-colors"
                       >
                         <LogOut className="w-4 h-4" />
-                        Sign Out
+                        {t('nav.sign_out')}
                       </button>
                     </div>
                   )}
@@ -200,18 +225,44 @@ export default function Navbar() {
               ) : (
                 <Link
                   href="/login"
-                  className="flex items-center gap-1.5 bg-slate-900 hover:bg-brand-600 text-white text-xs font-semibold py-2 px-3.5 rounded-xl transition-colors shadow-xs"
+                  className="flex items-center gap-1.5 bg-slate-900 dark:bg-brand-600 hover:bg-brand-600 dark:hover:bg-brand-700 text-white text-xs font-semibold py-2 px-3.5 rounded-xl transition-colors shadow-xs"
                 >
                   <UserIcon className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Sign In</span>
+                  <span className="hidden sm:inline">{t('nav.sign_in')}</span>
                 </Link>
               )}
             </div>
 
+            {/* Human Support Icon with WhatsApp Link in Navbar Right Corner */}
+            <a
+              id="nav-whatsapp-support-btn"
+              href={STORE_CONTACT.whatsappLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 py-1.5 px-2.5 sm:px-3 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 dark:border-emerald-500/30 transition-all hover:scale-105 active:scale-95 shadow-2xs group"
+              title={`${t('nav.whatsapp_support')} (${STORE_CONTACT.phone})`}
+              aria-label="Contact Store Support on WhatsApp"
+            >
+              <div className="relative flex items-center justify-center">
+                <div className="w-6 h-6 rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform">
+                  <UserIcon className="w-3.5 h-3.5" />
+                </div>
+                {/* Active live green pulse beacon */}
+                <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500 border border-white dark:border-slate-900" />
+                </span>
+              </div>
+              <span className="hidden md:inline font-bold text-xs">{t('nav.support')}</span>
+              <svg className="w-3.5 h-3.5 fill-[#25D366] shrink-0" viewBox="0 0 24 24">
+                <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z" />
+              </svg>
+            </a>
+
             {/* Mobile Hamburger Menu */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden w-10 h-10 rounded-xl flex items-center justify-center text-slate-700 hover:text-slate-900 hover:bg-slate-100"
+              className="lg:hidden w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800"
               aria-label="Toggle Navigation"
             >
               {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -225,18 +276,18 @@ export default function Navbar() {
             <form onSubmit={handleSearchSubmit} className="relative max-w-2xl mx-auto">
               <input
                 type="text"
-                placeholder="Search road cycles, mountain cycles, standard cycles, spares..."
+                placeholder={t('nav.search_placeholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 autoFocus
-                className="w-full bg-slate-50 border border-slate-300 rounded-2xl py-3 pl-12 pr-28 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 shadow-inner"
+                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-2xl py-3 pl-12 pr-28 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 shadow-inner"
               />
               <Search className="absolute left-4 top-3.5 w-5 h-5 text-slate-400" />
               <button
                 type="submit"
                 className="absolute right-2 top-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold px-4 py-1.5 rounded-xl transition-colors"
               >
-                Search
+                {t('nav.search_btn')}
               </button>
             </form>
           </div>
@@ -245,12 +296,33 @@ export default function Navbar() {
 
       {/* Mobile Navigation Drawer */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden border-t border-slate-100 bg-white/95 backdrop-blur-md px-6 py-5 flex flex-col gap-3 animate-in slide-in-from-top-4">
+        <div className="lg:hidden border-t border-slate-100 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md px-6 py-5 flex flex-col gap-3 animate-in slide-in-from-top-4">
+          {/* Mobile Theme Toolbar */}
+          <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Appearance</span>
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 flex items-center gap-1.5 text-xs font-semibold"
+            >
+              {theme === 'dark' ? (
+                <>
+                  <Sun className="w-4 h-4 text-amber-400" />
+                  <span>{t('nav.light_mode')}</span>
+                </>
+              ) : (
+                <>
+                  <Moon className="w-4 h-4 text-slate-600" />
+                  <span>{t('nav.dark_mode')}</span>
+                </>
+              )}
+            </button>
+          </div>
+
           {navLinks.map((link) => (
             <Link
               key={link.name}
               href={link.href}
-              className="text-base font-bold text-slate-800 hover:text-brand-600 py-2 border-b border-slate-100"
+              className="text-base font-bold text-slate-800 dark:text-slate-200 hover:text-brand-600 dark:hover:text-brand-400 py-2 border-b border-slate-100 dark:border-slate-800/80"
             >
               {link.name}
             </Link>
@@ -261,16 +333,33 @@ export default function Navbar() {
                 href="/login"
                 className="flex-1 bg-brand-600 text-white text-center py-2.5 rounded-xl font-bold text-sm"
               >
-                Sign In
+                {t('nav.sign_in')}
               </Link>
               <Link
                 href="/register"
-                className="flex-1 bg-slate-100 text-slate-800 text-center py-2.5 rounded-xl font-bold text-sm"
+                className="flex-1 bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-center py-2.5 rounded-xl font-bold text-sm"
               >
-                Register
+                {t('nav.register')}
               </Link>
             </div>
           )}
+
+          {/* Quick WhatsApp Support in Mobile Navigation */}
+          <div className="pt-2">
+            <a
+              id="mobile-nav-whatsapp-support-btn"
+              href={STORE_CONTACT.whatsappLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20bd5a] text-white py-2.5 px-4 rounded-xl font-bold text-xs shadow-sm transition-all"
+            >
+              <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center">
+                <UserIcon className="w-3 h-3 text-white" />
+              </div>
+              <span>{t('nav.whatsapp_support')}</span>
+              <span className="text-[11px] opacity-90">({STORE_CONTACT.phone})</span>
+            </a>
+          </div>
         </div>
       )}
     </header>

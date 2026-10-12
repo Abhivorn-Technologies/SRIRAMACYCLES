@@ -4,10 +4,84 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap');
 
-:root {
+:root,
+html[data-color-theme="racing-red"] {
   --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   --background: #ffffff;
-  --foreground: #09090b;
+  --foreground: #000000;
+  --brand-50: #fff5f5;
+  --brand-100: #ffe8e8;
+  --brand-200: #ffc9cb;
+  --brand-300: #ffa1a5;
+  --brand-400: #f87171;
+  --brand-500: #ef4444;
+  --brand-600: #E61A24;
+  --brand-700: #c8101c;
+  --brand-800: #9e0d16;
+  --brand-900: #7a0b11;
+  --brand-950: #450508;
+}
+
+html[data-color-theme="royal-navy"] {
+  --brand-50: #eff6ff;
+  --brand-100: #dbeafe;
+  --brand-200: #bfdbfe;
+  --brand-300: #93c5fd;
+  --brand-400: #60a5fa;
+  --brand-500: #3b82f6;
+  --brand-600: #2563eb;
+  --brand-700: #1d4ed8;
+  --brand-800: #1e40af;
+  --brand-900: #1e3a8a;
+  --brand-950: #172554;
+}
+
+html[data-color-theme="emerald-sport"] {
+  --brand-50: #ecfdf5;
+  --brand-100: #d1fae5;
+  --brand-200: #a7f3d0;
+  --brand-300: #6ee7b7;
+  --brand-400: #34d399;
+  --brand-500: #10b981;
+  --brand-600: #059669;
+  --brand-700: #047857;
+  --brand-800: #065f46;
+  --brand-900: #064e3b;
+  --brand-950: #022c22;
+}
+
+html[data-color-theme="sunset-amber"] {
+  --brand-50: #fff7ed;
+  --brand-100: #ffedd5;
+  --brand-200: #fed7aa;
+  --brand-300: #fdba74;
+  --brand-400: #fb923c;
+  --brand-500: #f97316;
+  --brand-600: #ea580c;
+  --brand-700: #c2410c;
+  --brand-800: #9a3412;
+  --brand-900: #7c2d12;
+  --brand-950: #431407;
+}
+
+html[data-color-theme="stealth-titanium"] {
+  --brand-50: #fff1f2;
+  --brand-100: #ffe4e6;
+  --brand-200: #fecdd3;
+  --brand-300: #fda4af;
+  --brand-400: #fb7185;
+  --brand-500: #f43f5e;
+  --brand-600: #e11d48;
+  --brand-700: #be123c;
+  --brand-800: #9f1239;
+  --brand-900: #881337;
+  --brand-950: #4c0519;
+}
+
+html.dark {
+  --background: #000000;
+  --foreground: #ffffff;
+  color-scheme: dark;
 }
 
 html {
@@ -21,6 +95,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Custom modern red scrollbar matching Sri Rama logo */
@@ -33,10 +108,18 @@ body {
   background: #f8fafc;
 }
 
+.dark ::-webkit-scrollbar-track {
+  background: #000000;
+}
+
 ::-webkit-scrollbar-thumb {
   background: #cbd5e1;
   border-radius: 9999px;
   transition: background-color 0.2s ease;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #27272a;
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -96,30 +179,61 @@ body {
   transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.animate-fade-in-up {
-  animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+@keyframes magicalSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(32px);
+    filter: blur(5px);
+  }
+  60% {
+    opacity: 0.92;
+    filter: blur(1px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0px);
+    filter: blur(0px);
+  }
 }
 
-.animate-float {
-  animation: floatSmooth 4s ease-in-out infinite;
+.animate-magical-up {
+  animation: magicalSlideUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.animate-pulse-red-glow {
-  animation: pulseGlowRed 3s infinite ease-in-out;
+.animate-magical-up-delay-1 {
+  animation: magicalSlideUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.08s forwards both;
+}
+
+.animate-magical-up-delay-2 {
+  animation: magicalSlideUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.16s forwards both;
+}
+
+.animate-magical-up-delay-3 {
+  animation: magicalSlideUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.24s forwards both;
 }
 
 /* Subtle glassmorphic utilities */
 .glass-nav {
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.94);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
 }
 
+.dark .glass-nav {
+  background: rgba(0, 0, 0, 0.94);
+  border-color: rgba(39, 39, 42, 0.8) !important;
+}
+
 .glass-card {
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.dark .glass-card {
+  background: rgba(10, 10, 12, 0.9);
+  border-color: rgba(39, 39, 42, 0.8);
 }
 
 /* Premium Card hover lift, zoom & red glow highlights */

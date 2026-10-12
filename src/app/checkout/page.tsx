@@ -34,10 +34,12 @@ import { formatPrice } from '@/lib/utils';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { APP_NAME } from '@/lib/constants';
 import { validatePhone, validateAddress, validateName, validateEmail, validatePostalCode } from '@/lib/validations';
+import { useLanguage } from '@/context/LanguageContext';
 
 type CheckoutStep = 'phone' | 'address' | 'payment';
 
 function CheckoutContent() {
+  const { t } = useLanguage();
   const router = useRouter();
   const searchParams = useSearchParams();
   const isBuyNow = searchParams.get('buyNow') === '1' || searchParams.get('mode') === 'buynow';
@@ -593,16 +595,16 @@ function CheckoutContent() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-100/70 py-6 sm:py-10 flex items-center justify-center p-3 sm:p-4">
-      <div className="max-w-lg w-full bg-white rounded-3xl border border-slate-200/90 shadow-xl overflow-hidden flex flex-col">
+    <div className="min-h-screen bg-slate-100/70 dark:bg-slate-950 py-6 sm:py-10 flex items-center justify-center p-3 sm:p-4 transition-colors duration-200">
+      <div className="max-w-lg w-full bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col">
         
         {/* Top Fast-Checkout Header */}
-        <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between bg-white">
+        <div className="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-white dark:bg-slate-900">
           <div className="flex items-center gap-2">
             {step !== 'phone' ? (
               <button
                 onClick={() => setStep(step === 'payment' ? 'address' : 'phone')}
-                className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-600 transition-colors"
+                className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors cursor-pointer"
                 aria-label="Back"
               >
                 <ArrowLeft className="w-4 h-4" />
@@ -610,22 +612,22 @@ function CheckoutContent() {
             ) : (
               <Link
                 href="/shop"
-                className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-600 transition-colors"
+                className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors"
                 aria-label="Back to Shop"
               >
                 <ArrowLeft className="w-4 h-4" />
               </Link>
             )}
             <div className="flex items-center gap-1.5">
-              <span className="text-xs font-black tracking-tight text-slate-900 uppercase">
-                SRI RAMA <span className="text-brand-600">CYCLES</span>
+              <span className="text-xs font-black tracking-tight text-slate-900 dark:text-white uppercase">
+                SRI RAMA <span className="text-brand-600 dark:text-brand-400">CYCLES</span>
               </span>
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-600 bg-slate-50 border border-slate-200/80 px-2.5 py-1 rounded-full">
-            <span>100% Secured</span>
-            <Lock className="w-3 h-3 text-emerald-600" />
+          <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 px-2.5 py-1 rounded-full">
+            <span>{t('checkout.security_badge')}</span>
+            <Lock className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
           </div>
         </div>
 
