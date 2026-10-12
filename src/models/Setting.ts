@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document, Model } from 'mongoose';
 
 export interface ISetting extends Document {
   key: string;
@@ -14,4 +14,8 @@ const SettingSchema = new Schema<ISetting>(
   { timestamps: true }
 );
 
-export default mongoose.models.Setting || mongoose.model<ISetting>('Setting', SettingSchema);
+const Setting: Model<ISetting> =
+  (mongoose.models.Setting as Model<ISetting>) ||
+  mongoose.model<ISetting>('Setting', SettingSchema);
+
+export default Setting;

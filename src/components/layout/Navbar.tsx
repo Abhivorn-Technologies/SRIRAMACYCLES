@@ -13,6 +13,9 @@ import {
   Menu,
   X,
   ChevronDown,
+  PackageCheck,
+  LayoutDashboard,
+  LogOut,
 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
@@ -159,7 +162,6 @@ export default function Navbar() {
                   <button
                     onClick={() => {
                       setIsUserDropdownOpen(!isUserDropdownOpen);
-                      setIsLangDropdownOpen(false);
                     }}
                     className="flex items-center gap-2 py-1.5 px-3 rounded-xl border border-slate-200/90 dark:border-slate-700 hover:border-brand-200 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-100 text-xs font-semibold shadow-xs transition-colors"
                   >
