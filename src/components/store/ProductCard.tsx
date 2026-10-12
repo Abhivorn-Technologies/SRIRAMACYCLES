@@ -31,7 +31,7 @@ export default function ProductCard({ product, onQuickView }: IProductCardProps)
     product.salePrice && product.salePrice > 0 ? product.salePrice : product.price;
 
   return (
-    <div className="group relative bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 hover:border-brand-300 dark:hover:border-brand-500 overflow-hidden card-hover-lift flex flex-col justify-between transition-all duration-300 shadow-2xs hover:shadow-xl">
+    <div className="group relative bg-white dark:bg-slate-900 rounded-3xl border border-brand-200/70 dark:border-slate-800 hover:border-brand-400 dark:hover:border-brand-500 overflow-hidden card-hover-lift flex flex-col justify-between transition-all duration-300 shadow-xs hover:shadow-xl">
       {/* Top Badges */}
       <div className="absolute top-3.5 left-3.5 z-10 flex flex-col gap-1.5 items-start pointer-events-none">
         {discountPercent > 0 && (

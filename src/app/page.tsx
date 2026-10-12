@@ -62,7 +62,7 @@ export default async function HomePage() {
   const { categories, featuredProducts, bestSellers, banners } = await getHomeData();
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-[#FFF4F0] dark:bg-black transition-colors duration-300">
       {/* 1. Hero Carousel */}
       <HeroBanner banners={banners} />
 

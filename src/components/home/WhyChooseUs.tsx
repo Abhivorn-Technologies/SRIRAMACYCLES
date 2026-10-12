@@ -48,7 +48,7 @@ export default function WhyChooseUs() {
   ];
 
   return (
-    <section className="py-16 sm:py-24 bg-white dark:bg-slate-950 transition-colors duration-200">
+    <section className="py-16 sm:py-24 bg-[#FFF4F0] dark:bg-slate-950 transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <span className="text-xs font-black text-brand-600 dark:text-brand-400 uppercase tracking-widest bg-brand-50 dark:bg-brand-950/60 border border-brand-200/60 dark:border-brand-900/50 px-3.5 py-1 rounded-full">

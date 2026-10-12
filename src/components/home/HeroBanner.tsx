@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, ChevronLeft, ChevronRight, Sparkles, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight, Sparkles, CheckCircle2, Truck, RotateCcw, ShieldCheck } from 'lucide-react';
 import { IBanner } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
 
@@ -91,9 +91,9 @@ export default function HeroBanner({ banners }: IHeroBannerProps) {
   const current = slides[currentIndex];
 
   return (
-    <section className="relative w-full bg-gradient-to-b from-white via-slate-50/70 to-white dark:from-black dark:via-zinc-950 dark:to-black overflow-hidden border-b border-slate-200/80 dark:border-zinc-800/80 select-none transition-colors duration-300">
-      {/* Subtle Ambient Red Glow */}
-      <div className="absolute left-1/4 top-1/2 -translate-y-1/2 w-96 h-96 bg-brand-600/10 rounded-full blur-3xl pointer-events-none" />
+    <section className="relative w-full bg-gradient-to-b from-[#FFF0EB] via-[#FDECE6] to-[#FFF4F0] dark:from-black dark:via-zinc-950 dark:to-black overflow-hidden border-b border-brand-200/60 dark:border-zinc-800/80 select-none transition-colors duration-300">
+      {/* Subtle Ambient Soft Pink Glow */}
+      <div className="absolute left-1/4 top-1/2 -translate-y-1/2 w-96 h-96 bg-brand-400/20 rounded-full blur-3xl pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 lg:py-18">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
@@ -104,9 +104,9 @@ export default function HeroBanner({ banners }: IHeroBannerProps) {
             {/* Pill Badge */}
             <div
               key={`badge-${current.id}`}
-              className="inline-flex items-center gap-2 bg-brand-50 dark:bg-zinc-900 border border-brand-200/80 dark:border-zinc-800 text-brand-700 dark:text-brand-400 px-4 py-1.5 rounded-full text-xs font-black shadow-xs animate-magical-up"
+              className="inline-flex items-center gap-2 bg-white/90 dark:bg-zinc-900 border border-brand-200 dark:border-zinc-800 text-brand-700 dark:text-brand-400 px-4 py-1.5 rounded-full text-xs font-black shadow-xs animate-magical-up"
             >
-              <Sparkles className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400 animate-pulse" />
+              <Sparkles className="w-3.5 h-3.5 text-brand-500 dark:text-brand-400 animate-pulse" />
               <span>{current.badge}</span>
             </div>
 
@@ -115,11 +115,11 @@ export default function HeroBanner({ banners }: IHeroBannerProps) {
               key={`title-${current.id}`}
               className="space-y-1 animate-magical-up-delay-1"
             >
-              <h2 className="text-lg sm:text-2xl font-black text-slate-800 dark:text-slate-200 tracking-tight">
+              <h2 className="text-xl sm:text-3xl font-black text-slate-800 dark:text-slate-200 tracking-tight">
                 {current.title}
               </h2>
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-950 dark:text-white leading-[1.15]">
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-red-600 dark:from-brand-500 dark:to-red-400">
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-950 dark:text-white leading-[1.12]">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-500 via-rose-500 to-brand-600 dark:from-brand-400 dark:to-brand-300">
                   {current.titleHighlight}
                 </span>
               </h1>
@@ -137,7 +137,7 @@ export default function HeroBanner({ banners }: IHeroBannerProps) {
             {current.priceTag && (
               <div
                 key={`price-${current.id}`}
-                className="inline-flex items-center gap-2 bg-white dark:bg-zinc-900 border border-slate-200/90 dark:border-zinc-800 px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-200 shadow-2xs animate-magical-up-delay-2"
+                className="inline-flex items-center gap-2 bg-white dark:bg-zinc-900 border border-brand-200/80 dark:border-zinc-800 px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-200 shadow-2xs animate-magical-up-delay-2"
               >
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
                 <span className="text-slate-500 dark:text-slate-400 font-medium">Starting from</span>
@@ -145,14 +145,14 @@ export default function HeroBanner({ banners }: IHeroBannerProps) {
               </div>
             )}
 
-            {/* Action Buttons: Dual-Tone Racing Red Primary + Jet Black Secondary */}
+            {/* Action Buttons: Soft Coral Pill Primary + Soft Warm White Secondary */}
             <div
               key={`cta-${current.id}`}
               className="flex flex-wrap items-center gap-3 pt-2 animate-magical-up-delay-3"
             >
               <Link
                 href={current.ctaLink}
-                className="bg-brand-600 hover:bg-brand-700 text-white font-black text-sm sm:text-base py-3.5 px-7 rounded-2xl flex items-center gap-2.5 shadow-lg shadow-brand-600/30 transition-all hover:scale-105 active:scale-95 btn-glow"
+                className="bg-brand-600 hover:bg-brand-700 text-white font-black text-sm sm:text-base py-3.5 px-8 rounded-full flex items-center gap-2.5 shadow-lg shadow-brand-500/30 transition-all hover:scale-105 active:scale-95 btn-glow"
               >
                 <span>{current.ctaText}</span>
                 <ArrowRight className="w-4 h-4" />
@@ -163,14 +163,14 @@ export default function HeroBanner({ banners }: IHeroBannerProps) {
                   href={current.secondaryLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-black hover:bg-zinc-900 text-white dark:bg-white dark:text-black dark:hover:bg-zinc-100 font-black text-sm sm:text-base py-3.5 px-6 rounded-2xl transition-all shadow-md hover:scale-102 active:scale-95 border border-black/10 dark:border-white/10"
+                  className="bg-white/95 hover:bg-white text-slate-800 dark:bg-zinc-900 dark:text-white dark:hover:bg-zinc-800 font-extrabold text-sm sm:text-base py-3.5 px-6 rounded-full transition-all shadow-xs hover:scale-102 active:scale-95 border border-brand-200/80 dark:border-zinc-700"
                 >
                   {current.secondaryText}
                 </a>
               ) : (
                 <Link
                   href={current.secondaryLink}
-                  className="bg-black hover:bg-zinc-900 text-white dark:bg-white dark:text-black dark:hover:bg-zinc-100 font-black text-sm sm:text-base py-3.5 px-6 rounded-2xl transition-all shadow-md hover:scale-102 active:scale-95 border border-black/10 dark:border-white/10"
+                  className="bg-white/95 hover:bg-white text-slate-800 dark:bg-zinc-900 dark:text-white dark:hover:bg-zinc-800 font-extrabold text-sm sm:text-base py-3.5 px-6 rounded-full transition-all shadow-xs hover:scale-102 active:scale-95 border border-brand-200/80 dark:border-zinc-700"
                 >
                   {current.secondaryText}
                 </Link>
@@ -267,6 +267,39 @@ export default function HeroBanner({ banners }: IHeroBannerProps) {
             </div>
           </div>
 
+        </div>
+
+        {/* Theme 2: Soft & Warm Trust Feature Strip */}
+        <div className="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-brand-200/70 dark:border-zinc-800/80 grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6">
+          <div className="flex items-center gap-4 p-4 rounded-2xl bg-white/95 dark:bg-zinc-900/90 border border-brand-200/80 dark:border-zinc-800/80 shadow-xs hover:shadow-md hover:border-brand-300 transition-all duration-300 group">
+            <div className="w-12 h-12 rounded-2xl bg-brand-50 dark:bg-brand-950/50 border border-brand-200/60 dark:border-brand-900/40 flex items-center justify-center text-brand-600 dark:text-brand-400 shrink-0 group-hover:scale-105 transition-transform">
+              <Truck className="w-6 h-6" />
+            </div>
+            <div>
+              <h4 className="text-sm font-extrabold text-slate-900 dark:text-white">Free Shipping</h4>
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">On Orders Above ₹999</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4 p-4 rounded-2xl bg-white/95 dark:bg-zinc-900/90 border border-brand-200/80 dark:border-zinc-800/80 shadow-xs hover:shadow-md hover:border-brand-300 transition-all duration-300 group">
+            <div className="w-12 h-12 rounded-2xl bg-brand-50 dark:bg-brand-950/50 border border-brand-200/60 dark:border-brand-900/40 flex items-center justify-center text-brand-600 dark:text-brand-400 shrink-0 group-hover:scale-105 transition-transform">
+              <RotateCcw className="w-6 h-6" />
+            </div>
+            <div>
+              <h4 className="text-sm font-extrabold text-slate-900 dark:text-white">Easy Returns</h4>
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Within 7 Days</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4 p-4 rounded-2xl bg-white/95 dark:bg-zinc-900/90 border border-brand-200/80 dark:border-zinc-800/80 shadow-xs hover:shadow-md hover:border-brand-300 transition-all duration-300 group">
+            <div className="w-12 h-12 rounded-2xl bg-brand-50 dark:bg-brand-950/50 border border-brand-200/60 dark:border-brand-900/40 flex items-center justify-center text-brand-600 dark:text-brand-400 shrink-0 group-hover:scale-105 transition-transform">
+              <ShieldCheck className="w-6 h-6" />
+            </div>
+            <div>
+              <h4 className="text-sm font-extrabold text-slate-900 dark:text-white">Secure Payment</h4>
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">100% Safe & Secure</p>
+            </div>
+          </div>
         </div>
       </div>
     </section>

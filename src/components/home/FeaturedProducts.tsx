@@ -36,7 +36,7 @@ export default function FeaturedProducts({
   const resolvedButtonText = buttonText || t('featured.view_all_btn');
 
   return (
-    <section className="py-16 sm:py-20 bg-slate-50 dark:bg-slate-900/40 border-y border-slate-200/60 dark:border-slate-800 transition-colors duration-200">
+    <section className="py-16 sm:py-20 bg-[#FFF7F4] dark:bg-slate-900/40 border-y border-brand-200/50 dark:border-slate-800 transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">

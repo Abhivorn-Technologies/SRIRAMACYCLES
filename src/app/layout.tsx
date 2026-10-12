@@ -66,12 +66,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           dangerouslySetInnerHTML={{
             __html: `
               try {
-                const theme = localStorage.getItem('sr_theme');
-                if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                  document.documentElement.classList.add('dark');
-                } else {
-                  document.documentElement.classList.remove('dark');
-                }
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('sr_theme', 'light');
                 const lang = localStorage.getItem('sr_lang');
                 if (lang) {
                   document.documentElement.lang = lang;
@@ -81,7 +77,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
       </head>
-      <body className="min-h-screen flex flex-col bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 selection:bg-brand-500 selection:text-white transition-colors duration-200" suppressHydrationWarning>
+      <body className="min-h-screen flex flex-col bg-[#FFF4F0] text-slate-900 selection:bg-brand-500 selection:text-white transition-colors duration-200" suppressHydrationWarning>
         <ThemeProvider>
           <LanguageProvider>
             <ToastProvider>

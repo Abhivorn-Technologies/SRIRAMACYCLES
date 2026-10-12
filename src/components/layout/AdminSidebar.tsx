@@ -18,6 +18,7 @@ import {
   LogOut,
   X,
   Receipt,
+  Palette,
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { APP_NAME } from '@/lib/constants';
@@ -47,6 +48,7 @@ export default function AdminSidebar({
     { label: 'Customers', href: '/admin/customers', icon: Users },
     { label: 'Coupons', href: '/admin/coupons', icon: Tag },
     { label: 'Banners & Hero', href: '/admin/banners', icon: ImageIcon },
+    { label: 'Theme & Colors', href: '/admin/theme', icon: Palette, badge: 'Theme 2' },
     { label: 'Enquiries', href: '/admin/enquiries', icon: MessageSquare },
   ];
 

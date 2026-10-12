@@ -41,7 +41,7 @@ export default function PromoBanner() {
     : '25% OFF';
 
   return (
-    <section className="py-12 bg-slate-50/50 dark:bg-slate-950 transition-colors duration-200">
+    <section className="py-12 bg-[#FFF4F0] dark:bg-slate-950 transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 via-brand-950 to-slate-900 text-white shadow-xl border border-slate-800">
           {/* Subtle Background Glow */}

@@ -21,7 +21,7 @@ export default function ThemePrototypesPage() {
           Sri Rama Cycles — Theme Prototypes
         </h1>
         <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto mt-2 leading-relaxed">
-          Here are 5 curated, simple and beautiful theme directions designed for your client. Click &ldquo;Activate Live Preview&rdquo; on any card to see the entire website switch instantly in real time!
+          Curated theme designs for your client including <strong>Theme 2: Soft &amp; Warm</strong> (now applied live), <strong>Theme 1: Clean &amp; Modern</strong>, and <strong>Theme 3: Dark Minimal</strong>. Click &ldquo;Activate Live Preview&rdquo; on any card to switch the entire website instantly!
         </p>
         <div className="mt-4 flex items-center justify-center gap-4">
           <Link

@@ -5,10 +5,57 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap');
 
 :root,
-html[data-color-theme="racing-red"] {
+html[data-color-theme="soft-warm"] {
   --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-  --background: #ffffff;
-  --foreground: #000000;
+  --background: #FFF4F0; /* Exact soft blush light-pink shade from reference mockup */
+  --foreground: #1e293b;
+  --brand-50: #FFF5F2;
+  --brand-100: #FFEAE3;
+  --brand-200: #FFD5CA;
+  --brand-300: #FFB7A7;
+  --brand-400: #FF9682;
+  --brand-500: #FF7361;
+  --brand-600: #F26457;
+  --brand-700: #DC4D3F;
+  --brand-800: #B53E32;
+  --brand-900: #93362C;
+  --brand-950: #4E1711;
+}
+
+html[data-color-theme="soft-warm"] .glass-nav {
+  background: rgba(255, 244, 240, 0.94);
+  border-color: rgba(255, 213, 202, 0.7) !important;
+}
+
+html[data-color-theme="clean-modern"] {
+  --brand-50: #eff6ff;
+  --brand-100: #dbeafe;
+  --brand-200: #bfdbfe;
+  --brand-300: #93c5fd;
+  --brand-400: #60a5fa;
+  --brand-500: #3b82f6;
+  --brand-600: #1e88e5;
+  --brand-700: #1565c0;
+  --brand-800: #0d47a1;
+  --brand-900: #1e3a8a;
+  --brand-950: #172554;
+}
+
+html[data-color-theme="dark-minimal"] {
+  --brand-50: #f0f9ff;
+  --brand-100: #e0f2fe;
+  --brand-200: #bae6fd;
+  --brand-300: #7dd3fc;
+  --brand-400: #38bdf8;
+  --brand-500: #0ea5e9;
+  --brand-600: #0284c7;
+  --brand-700: #0369a1;
+  --brand-800: #075985;
+  --brand-900: #0c4a6e;
+  --brand-950: #082f49;
+}
+
+html[data-color-theme="racing-red"] {
   --brand-50: #fff5f5;
   --brand-100: #ffe8e8;
   --brand-200: #ffc9cb;

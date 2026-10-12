@@ -13,16 +13,10 @@ import {
   Menu,
   X,
   ChevronDown,
-  LogOut,
-  PackageCheck,
-  LayoutDashboard,
-  Sun,
-  Moon,
 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
 import { useAuth } from '@/context/AuthContext';
-import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { APP_NAME, STORE_CONTACT } from '@/lib/constants';
 
@@ -32,7 +26,6 @@ export default function Navbar() {
   const { cartCount } = useCart();
   const { wishlistCount } = useWishlist();
   const { user, isAdmin, logout } = useAuth();
-  const { theme, toggleTheme } = useTheme();
   const { t } = useLanguage();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -118,22 +111,9 @@ export default function Navbar() {
             })}
           </nav>
 
-          {/* Right Action Icons (Theme, Search, Wishlist, Cart, Profile) */}
+          {/* Right Action Icons (Search, Wishlist, Cart, Profile) */}
           <div className="flex items-center gap-1.5 sm:gap-2.5">
 
-            {/* Theme Toggle Button */}
-            <button
-              onClick={toggleTheme}
-              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors border border-transparent hover:border-slate-200 dark:hover:border-slate-700 group"
-              aria-label={theme === 'dark' ? t('nav.light_mode') : t('nav.dark_mode')}
-              title={theme === 'dark' ? t('nav.light_mode') : t('nav.dark_mode')}
-            >
-              {theme === 'dark' ? (
-                <Sun className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400 group-hover:rotate-45 transition-transform duration-300" />
-              ) : (
-                <Moon className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600 group-hover:-rotate-12 transition-transform duration-300" />
-              )}
-            </button>
 
             {/* Search Trigger */}
             <button
@@ -297,26 +277,6 @@ export default function Navbar() {
       {/* Mobile Navigation Drawer */}
       {isMobileMenuOpen && (
         <div className="lg:hidden border-t border-slate-100 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md px-6 py-5 flex flex-col gap-3 animate-in slide-in-from-top-4">
-          {/* Mobile Theme Toolbar */}
-          <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
-            <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Appearance</span>
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 flex items-center gap-1.5 text-xs font-semibold"
-            >
-              {theme === 'dark' ? (
-                <>
-                  <Sun className="w-4 h-4 text-amber-400" />
-                  <span>{t('nav.light_mode')}</span>
-                </>
-              ) : (
-                <>
-                  <Moon className="w-4 h-4 text-slate-600" />
-                  <span>{t('nav.dark_mode')}</span>
-                </>
-              )}
-            </button>
-          </div>
 
           {navLinks.map((link) => (
             <Link

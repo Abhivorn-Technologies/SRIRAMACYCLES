@@ -123,29 +123,29 @@ export const translations: Translations = {
 
   // Hero Section
   'hero.slide1_badge': {
-    en: '✨ 2026 Pro Series',
-    te: '✨ 2026 ప్రో సిరీస్',
-    hi: '✨ 2026 प्रो सीरीज़',
+    en: '✨ Sri Rama Signature',
+    te: '✨ శ్రీ రామ సిగ్నేచర్',
+    hi: '✨ श्री राम सिग्नेचर',
   },
   'hero.slide1_title': {
-    en: 'Ride with Passion.',
-    te: 'మక్కువతో సైక్లింగ్ చేయండి.',
-    hi: 'जुनून के साथ राइड करें।',
+    en: 'Better Cycles,',
+    te: 'మెరుగైన సైకిళ్లు,',
+    hi: 'बेहतर साइकिलें,',
   },
   'hero.slide1_highlight': {
-    en: 'Engineered for Pure Speed.',
-    te: 'వేగం మరియు సామర్థ్యంతో రూపొందించబడింది.',
-    hi: 'असाधारण गति के लिए निर्मित।',
+    en: 'Brighter Journeys',
+    te: 'ఆనందకర ప్రయాణాలు',
+    hi: 'उज्ज्वल यात्राएं',
   },
   'hero.slide1_subtitle': {
-    en: 'Ultra-light carbon frames, Shimano 105 gearing, and aerodynamic precision for riders who demand excellence.',
-    te: 'అల్ట్రా-లైట్ కార్బన్ ఫ్రేమ్‌లు, షిమనో 105 గేరింగ్ మరియు రైడర్‌ల కోసం అత్యుత్తమ ఏరోడైనమిక్ డిజైన్.',
-    hi: 'अल्ट्रा-लाइट कार्बन फ्रेम, शिमानो 105 गियरिंग, और बेहतरीन राइडर्स के लिए सटीक एरोडायनामिक डिज़ाइन।',
+    en: 'Quality Cycles for a Healthier, Happier You',
+    te: 'ఆరోగ్యకరమైన, ఆనందకరమైన జీవితం కోసం నాణ్యమైన సైకిళ్లు',
+    hi: 'एक स्वस्थ और खुशहाल जीवन के लिए बेहतरीन साइकिलें',
   },
   'hero.slide1_cta': {
-    en: 'Explore Road Cycles',
-    te: 'రోడ్ సైకిళ్లను చూడండి',
-    hi: 'रोड साइकिल देखें',
+    en: 'Shop Now',
+    te: 'ఇప్పుడే కొనండి',
+    hi: 'अभी खरीदें',
   },
   'hero.slide1_secondary': {
     en: 'Shop All Cycles',
@@ -153,9 +153,9 @@ export const translations: Translations = {
     hi: 'सभी साइकिलें देखें',
   },
   'hero.slide1_price': {
-    en: 'Starting from ₹19,999',
-    te: 'ప్రారంభ ధర ₹19,999',
-    hi: 'शुरुआती कीमत ₹19,999',
+    en: 'Starting from ₹12,499',
+    te: 'ప్రారంభ ధర ₹12,499',
+    hi: 'शुरुआती कीमत ₹12,499',
   },
 
   'hero.slide2_badge': {

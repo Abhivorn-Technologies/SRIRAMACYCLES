@@ -8,10 +8,10 @@ export async function GET() {
   try {
     await connectToDatabase();
     const setting = await Setting.findOne({ key: 'color_theme' }).lean();
-    const themeId = setting?.value || 'racing-red';
+    const themeId = setting?.value || 'soft-warm';
     return NextResponse.json({ success: true, themeId });
   } catch (error: any) {
-    return NextResponse.json({ success: true, themeId: 'racing-red' });
+    return NextResponse.json({ success: true, themeId: 'soft-warm' });
   }
 }
 
@@ -20,7 +20,16 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { themeId } = body;
 
-    const validThemes = ['racing-red', 'royal-navy', 'emerald-sport', 'sunset-amber', 'stealth-titanium'];
+    const validThemes = [
+      'soft-warm',
+      'clean-modern',
+      'dark-minimal',
+      'racing-red',
+      'royal-navy',
+      'emerald-sport',
+      'sunset-amber',
+      'stealth-titanium',
+    ];
     if (!themeId || !validThemes.includes(themeId)) {
       return NextResponse.json(
         { success: false, message: 'Invalid theme specified' },

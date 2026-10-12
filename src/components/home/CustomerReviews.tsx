@@ -85,7 +85,7 @@ export default function CustomerReviews() {
   };
 
   return (
-    <section className="py-16 sm:py-24 bg-slate-50 dark:bg-slate-900/40 border-t border-slate-200/70 dark:border-slate-800 relative overflow-hidden transition-colors duration-200">
+    <section className="py-16 sm:py-24 bg-[#FFF7F4] dark:bg-slate-900/40 border-t border-brand-200/50 dark:border-slate-800 relative overflow-hidden transition-colors duration-200">
       {/* Background Soft Red Radial Glow */}
       <div className="absolute top-0 right-1/4 w-96 h-96 bg-brand-500/5 rounded-full blur-3xl pointer-events-none" />
 
