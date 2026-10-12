@@ -81,15 +81,15 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-24 sm:h-28 md:h-30 gap-6">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 shrink-0 group py-2 pl-2 sm:pl-5 md:pl-8">
-            <div className="relative overflow-hidden transition-transform duration-300 group-hover:scale-105">
+          <Link href="/" className="flex items-center h-full shrink-0 group py-0 pl-1 sm:pl-3 md:pl-4">
+            <div className="relative h-full flex items-center overflow-hidden transition-transform duration-300 group-hover:scale-105">
               <Image
                 src="/SRI RAMA logo 3.png"
                 alt="Sri Rama Cycle Store & Auto Spares"
-                width={400}
-                height={120}
+                width={450}
+                height={135}
                 priority
-                className="h-16 sm:h-20 md:h-24 lg:h-26 w-auto object-contain drop-shadow-lg"
+                className="h-20 sm:h-24 md:h-26 lg:h-[7rem] max-h-full w-auto object-contain drop-shadow-md"
               />
             </div>
           </Link>
