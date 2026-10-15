@@ -29,12 +29,22 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 
   const showToast = useCallback(
     (message: string, type: ToastType = 'info') => {
-      const id = Math.random().toString(36).substring(2, 9);
-      setToasts((prev) => [...prev, { id, message, type }]);
+      if (!message) return;
 
-      setTimeout(() => {
-        removeToast(id);
-      }, 4000);
+      setToasts((prev) => {
+        // Prevent duplicate toasts with the identical message & type
+        if (prev.some((t) => t.message === message && t.type === type)) {
+          return prev;
+        }
+        const id = Math.random().toString(36).substring(2, 9);
+        setTimeout(() => {
+          removeToast(id);
+        }, 3500);
+
+        // Keep maximum 3 toasts visible at once to prevent screen flooding
+        const updated = [...prev, { id, message, type }];
+        return updated.slice(-3);
+      });
     },
     [removeToast]
   );

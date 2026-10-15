@@ -1,13 +1,14 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import { Plus, Edit2, Trash2, FolderTree, X, Eye, EyeOff } from 'lucide-react';
+import { Plus, Edit2, Trash2, FolderTree, X, Eye, EyeOff, UploadCloud, Link as LinkIcon, Image as ImageIcon } from 'lucide-react';
 import { ICategory } from '@/types';
 import { useToast } from '@/context/ToastContext';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import ConfirmModal from '@/components/common/ConfirmModal';
 import Pagination from '@/components/common/Pagination';
+import { slugify } from '@/lib/utils';
 
 export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState<ICategory[]>([]);
@@ -16,6 +17,10 @@ export default function AdminCategoriesPage() {
   const [editingCategory, setEditingCategory] = useState<ICategory | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [imageInputMode, setImageInputMode] = useState<'upload' | 'url'>('upload');
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const itemsPerPage = 8;
   const { success, error } = useToast();
 
@@ -51,6 +56,7 @@ export default function AdminCategoriesPage() {
   const openAddModal = () => {
     setEditingCategory(null);
     setFormData({ name: '', slug: '', description: '', image: '', order: '0', isActive: true });
+    setImageInputMode('upload');
     setModalOpen(true);
   };
 
@@ -64,6 +70,7 @@ export default function AdminCategoriesPage() {
       order: cat.order?.toString() || '0',
       isActive: cat.isActive !== false,
     });
+    setImageInputMode(cat.image && cat.image.startsWith('http') ? 'url' : 'upload');
     setModalOpen(true);
   };
 
@@ -120,10 +127,43 @@ export default function AdminCategoriesPage() {
     }
   };
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+    try {
+      const uploadData = new FormData();
+      uploadData.append('file', file);
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: uploadData,
+      });
+
+      const data = await res.json();
+      if (data.success && data.url) {
+        setFormData((prev) => ({ ...prev, image: data.url }));
+        success(`Image "${file.name}" uploaded successfully!`);
+      } else {
+        error(data.message || 'Failed to upload image');
+      }
+    } catch (err) {
+      error('An error occurred during file upload');
+    } finally {
+      setUploadingImage(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name) return;
+    if (!formData.name.trim()) return;
+    if (isSubmitting) return; // Prevent multiple clicks
 
+    setIsSubmitting(true);
     try {
       const url = editingCategory ? `/api/categories/${editingCategory._id}` : '/api/categories';
       const method = editingCategory ? 'PUT' : 'POST';
@@ -133,6 +173,7 @@ export default function AdminCategoriesPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
+          name: formData.name.trim(),
           order: Number(formData.order),
           isActive: formData.isActive,
         }),
@@ -149,6 +190,8 @@ export default function AdminCategoriesPage() {
       }
     } catch (err) {
       error('An error occurred');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -298,14 +341,14 @@ export default function AdminCategoriesPage() {
       {/* Modal */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in">
-          <div className="relative bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-100 flex flex-col gap-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div className="relative bg-white rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 sm:p-8 shadow-2xl border border-slate-100 flex flex-col gap-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 sticky top-0 bg-white z-10">
               <h3 className="text-base font-black text-slate-900">
                 {editingCategory ? 'Edit Category' : 'Create Category'}
               </h3>
               <button
                 onClick={() => setModalOpen(false)}
-                className="p-1 text-slate-400 hover:text-slate-600"
+                className="p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -320,36 +363,141 @@ export default function AdminCategoriesPage() {
                   type="text"
                   required
                   value={formData.name}
-                  onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setFormData((p) => ({
+                      ...p,
+                      name: val,
+                      slug: !editingCategory ? slugify(val) : p.slug,
+                    }));
+                  }}
                   placeholder="e.g. Mountain Cycles"
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-brand-500/20"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                  Slug (Optional)
-                </label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-xs font-bold text-slate-700">
+                    Slug (Auto-generated)
+                  </label>
+                  <span className="text-[10px] text-slate-400">Used for URL filtering</span>
+                </div>
                 <input
                   type="text"
                   value={formData.slug}
-                  onChange={(e) => setFormData((p) => ({ ...p, slug: e.target.value }))}
+                  onChange={(e) => setFormData((p) => ({ ...p, slug: slugify(e.target.value) }))}
                   placeholder="e.g. mountain-cycles"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-mono font-medium focus:outline-none focus:ring-2 focus:ring-brand-500/20"
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                  Banner Image URL
-                </label>
-                <input
-                  type="url"
-                  value={formData.image}
-                  onChange={(e) => setFormData((p) => ({ ...p, image: e.target.value }))}
-                  placeholder="https://images.unsplash.com/..."
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-brand-500/20"
-                />
+              {/* Category Image Upload or URL */}
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                    <ImageIcon className="w-3.5 h-3.5 text-brand-600" />
+                    Category Banner / Image
+                  </label>
+                  {/* Mode switcher tabs */}
+                  <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg">
+                    <button
+                      type="button"
+                      onClick={() => setImageInputMode('upload')}
+                      className={`px-2.5 py-1 text-[11px] font-bold rounded-md transition-all flex items-center gap-1 ${
+                        imageInputMode === 'upload'
+                          ? 'bg-white text-brand-600 shadow-2xs'
+                          : 'text-slate-500 hover:text-slate-800'
+                      }`}
+                    >
+                      <UploadCloud className="w-3 h-3" />
+                      Upload File
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setImageInputMode('url')}
+                      className={`px-2.5 py-1 text-[11px] font-bold rounded-md transition-all flex items-center gap-1 ${
+                        imageInputMode === 'url'
+                          ? 'bg-white text-brand-600 shadow-2xs'
+                          : 'text-slate-500 hover:text-slate-800'
+                      }`}
+                    >
+                      <LinkIcon className="w-3 h-3" />
+                      Image URL
+                    </button>
+                  </div>
+                </div>
+
+                {imageInputMode === 'upload' ? (
+                  <div>
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleFileUpload}
+                      accept="image/*"
+                      className="hidden"
+                    />
+                    <div
+                      onClick={() => fileInputRef.current?.click()}
+                      className="border-2 border-dashed border-slate-200 hover:border-brand-500 bg-slate-50/70 hover:bg-brand-50/30 rounded-2xl p-5 text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-2 group"
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-600 group-hover:text-brand-600 group-hover:border-brand-300 flex items-center justify-center shadow-2xs transition-colors">
+                        {uploadingImage ? (
+                          <LoadingSpinner size="sm" />
+                        ) : (
+                          <UploadCloud className="w-5 h-5" />
+                        )}
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-slate-800">
+                          {uploadingImage
+                            ? 'Uploading category image...'
+                            : 'Click to upload image from device'}
+                        </p>
+                        <p className="text-[10px] text-slate-400 mt-0.5">
+                          Supports PNG, JPG, WEBP, or SVG
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <input
+                      type="url"
+                      value={formData.image}
+                      onChange={(e) => setFormData((p) => ({ ...p, image: e.target.value }))}
+                      placeholder="Paste image link, e.g. https://images.unsplash.com/..."
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                    />
+                  </div>
+                )}
+
+                {/* Preview Thumbnail */}
+                {formData.image && (
+                  <div className="relative mt-1 p-2 rounded-2xl bg-slate-50 border border-slate-200 flex items-center gap-3">
+                    <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-slate-200 shrink-0 border border-slate-200">
+                      <Image
+                        src={formData.image}
+                        alt="Category preview"
+                        fill
+                        sizes="64px"
+                        className="object-cover"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-bold text-slate-800 truncate">Current Image</p>
+                      <p className="text-[11px] text-slate-500 truncate">{formData.image}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setFormData((p) => ({ ...p, image: '' }))}
+                      className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                      title="Remove image"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
               </div>
 
               <div>
@@ -389,9 +537,17 @@ export default function AdminCategoriesPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 text-xs font-bold text-white bg-brand-600 hover:bg-brand-500 rounded-xl shadow-sm"
+                  disabled={isSubmitting || uploadingImage}
+                  className="px-5 py-2 text-xs font-bold text-white bg-brand-600 hover:bg-brand-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl shadow-sm flex items-center gap-1.5"
                 >
-                  {editingCategory ? 'Update' : 'Create'}
+                  {isSubmitting ? (
+                    <>
+                      <LoadingSpinner size="sm" />
+                      <span>{editingCategory ? 'Updating...' : 'Creating...'}</span>
+                    </>
+                  ) : (
+                    <span>{editingCategory ? 'Update' : 'Create'}</span>
+                  )}
                 </button>
               </div>
             </form>

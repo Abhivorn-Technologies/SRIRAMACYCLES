@@ -85,6 +85,12 @@ export async function POST(req: NextRequest) {
       { status: 201 }
     );
   } catch (error: any) {
+    if (error.code === 11000) {
+      return NextResponse.json(
+        { success: false, message: 'A category with this name or slug already exists' },
+        { status: 400 }
+      );
+    }
     return NextResponse.json(
       { success: false, message: error.message || 'Error creating category' },
       { status: 500 }

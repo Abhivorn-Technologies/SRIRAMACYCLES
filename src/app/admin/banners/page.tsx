@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import { Plus, Trash2, Edit2, Image as ImageIcon, X, Compass, Link as LinkIcon, ExternalLink, Sparkles, Check } from 'lucide-react';
+import { Plus, Trash2, Edit2, Image as ImageIcon, X, Compass, Link as LinkIcon, ExternalLink, Sparkles, Check, UploadCloud } from 'lucide-react';
 import { IBanner } from '@/types';
 import { useToast } from '@/context/ToastContext';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
@@ -40,6 +40,10 @@ export default function AdminBannersPage() {
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [isCustomUrl, setIsCustomUrl] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [imageInputMode, setImageInputMode] = useState<'upload' | 'url'>('upload');
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const itemsPerPage = 6;
   const { success, error } = useToast();
 
@@ -97,6 +101,7 @@ export default function AdminBannersPage() {
   const openAddModal = () => {
     setEditingBanner(null);
     setIsCustomUrl(false);
+    setImageInputMode('upload');
     setFormData({
       title: '',
       subtitle: '',
@@ -112,6 +117,7 @@ export default function AdminBannersPage() {
 
   const openEditModal = (b: IBanner) => {
     setEditingBanner(b);
+    setImageInputMode(b.image && b.image.startsWith('http') ? 'url' : 'upload');
     // Check if the current ctaLink is an external URL or custom format
     const link = b.ctaLink || '/shop';
     const isStandard =
@@ -134,6 +140,37 @@ export default function AdminBannersPage() {
       order: b.order?.toString() || '0',
     });
     setModalOpen(true);
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+    try {
+      const uploadData = new FormData();
+      uploadData.append('file', file);
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: uploadData,
+      });
+
+      const data = await res.json();
+      if (data.success && data.url) {
+        setFormData((prev) => ({ ...prev, image: data.url }));
+        success(`Banner image "${file.name}" uploaded successfully!`);
+      } else {
+        error(data.message || 'Failed to upload image');
+      }
+    } catch (err) {
+      error('An error occurred during file upload');
+    } finally {
+      setUploadingImage(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
   };
 
   const handleDelete = (id: string) => {
@@ -162,7 +199,9 @@ export default function AdminBannersPage() {
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.title || !formData.image) return;
+    if (isSubmitting) return;
 
+    setIsSubmitting(true);
     try {
       const url = editingBanner ? `/api/banners/${editingBanner._id}` : '/api/banners';
       const method = editingBanner ? 'PUT' : 'POST';
@@ -187,6 +226,8 @@ export default function AdminBannersPage() {
       }
     } catch (err) {
       error('An error occurred');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -343,19 +384,88 @@ export default function AdminBannersPage() {
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                  Background Image URL *
-                </label>
-                <input
-                  type="url"
-                  required
-                  value={formData.image}
-                  onChange={(e) => setFormData((p) => ({ ...p, image: e.target.value }))}
-                  placeholder="https://images.unsplash.com/..."
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-brand-500/20"
-                />
-                <div className="flex flex-wrap items-center gap-1.5 mt-2">
+              {/* Background Image Upload or URL */}
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                    <ImageIcon className="w-3.5 h-3.5 text-brand-600" />
+                    Banner Background Image *
+                  </label>
+                  {/* Mode switcher tabs */}
+                  <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg">
+                    <button
+                      type="button"
+                      onClick={() => setImageInputMode('upload')}
+                      className={`px-2.5 py-1 text-[11px] font-bold rounded-md transition-all flex items-center gap-1 ${
+                        imageInputMode === 'upload'
+                          ? 'bg-white text-brand-600 shadow-2xs'
+                          : 'text-slate-500 hover:text-slate-800'
+                      }`}
+                    >
+                      <UploadCloud className="w-3 h-3" />
+                      Upload File
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setImageInputMode('url')}
+                      className={`px-2.5 py-1 text-[11px] font-bold rounded-md transition-all flex items-center gap-1 ${
+                        imageInputMode === 'url'
+                          ? 'bg-white text-brand-600 shadow-2xs'
+                          : 'text-slate-500 hover:text-slate-800'
+                      }`}
+                    >
+                      <LinkIcon className="w-3 h-3" />
+                      Image URL
+                    </button>
+                  </div>
+                </div>
+
+                {imageInputMode === 'upload' ? (
+                  <div>
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleFileUpload}
+                      accept="image/*"
+                      className="hidden"
+                    />
+                    <div
+                      onClick={() => fileInputRef.current?.click()}
+                      className="border-2 border-dashed border-slate-200 hover:border-brand-500 bg-slate-50/70 hover:bg-brand-50/30 rounded-2xl p-5 text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-2 group"
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-600 group-hover:text-brand-600 group-hover:border-brand-300 flex items-center justify-center shadow-2xs transition-colors">
+                        {uploadingImage ? (
+                          <LoadingSpinner size="sm" />
+                        ) : (
+                          <UploadCloud className="w-5 h-5" />
+                        )}
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-slate-800">
+                          {uploadingImage
+                            ? 'Uploading banner image...'
+                            : 'Click to upload banner from device'}
+                        </p>
+                        <p className="text-[10px] text-slate-400 mt-0.5">
+                          High-resolution recommended (PNG, JPG, WEBP)
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <input
+                      type="url"
+                      value={formData.image}
+                      onChange={(e) => setFormData((p) => ({ ...p, image: e.target.value }))}
+                      placeholder="Paste image link, e.g. https://images.unsplash.com/..."
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                    />
+                  </div>
+                )}
+
+                {/* Quick Unsplash Presets */}
+                <div className="flex flex-wrap items-center gap-1.5 pt-1">
                   <span className="text-[10px] text-slate-400 font-semibold mr-0.5">Quick Photos:</span>
                   {IMAGE_PRESETS.map((preset) => (
                     <button
@@ -372,6 +482,33 @@ export default function AdminBannersPage() {
                     </button>
                   ))}
                 </div>
+
+                {/* Preview Thumbnail */}
+                {formData.image && (
+                  <div className="relative mt-1 p-2 rounded-2xl bg-slate-50 border border-slate-200 flex items-center gap-3">
+                    <div className="relative w-24 h-14 rounded-xl overflow-hidden bg-slate-200 shrink-0 border border-slate-200">
+                      <Image
+                        src={formData.image}
+                        alt="Banner preview"
+                        fill
+                        sizes="96px"
+                        className="object-cover"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-bold text-slate-800 truncate">Selected Banner</p>
+                      <p className="text-[11px] text-slate-500 truncate">{formData.image}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setFormData((p) => ({ ...p, image: '' }))}
+                      className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                      title="Remove image"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
               </div>
 
               {/* Navigation Destination Picker (No coding needed) */}
@@ -556,9 +693,17 @@ export default function AdminBannersPage() {
                   </button>
                   <button
                     type="submit"
-                    className="px-5 py-2 text-xs font-bold text-white bg-brand-600 hover:bg-brand-500 active:scale-95 rounded-xl shadow-sm transition-all"
+                    disabled={isSubmitting || uploadingImage}
+                    className="px-5 py-2 text-xs font-bold text-white bg-brand-600 hover:bg-brand-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl shadow-sm flex items-center gap-1.5 transition-all"
                   >
-                    {editingBanner ? 'Update Banner' : 'Create Banner'}
+                    {isSubmitting ? (
+                      <>
+                        <LoadingSpinner size="sm" />
+                        <span>{editingBanner ? 'Updating...' : 'Creating...'}</span>
+                      </>
+                    ) : (
+                      <span>{editingBanner ? 'Update Banner' : 'Create Banner'}</span>
+                    )}
                   </button>
                 </div>
               </div>

@@ -18,10 +18,23 @@ import {
   Tag,
   FileText,
   Sliders,
+  RotateCw,
+  Sparkles,
 } from 'lucide-react';
 import { ICategory, ISpecification } from '@/types';
 import { useToast } from '@/context/ToastContext';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
+
+const generateSku = (categoryName?: string) => {
+  const prefix = 'SRC';
+  let catPart = 'CYC';
+  if (categoryName) {
+    const clean = categoryName.replace(/[^a-zA-Z]/g, '').slice(0, 3).toUpperCase();
+    if (clean.length >= 2) catPart = clean;
+  }
+  const randomNum = Math.floor(1000 + Math.random() * 9000);
+  return `${prefix}-${catPart}-${randomNum}`;
+};
 
 export default function AddProductPage() {
   const router = useRouter();
@@ -31,7 +44,7 @@ export default function AddProductPage() {
   const [categories, setCategories] = useState<ICategory[]>([]);
   const [loading, setLoading] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
-  const [urlInputMode, setUrlInputMode] = useState(false);
+  const [imageInputMode, setImageInputMode] = useState<'upload' | 'url'>('upload');
   const [customImageUrl, setCustomImageUrl] = useState('');
 
   const [formData, setFormData] = useState({
@@ -41,7 +54,7 @@ export default function AddProductPage() {
     price: '',
     salePrice: '',
     stock: '10',
-    sku: '',
+    sku: generateSku(),
     shortDescription: '',
     description: '',
     images: [] as string[],
@@ -64,7 +77,11 @@ export default function AddProductPage() {
         const data = await res.json();
         if (data.success && data.categories.length > 0) {
           setCategories(data.categories);
-          setFormData((p) => ({ ...p, category: data.categories[0]._id }));
+          setFormData((p) => ({
+            ...p,
+            category: data.categories[0]._id,
+            sku: p.sku && p.sku !== 'SRC-CYC-1000' ? p.sku : generateSku(data.categories[0].name),
+          }));
         }
       } catch (err) {
         console.error(err);
@@ -81,7 +98,16 @@ export default function AddProductPage() {
       const checked = (e.target as HTMLInputElement).checked;
       setFormData((p) => ({ ...p, [name]: checked }));
     } else {
-      setFormData((p) => ({ ...p, [name]: value }));
+      setFormData((p) => {
+        const updated = { ...p, [name]: value };
+        if (name === 'category') {
+          const cat = categories.find((c) => c._id === value);
+          if (cat && (!p.sku || p.sku.startsWith('SRC-'))) {
+            updated.sku = generateSku(cat.name);
+          }
+        }
+        return updated;
+      });
     }
   };
 
@@ -133,7 +159,6 @@ export default function AddProductPage() {
       images: [...prev.images, customImageUrl.trim()],
     }));
     setCustomImageUrl('');
-    setUrlInputMode(false);
     success('Image URL added to gallery');
   };
 
@@ -160,6 +185,7 @@ export default function AddProductPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading) return;
 
     if (!formData.name || !formData.price || !formData.category) {
       error('Please provide Product Name, Price, and Category');
@@ -318,17 +344,41 @@ export default function AddProductPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                SKU / Item Code
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                  <span>Item Code / SKU</span>
+                  <span className="text-rose-500">*</span>
+                  <span className="text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full">
+                    Auto-generated
+                  </span>
+                </label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const cat = categories.find((c) => c._id === formData.category);
+                    const newCode = generateSku(cat?.name);
+                    setFormData((p) => ({ ...p, sku: newCode }));
+                    success(`New Item Code generated: ${newCode}`);
+                  }}
+                  className="text-[11px] font-bold text-brand-600 hover:text-brand-700 flex items-center gap-1 transition-colors cursor-pointer"
+                  title="Generate a new Item Code"
+                >
+                  <RotateCw className="w-3 h-3" />
+                  Regenerate
+                </button>
+              </div>
               <input
                 type="text"
                 name="sku"
+                required
                 value={formData.sku}
                 onChange={handleInputChange}
-                placeholder="e.g. SRC-RD-009"
-                className="w-full bg-slate-50 border border-slate-200 focus:border-brand-500 focus:bg-white rounded-2xl py-3 px-4 text-xs sm:text-sm text-slate-900 focus:outline-none transition-all font-medium"
+                placeholder="e.g. SRC-ROA-4821"
+                className="w-full bg-slate-50 border border-slate-200 focus:border-brand-500 focus:bg-white rounded-2xl py-3 px-4 text-xs sm:text-sm text-slate-900 focus:outline-none transition-all font-mono font-bold uppercase tracking-wider"
               />
+              <p className="text-[11px] text-slate-400 mt-1">
+                Unique identifier automatically assigned for in-store billing &amp; inventory tracking.
+              </p>
             </div>
 
             <div>
@@ -397,7 +447,7 @@ export default function AddProductPage() {
 
         {/* 3. Product Images & Direct Upload */}
         <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col gap-5">
-          <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
                 <UploadCloud className="w-4 h-4" />
@@ -407,17 +457,36 @@ export default function AddProductPage() {
               </h2>
             </div>
 
-            <button
-              type="button"
-              onClick={() => setUrlInputMode(!urlInputMode)}
-              className="text-xs text-brand-600 hover:text-brand-800 font-semibold flex items-center gap-1"
-            >
-              <LinkIcon className="w-3.5 h-3.5" />
-              <span>{urlInputMode ? 'Hide URL Input' : 'Add via URL'}</span>
-            </button>
+            {/* Mode Switcher Tabs */}
+            <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl self-start sm:self-auto">
+              <button
+                type="button"
+                onClick={() => setImageInputMode('upload')}
+                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${
+                  imageInputMode === 'upload'
+                    ? 'bg-white text-purple-700 shadow-2xs'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <UploadCloud className="w-3.5 h-3.5" />
+                Upload from Device
+              </button>
+              <button
+                type="button"
+                onClick={() => setImageInputMode('url')}
+                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${
+                  imageInputMode === 'url'
+                    ? 'bg-white text-purple-700 shadow-2xs'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <LinkIcon className="w-3.5 h-3.5" />
+                Add via Web URL
+              </button>
+            </div>
           </div>
 
-          {/* Direct File Upload Trigger Dropzone */}
+          {/* Direct File Upload Dropzone or URL Input */}
           <div className="flex flex-col gap-3">
             <input
               type="file"
@@ -428,46 +497,57 @@ export default function AddProductPage() {
               className="hidden"
             />
 
-            <div
-              onClick={() => fileInputRef.current?.click()}
-              className="border-2 border-dashed border-slate-300 hover:border-emerald-500 bg-slate-50/70 hover:bg-emerald-50/30 rounded-3xl p-8 text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-3 group"
-            >
-              <div className="w-14 h-14 rounded-2xl bg-white border border-slate-200 text-slate-600 group-hover:text-emerald-600 group-hover:border-emerald-300 flex items-center justify-center shadow-xs transition-colors">
-                {uploadingImage ? (
-                  <LoadingSpinner size="md" />
-                ) : (
-                  <UploadCloud className="w-7 h-7" />
-                )}
+            {imageInputMode === 'upload' ? (
+              <div
+                onClick={() => fileInputRef.current?.click()}
+                className="border-2 border-dashed border-slate-300 hover:border-emerald-500 bg-slate-50/70 hover:bg-emerald-50/30 rounded-3xl p-8 text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-3 group"
+              >
+                <div className="w-14 h-14 rounded-2xl bg-white border border-slate-200 text-slate-600 group-hover:text-emerald-600 group-hover:border-emerald-300 flex items-center justify-center shadow-xs transition-colors">
+                  {uploadingImage ? (
+                    <LoadingSpinner size="md" />
+                  ) : (
+                    <UploadCloud className="w-7 h-7" />
+                  )}
+                </div>
+                <div>
+                  <p className="text-xs sm:text-sm font-bold text-slate-800">
+                    {uploadingImage
+                      ? 'Uploading image files...'
+                      : 'Click here to Upload Images from your device'}
+                  </p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">
+                    Supports PNG, JPG, WEBP, and SVG (You can select multiple photos)
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-xs sm:text-sm font-bold text-slate-800">
-                  {uploadingImage
-                    ? 'Uploading image files...'
-                    : 'Click here to Upload Images from your device'}
+            ) : (
+              <div className="flex flex-col gap-2 p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                <label className="text-xs font-bold text-slate-700">Direct Web Image Link</label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="url"
+                    value={customImageUrl}
+                    onChange={(e) => setCustomImageUrl(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAddUrlImage();
+                      }
+                    }}
+                    placeholder="https://images.unsplash.com/... or any direct HTTPS image link"
+                    className="flex-1 bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-brand-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddUrlImage}
+                    className="bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition-colors shadow-2xs"
+                  >
+                    Add to Gallery
+                  </button>
+                </div>
+                <p className="text-[11px] text-slate-400">
+                  Tip: Press Enter or click &quot;Add to Gallery&quot; to append this image.
                 </p>
-                <p className="text-[11px] text-slate-500 mt-0.5">
-                  Supports PNG, JPG, WEBP, and SVG (You can select multiple photos)
-                </p>
-              </div>
-            </div>
-
-            {/* Optional URL Input Mode */}
-            {urlInputMode && (
-              <div className="flex items-center gap-2 mt-2 bg-slate-50 p-3 rounded-2xl border border-slate-200">
-                <input
-                  type="url"
-                  value={customImageUrl}
-                  onChange={(e) => setCustomImageUrl(e.target.value)}
-                  placeholder="Paste direct HTTPS image URL here..."
-                  className="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-brand-500"
-                />
-                <button
-                  type="button"
-                  onClick={handleAddUrlImage}
-                  className="bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold px-4 py-2 rounded-xl"
-                >
-                  Add
-                </button>
               </div>
             )}
           </div>
