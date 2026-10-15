@@ -90,7 +90,7 @@ function AdminOrdersContent() {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between">
+      <div className="bg-white p-4 rounded-2xl border-2 border-slate-300 shadow-sm flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between">
         {/* Search */}
         <div className="relative flex-1 min-w-[260px]">
           <input
@@ -98,25 +98,25 @@ function AdminOrdersContent() {
             placeholder="Search Order ID, Customer Name, Phone..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2 pl-9 pr-4 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+            className="w-full bg-slate-50 border-2 border-slate-300 rounded-xl py-2 pl-9 pr-4 text-xs sm:text-sm font-bold text-slate-950 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
           />
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+          <Search className="w-4 h-4 text-slate-700 absolute left-3 top-3" />
         </div>
 
         {/* Channel Filters */}
-        <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl shrink-0">
+        <div className="flex items-center gap-1.5 bg-slate-200 p-1.5 rounded-xl shrink-0">
           <button
             onClick={() => setChannelFilter('ALL')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-              channelFilter === 'ALL' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600'
+            className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all ${
+              channelFilter === 'ALL' ? 'bg-white text-slate-950 shadow-xs' : 'text-slate-800'
             }`}
           >
             All Channels
           </button>
           <button
             onClick={() => setChannelFilter('ONLINE')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${
-              channelFilter === 'ONLINE' ? 'bg-brand-600 text-white shadow-2xs' : 'text-slate-600'
+            className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all flex items-center gap-1 ${
+              channelFilter === 'ONLINE' ? 'bg-brand-600 text-white shadow-xs' : 'text-slate-800'
             }`}
           >
             <Globe className="w-3.5 h-3.5" />
@@ -124,8 +124,8 @@ function AdminOrdersContent() {
           </button>
           <button
             onClick={() => setChannelFilter('POS')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${
-              channelFilter === 'POS' ? 'bg-slate-900 text-white shadow-2xs' : 'text-slate-600'
+            className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all flex items-center gap-1 ${
+              channelFilter === 'POS' ? 'bg-slate-950 text-white shadow-xs' : 'text-slate-800'
             }`}
           >
             <Store className="w-3.5 h-3.5" />
@@ -138,7 +138,7 @@ function AdminOrdersContent() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="bg-slate-50 border border-slate-200 text-xs font-bold text-slate-800 rounded-xl px-3 py-2 focus:outline-none"
+            className="bg-white border-2 border-slate-300 text-xs sm:text-sm font-black text-slate-950 rounded-xl px-3 py-2 focus:outline-none"
           >
             <option value="All">All Statuses</option>
             <option value="Placed">Placed</option>
@@ -154,7 +154,7 @@ function AdminOrdersContent() {
       </div>
 
       {/* Orders Table */}
-      <div className="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
+      <div className="bg-white rounded-3xl border-2 border-slate-300 shadow-sm overflow-hidden">
         {loading ? (
           <div className="py-20 flex justify-center">
             <LoadingSpinner size="lg" />
@@ -163,56 +163,91 @@ function AdminOrdersContent() {
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead>
-                <tr className="border-b border-slate-200 bg-slate-50/70 text-slate-500 font-bold uppercase">
-                  <th className="py-3.5 px-4">Order ID & Date</th>
-                  <th className="py-3.5 px-4">Sales Channel</th>
-                  <th className="py-3.5 px-4">Customer & Phone</th>
-                  <th className="py-3.5 px-4">Items & Variants</th>
-                  <th className="py-3.5 px-4">Total Amount</th>
-                  <th className="py-3.5 px-4">Payment</th>
-                  <th className="py-3.5 px-4">Status</th>
-                  <th className="py-3.5 px-4 text-right">Action</th>
+                <tr className="border-b-2 border-slate-300 bg-slate-100 text-slate-900 font-black uppercase tracking-wider text-xs">
+                  <th className="py-4 px-4 font-black">Order ID</th>
+                  <th className="py-4 px-4 font-black bg-amber-50/80 border-x border-amber-200 text-amber-950">
+                    <span className="flex items-center gap-1.5">
+                      <Calendar className="w-4 h-4 text-amber-900" />
+                      Purchased
+                    </span>
+                  </th>
+                  <th className="py-4 px-4 font-black">Sales Channel</th>
+                  <th className="py-4 px-4 font-black">Customer & Phone</th>
+                  <th className="py-4 px-4 font-black">Items & Variants</th>
+                  <th className="py-4 px-4 font-black bg-blue-50/80 border-x border-blue-200 text-blue-950">
+                    Cycle Size
+                  </th>
+                  <th className="py-4 px-4 font-black">Total Amount</th>
+                  <th className="py-4 px-4 font-black">Payment</th>
+                  <th className="py-4 px-4 font-black">Status</th>
+                  <th className="py-4 px-4 font-black text-right">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y-2 divide-slate-200">
                 {paginatedOrders.map((ord) => {
                   const isPOS = ord.orderSource === 'POS';
                   const paymentDisplay = ord.posDetails?.paymentMode || ord.paymentMethod;
 
                   return (
-                    <tr key={ord._id} className="hover:bg-slate-50/50">
-                      <td className="py-3.5 px-4">
-                        <span className="font-bold font-mono text-slate-900 block">
+                    <tr key={ord._id} className="hover:bg-slate-50/80 transition-colors">
+                      {/* Order ID */}
+                      <td className="py-4 px-4 align-middle">
+                        <span className="font-black font-mono text-sm sm:text-base text-slate-950 block tracking-wide">
                           {ord.orderNumber}
-                        </span>
-                        <span className="text-[10px] text-slate-400">
-                          {formatDateTime(ord.createdAt)}
                         </span>
                       </td>
 
-                      <td className="py-3.5 px-4">
+                      {/* Dedicated Purchased Date Column */}
+                      <td className="py-4 px-4 align-middle bg-amber-50/40 border-x border-amber-200/80 whitespace-nowrap">
+                        <div className="flex items-center gap-2">
+                          <div className="p-1.5 rounded-lg bg-amber-100 border border-amber-300 text-amber-950 shrink-0">
+                            <Calendar className="w-4 h-4 text-slate-950" />
+                          </div>
+                          <div>
+                            <span className="text-sm font-black text-slate-950 block">
+                              {formatDate(ord.createdAt)}
+                            </span>
+                            <span className="text-xs font-black text-slate-800 block mt-0.5">
+                              {ord.createdAt
+                                ? new Date(ord.createdAt).toLocaleTimeString('en-IN', {
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    hour12: true,
+                                  })
+                                : ''}
+                            </span>
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* Sales Channel */}
+                      <td className="py-4 px-4 align-middle">
                         {isPOS ? (
-                          <span className="inline-flex items-center gap-1 bg-slate-900 text-white font-black px-2.5 py-0.5 rounded-full text-[10px] shadow-2xs">
-                            <Store className="w-3 h-3 text-amber-400" />
+                          <span className="inline-flex items-center gap-1.5 bg-slate-950 text-white font-black px-3 py-1 rounded-full text-xs shadow-xs border border-slate-950">
+                            <Store className="w-3.5 h-3.5 text-amber-400" />
                             <span>In-Store POS</span>
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 bg-brand-50 text-brand-700 border border-brand-200 font-bold px-2.5 py-0.5 rounded-full text-[10px]">
-                            <Globe className="w-3 h-3" />
+                          <span className="inline-flex items-center gap-1.5 bg-brand-100 text-brand-950 border border-brand-400 font-black px-3 py-1 rounded-full text-xs shadow-2xs">
+                            <Globe className="w-3.5 h-3.5 text-brand-700" />
                             <span>Online Order</span>
                           </span>
                         )}
                       </td>
 
-                      <td className="py-3.5 px-4">
-                        <span className="font-semibold text-slate-900 block">{ord.customer.name}</span>
-                        <span className="text-[10px] text-slate-500 font-mono">
-                          {ord.customer.phone || 'Counter'}
+                      {/* Customer & Phone */}
+                      <td className="py-4 px-4 align-middle">
+                        <span className="font-black text-sm text-slate-950 block">
+                          {ord.customer.name}
+                        </span>
+                        <span className="text-xs font-bold text-slate-900 font-mono block mt-0.5">
+                          📞 {ord.customer.phone || 'Counter Sale'}
                         </span>
                       </td>
 
-                      <td className="py-3 px-4 text-slate-700 min-w-[220px] max-w-[300px]">
-                        <div className="flex flex-col gap-1.5">
+                      {/* Items & Variants */}
+                      <td className="py-4 px-4 align-middle text-slate-900 min-w-[220px] max-w-[320px]">
+                        <div className="flex flex-col gap-2">
                           {ord.items.slice(0, 2).map((it: any, idx: number) => {
                             const itemImg =
                               it.image ||
@@ -222,36 +257,36 @@ function AdminOrdersContent() {
                             const size = it.variant?.size || it.selectedSize || (it as any).size;
 
                             return (
-                              <div key={idx} className="flex items-center gap-2">
-                                <div className="relative w-9 h-9 rounded-lg bg-slate-50 border border-slate-200 shrink-0 overflow-hidden p-0.5">
+                              <div key={idx} className="flex items-center gap-2.5">
+                                <div className="relative w-10 h-10 rounded-lg bg-white border-2 border-slate-300 shrink-0 overflow-hidden p-0.5">
                                   <Image
                                     src={itemImg}
                                     alt={it.name || 'Cycle'}
                                     fill
-                                    sizes="36px"
+                                    sizes="40px"
                                     className="object-contain"
                                   />
                                 </div>
                                 <div className="min-w-0 flex-1 leading-tight">
-                                  <p className="font-bold text-xs text-slate-900 truncate" title={it.name}>
+                                  <p className="font-black text-xs text-slate-950 truncate" title={it.name}>
                                     {it.name}
                                   </p>
-                                  <div className="flex flex-wrap items-center gap-1 mt-0.5">
-                                    <span className="text-[10px] font-bold text-slate-700 bg-slate-100 px-1 rounded">
+                                  <div className="flex flex-wrap items-center gap-1.5 mt-1">
+                                    <span className="text-xs font-black text-slate-950 bg-slate-200 border border-slate-300 px-1.5 py-0.5 rounded">
                                       x{it.quantity}
                                     </span>
                                     {color && (
                                       <span
-                                        className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-900 bg-amber-50 border border-amber-200/80 px-1.5 py-0.2 rounded truncate max-w-[130px]"
+                                        className="inline-flex items-center gap-1 text-[11px] font-black text-amber-950 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded truncate max-w-[140px]"
                                         title={color}
                                       >
-                                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+                                        <span className="w-2 h-2 rounded-full bg-amber-600 shrink-0" />
                                         {color}
                                       </span>
                                     )}
                                     {size && (
                                       <span
-                                        className="text-[10px] font-medium text-slate-600 bg-slate-100 border border-slate-200 px-1.5 py-0.2 rounded truncate max-w-[90px]"
+                                        className="text-[11px] font-black text-slate-900 bg-slate-200 border border-slate-300 px-2 py-0.5 rounded truncate max-w-[100px]"
                                         title={size}
                                       >
                                         {size}
@@ -263,49 +298,83 @@ function AdminOrdersContent() {
                             );
                           })}
                           {ord.items.length > 2 && (
-                            <span className="text-[10px] font-bold text-brand-700 pl-11">
+                            <span className="text-xs font-black text-brand-700 pl-12">
                               +{ord.items.length - 2} more item(s)
                             </span>
                           )}
                         </div>
                       </td>
 
-                      <td className="py-3.5 px-4 font-black text-slate-900">
-                        {formatPrice(ord.pricing.total)}
+                      {/* Dedicated Cycle Size Column */}
+                      <td className="py-4 px-4 align-middle bg-blue-50/40 border-x border-blue-200/80 whitespace-nowrap">
+                        <div className="flex flex-col gap-1.5">
+                          {ord.items.map((it: any, idx: number) => {
+                            const size = it.variant?.size || it.selectedSize || (it as any).size;
+                            return (
+                              <div key={idx} className="flex items-center gap-1.5">
+                                {size ? (
+                                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-blue-100 border-2 border-blue-400 text-blue-950 font-black text-xs shadow-2xs">
+                                    <span className="w-2 h-2 rounded-full bg-blue-700 shrink-0" />
+                                    {size}
+                                  </span>
+                                ) : (
+                                  <span className="inline-block px-2.5 py-1 rounded-md bg-slate-100 border border-slate-300 text-slate-800 font-bold text-[11px]">
+                                    Standard / N/A
+                                  </span>
+                                )}
+                                {ord.items.length > 1 && (
+                                  <span className="text-[10px] font-bold text-slate-700 max-w-[85px] truncate" title={it.name}>
+                                    {it.name}
+                                  </span>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
                       </td>
 
-                      <td className="py-3.5 px-4">
+                      {/* Total Amount */}
+                      <td className="py-4 px-4 align-middle">
+                        <span className="font-black text-base text-slate-950 block">
+                          {formatPrice(ord.pricing.total)}
+                        </span>
+                      </td>
+
+                      {/* Payment */}
+                      <td className="py-4 px-4 align-middle">
                         <span
-                          className={`text-[10px] font-bold px-2 py-0.5 rounded-md inline-block ${
+                          className={`text-xs font-black px-2.5 py-1 rounded-lg inline-block border ${
                             ord.paymentStatus === 'Paid'
-                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                              : 'bg-amber-50 text-amber-700 border border-amber-200'
+                              ? 'bg-emerald-100 text-emerald-950 border-emerald-400'
+                              : 'bg-amber-100 text-amber-950 border-amber-400'
                           }`}
                         >
                           {paymentDisplay} ({ord.paymentStatus})
                         </span>
                         {ord.paymentDetails?.paymentId && (
-                          <span className="block text-[9px] font-mono text-slate-500 mt-0.5" title="Razorpay Payment ID">
-                            {ord.paymentDetails.paymentId}
+                          <span className="block text-[11px] font-bold font-mono text-slate-900 mt-1" title="Razorpay Payment ID">
+                            ID: {ord.paymentDetails.paymentId}
                           </span>
                         )}
                       </td>
 
-                      <td className="py-3.5 px-4">
+                      {/* Order Status */}
+                      <td className="py-4 px-4 align-middle">
                         <span
-                          className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${
+                          className={`text-xs font-black px-3 py-1 rounded-full inline-block border shadow-2xs ${
                             ord.orderStatus === 'Delivered'
-                              ? 'bg-emerald-50 text-emerald-700'
+                              ? 'bg-emerald-100 text-emerald-950 border-emerald-400'
                               : ord.orderStatus === 'Cancelled'
-                                ? 'bg-rose-50 text-rose-700'
-                                : 'bg-brand-50 text-brand-700'
+                                ? 'bg-rose-100 text-rose-950 border-rose-400'
+                                : 'bg-brand-100 text-brand-950 border-brand-400'
                           }`}
                         >
                           {ord.orderStatus}
                         </span>
                       </td>
 
-                      <td className="py-3.5 px-4 text-right">
+                      {/* Action */}
+                      <td className="py-4 px-4 align-middle text-right">
                         <div className="flex items-center justify-end gap-2">
                           {isPOS && (
                             <button
@@ -322,17 +391,17 @@ function AdminOrdersContent() {
                                   posDetails: ord.posDetails,
                                 })
                               }
-                              className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[11px] py-1.5 px-2.5 rounded-lg transition-colors flex items-center gap-1 shadow-2xs"
+                              className="bg-slate-200 hover:bg-slate-300 text-slate-950 font-black text-xs py-2 px-3 rounded-xl transition-colors flex items-center gap-1.5 border border-slate-300 shadow-2xs"
                               title="Print Receipt / View Bill"
                             >
-                              <Receipt className="w-3.5 h-3.5 text-brand-700" />
+                              <Receipt className="w-4 h-4 text-brand-800" />
                               <span>Receipt</span>
                             </button>
                           )}
 
                           <Link
                             href={`/admin/orders/${ord._id}`}
-                            className="bg-brand-600 hover:bg-brand-700 text-white font-bold text-[11px] py-1.5 px-3 rounded-lg transition-colors inline-block shadow-xs"
+                            className="bg-brand-600 hover:bg-brand-700 text-white font-black text-xs py-2 px-3.5 rounded-xl transition-colors inline-block shadow-xs"
                           >
                             Manage
                           </Link>

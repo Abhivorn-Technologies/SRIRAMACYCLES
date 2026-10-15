@@ -459,9 +459,13 @@ export default function AdminOrderDetailPage() {
                             </span>
                           )}
 
-                          {size && (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-800 border border-blue-200">
-                              <span>Size: {size}</span>
+                          {size ? (
+                            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-lg text-xs font-black bg-blue-100 text-blue-950 border-2 border-blue-400 shadow-2xs">
+                              <span>Cycle Size: {size}</span>
+                            </span>
+                          ) : (
+                            <span className="text-xs text-slate-500 font-bold">
+                              Size: Standard / N/A
                             </span>
                           )}
                         </div>

@@ -190,10 +190,18 @@ export interface IEnquiry {
 
 export interface IReview {
   _id: string;
-  product: string;
+  product?: string | any;
+  productName?: string;
+  orderNumber?: string;
+  order?: string | any;
   user?: string;
   name: string;
+  email?: string;
+  phone?: string;
   rating: number;
   comment: string;
+  reviewContext?: 'order_placed' | 'order_received' | 'product' | 'general';
+  isApproved?: boolean;
   createdAt: string;
+  updatedAt?: string;
 }

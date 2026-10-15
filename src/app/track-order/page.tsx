@@ -20,6 +20,7 @@ import { formatPrice, formatDate, formatDateTime } from '@/lib/utils';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { STORE_CONTACT } from '@/lib/constants';
 import { useLanguage } from '@/context/LanguageContext';
+import OrderReviewCard from '@/components/common/OrderReviewCard';
 
 function TrackOrderContent() {
   const { t } = useLanguage();
@@ -346,6 +347,22 @@ function TrackOrderContent() {
                   })}
                 </div>
               </div>
+            </div>
+
+            {/* Customer Review Card on Receiving Order */}
+            <div className="mt-8">
+              <OrderReviewCard
+                orderNumber={order.orderNumber}
+                customerName={order.customer?.name}
+                customerEmail={order.customer?.email}
+                customerPhone={order.customer?.phone}
+                productName={
+                  Array.isArray(order.items) && order.items.length > 0
+                    ? order.items.map((it: any) => it.name).join(', ')
+                    : ''
+                }
+                context="order_received"
+              />
             </div>
           </div>
         )}

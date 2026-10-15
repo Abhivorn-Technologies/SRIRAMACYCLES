@@ -20,10 +20,24 @@ import {
   Sliders,
   RotateCw,
   Sparkles,
+  Bike,
 } from 'lucide-react';
-import { ICategory, ISpecification } from '@/types';
+import { ICategory, ISpecification, IVariant } from '@/types';
 import { useToast } from '@/context/ToastContext';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
+
+const COMMON_CYCLE_SIZES = [
+  '20T',
+  '24T',
+  '26T',
+  '27.5T',
+  '29T',
+  '17" (Medium)',
+  '18.5" (Large)',
+  'Small',
+  'Medium',
+  'Large',
+];
 
 const generateSku = (categoryName?: string) => {
   const prefix = 'SRC';
@@ -63,12 +77,50 @@ export default function AddProductPage() {
     isNewArrival: true,
   });
 
+  const [variants, setVariants] = useState<Array<{ size: string; stock: number; color?: string }>>([
+    { size: '26T', stock: 10 },
+    { size: '27.5T', stock: 10 },
+  ]);
+  const [customSizeInput, setCustomSizeInput] = useState('');
+
   const [specs, setSpecs] = useState<ISpecification[]>([
     { key: 'Frame', value: '6061 Double Butted Aluminium Alloy' },
     { key: 'Gears', value: 'Shimano 21-Speed' },
     { key: 'Brakes', value: 'Dual Mechanical Disc Brakes 160mm' },
     { key: 'Weight', value: '11.5 kg' },
   ]);
+
+  const handleToggleSize = (sizeName: string) => {
+    const exists = variants.some((v) => v.size.toLowerCase() === sizeName.toLowerCase());
+    if (exists) {
+      setVariants((prev) => prev.filter((v) => v.size.toLowerCase() !== sizeName.toLowerCase()));
+    } else {
+      const defaultStock = parseInt(formData.stock, 10) || 10;
+      setVariants((prev) => [...prev, { size: sizeName, stock: defaultStock }]);
+    }
+  };
+
+  const handleAddCustomSize = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const clean = customSizeInput.trim();
+    if (!clean) return;
+    const exists = variants.some((v) => v.size.toLowerCase() === clean.toLowerCase());
+    if (!exists) {
+      const defaultStock = parseInt(formData.stock, 10) || 10;
+      setVariants((prev) => [...prev, { size: clean, stock: defaultStock }]);
+    }
+    setCustomSizeInput('');
+  };
+
+  const handleRemoveSize = (index: number) => {
+    setVariants((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleVariantStockChange = (index: number, val: number) => {
+    setVariants((prev) =>
+      prev.map((v, i) => (i === index ? { ...v, stock: Math.max(0, val) } : v))
+    );
+  };
 
   useEffect(() => {
     async function loadCats() {
@@ -215,6 +267,7 @@ export default function AddProductPage() {
           formData.images.length > 0
             ? formData.images
             : ['https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=1000&q=80'],
+        variants: variants.filter((v) => v.size && v.size.trim().length > 0),
         specifications: specs.filter((s) => s.key && s.value),
         isFeatured: formData.isFeatured,
         isBestSeller: formData.isBestSeller,
@@ -445,7 +498,123 @@ export default function AddProductPage() {
           </div>
         </div>
 
-        {/* 3. Product Images & Direct Upload */}
+        {/* 3. Cycle Sizes & Frame Dimensions */}
+        <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col gap-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                <Bike className="w-4 h-4" />
+              </div>
+              <div>
+                <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
+                  3. Available Cycle Sizes &amp; Dimensions
+                </h2>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Specify cycle frame / wheel sizes (e.g. 26T, 27.5T, 29T). Customers can pick their size on product &amp; checkout pages.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Selection Presets */}
+          <div>
+            <label className="block text-xs font-bold text-slate-700 mb-2">
+              Quick Click to Add Common Cycle Sizes:
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {COMMON_CYCLE_SIZES.map((size) => {
+                const isSelected = variants.some((v) => v.size.toLowerCase() === size.toLowerCase());
+                return (
+                  <button
+                    type="button"
+                    key={size}
+                    onClick={() => handleToggleSize(size)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all flex items-center gap-1.5 border cursor-pointer ${
+                      isSelected
+                        ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                        : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
+                    }`}
+                  >
+                    <span>{size}</span>
+                    {isSelected && <CheckCircle2 className="w-3.5 h-3.5 text-white" />}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Custom Size Input */}
+          <div className="flex items-center gap-2 max-w-md">
+            <input
+              type="text"
+              value={customSizeInput}
+              onChange={(e) => setCustomSizeInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleAddCustomSize();
+                }
+              }}
+              placeholder="Or type custom size (e.g. 28T, 20 Inch, Junior 16T)..."
+              className="flex-1 bg-slate-50 border border-slate-200 focus:border-blue-500 focus:bg-white rounded-xl py-2 px-3 text-xs text-slate-900 focus:outline-none font-medium"
+            />
+            <button
+              type="button"
+              onClick={() => handleAddCustomSize()}
+              className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2 px-3.5 rounded-xl flex items-center gap-1.5 transition-colors shadow-2xs cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Add Size</span>
+            </button>
+          </div>
+
+          {/* Active Sizes List */}
+          <div>
+            <label className="block text-xs font-bold text-slate-700 mb-2">
+              Configured Sizes for this Product ({variants.length}):
+            </label>
+            {variants.length === 0 ? (
+              <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200 text-amber-900 text-xs font-semibold">
+                ⚠️ No specific sizes added. Product will be sold as standard one-size. Click any button above to add sizes.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                {variants.map((v, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center justify-between p-3 rounded-2xl bg-blue-50/50 border border-blue-200/80 shadow-2xs"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="inline-block px-2.5 py-1 rounded-lg bg-blue-600 text-white font-black text-xs">
+                        {v.size}
+                      </span>
+                      <div className="flex items-center gap-1">
+                        <span className="text-[10px] text-slate-500 font-bold">Qty:</span>
+                        <input
+                          type="number"
+                          min="0"
+                          value={v.stock}
+                          onChange={(e) => handleVariantStockChange(idx, parseInt(e.target.value, 10) || 0)}
+                          className="w-14 bg-white border border-slate-300 rounded-lg px-1.5 py-0.5 text-xs font-black text-slate-900 text-center"
+                        />
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveSize(idx)}
+                      className="w-6 h-6 rounded-full bg-white hover:bg-rose-100 text-slate-400 hover:text-rose-600 border border-slate-200 flex items-center justify-center transition-colors cursor-pointer"
+                      title="Remove size"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* 4. Product Images & Direct Upload */}
         <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col gap-5">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
             <div className="flex items-center gap-2.5">
@@ -453,7 +622,7 @@ export default function AddProductPage() {
                 <UploadCloud className="w-4 h-4" />
               </div>
               <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
-                3. Product Images Gallery
+                4. Product Images Gallery
               </h2>
             </div>
 
@@ -593,14 +762,14 @@ export default function AddProductPage() {
           )}
         </div>
 
-        {/* 4. Descriptions */}
+        {/* 5. Descriptions */}
         <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col gap-5">
           <div className="flex items-center gap-2.5 pb-4 border-b border-slate-100">
             <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
               <FileText className="w-4 h-4" />
             </div>
             <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
-              4. Descriptions
+              5. Descriptions
             </h2>
           </div>
 
@@ -633,7 +802,7 @@ export default function AddProductPage() {
           </div>
         </div>
 
-        {/* 5. Technical Specifications */}
+        {/* 6. Technical Specifications */}
         <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col gap-5">
           <div className="flex items-center justify-between pb-4 border-b border-slate-100">
             <div className="flex items-center gap-2.5">
@@ -641,7 +810,7 @@ export default function AddProductPage() {
                 <Sliders className="w-4 h-4" />
               </div>
               <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
-                5. Technical Specifications
+                6. Technical Specifications
               </h2>
             </div>
 
@@ -686,14 +855,14 @@ export default function AddProductPage() {
           </div>
         </div>
 
-        {/* 6. Visibility Badges */}
+        {/* 7. Visibility Badges */}
         <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col gap-4">
           <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100">
             <div className="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
               <Tag className="w-4 h-4" />
             </div>
             <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
-              6. Catalog Badges
+              7. Catalog Badges
             </h2>
           </div>
 

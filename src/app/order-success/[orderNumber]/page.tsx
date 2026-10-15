@@ -18,6 +18,7 @@ import { IOrder } from '@/types';
 import { formatPrice, formatDate } from '@/lib/utils';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import TaxInvoiceModal from '@/components/common/TaxInvoiceModal';
+import OrderReviewCard from '@/components/common/OrderReviewCard';
 
 export default function OrderSuccessPage() {
   const params = useParams();
@@ -219,6 +220,24 @@ export default function OrderSuccessPage() {
             </Link>
           </div>
         </div>
+
+        {/* Ask Customer for Review After Placing Order */}
+        {order && (
+          <div className="mt-8">
+            <OrderReviewCard
+              orderNumber={order.orderNumber || orderNumber}
+              customerName={order.customer?.name}
+              customerEmail={order.customer?.email}
+              customerPhone={order.customer?.phone}
+              productName={
+                Array.isArray(order.items) && order.items.length > 0
+                  ? order.items.map((it: any) => it.name).join(', ')
+                  : ''
+              }
+              context="order_placed"
+            />
+          </div>
+        )}
       </div>
 
       {order && (
