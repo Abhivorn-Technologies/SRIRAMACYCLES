@@ -53,7 +53,7 @@ export default function CookiePolicyPage() {
           </h1>
 
           <p className="mt-4 text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed">
-            This Cookie Policy explains how <strong>{STORE_CONTACT.businessName}</strong> and technical provider Abhivorn Technologies use cookies, local storage objects, and similar web technologies when you browse our website.
+            This Cookie Policy explains how <strong>{STORE_CONTACT.businessName}</strong> uses cookies, local storage objects, and similar web technologies when you browse our website.
           </p>
         </div>
 

@@ -163,7 +163,7 @@ export default function TermsAndConditionsPage() {
               8. Intellectual Property
             </h2>
             <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-              All content on this website, including logos, store branding, product photographs, text, graphics, and code, is the property of {STORE_CONTACT.businessName} and its technical partner Abhivorn Technologies, protected under Indian Copyright and Trademark laws. Unauthorized reproduction is strictly prohibited.
+              All content on this website, including logos, store branding, product photographs, text, graphics, and code, is the property of {STORE_CONTACT.businessName}, protected under Indian Copyright and Trademark laws. Unauthorized reproduction is strictly prohibited.
             </p>
           </section>
 

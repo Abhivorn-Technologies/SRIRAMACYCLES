@@ -94,7 +94,6 @@ export default function PrivacyPolicyPage() {
               <p><strong>Registered Address:</strong> {STORE_CONTACT.address}</p>
               <p><strong>Support Email:</strong> <a href={`mailto:${STORE_CONTACT.supportEmail}`} className="text-brand-600 dark:text-brand-400 font-semibold hover:underline">{STORE_CONTACT.supportEmail}</a></p>
               <p><strong>Phone / Helpline:</strong> <a href={`tel:${STORE_CONTACT.rawPhone}`} className="text-brand-600 dark:text-brand-400 font-semibold hover:underline">{STORE_CONTACT.phone}</a></p>
-              <p><strong>Developed & Maintained by:</strong> Abhivorn Technologies</p>
             </div>
           </section>
 
