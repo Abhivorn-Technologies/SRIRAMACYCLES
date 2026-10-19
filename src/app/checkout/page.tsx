@@ -1428,11 +1428,23 @@ function CheckoutContent() {
                 </div>
               </div>
 
+              {/* Privacy & Terms Consent Notice */}
+              <div className="text-[11px] text-slate-500 leading-relaxed px-1 text-center">
+                By placing this order, you agree to our{' '}
+                <a href="/terms-and-conditions" target="_blank" rel="noopener noreferrer" className="text-brand-600 font-bold hover:underline">
+                  Terms & Conditions
+                </a>{' '}
+                and{' '}
+                <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-brand-600 font-bold hover:underline">
+                  Privacy Policy
+                </a>.
+              </div>
+
               {/* Final Submit Place Order */}
               <button
                 onClick={handlePlaceOrder}
                 disabled={loading}
-                className="w-full bg-brand-600 hover:bg-brand-700 disabled:opacity-75 text-white font-bold py-3.5 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-brand-600/25 transition-all active:scale-98 mt-2"
+                className="w-full bg-brand-600 hover:bg-brand-700 disabled:opacity-75 text-white font-bold py-3.5 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-brand-600/25 transition-all active:scale-98 mt-1"
               >
                 {loading ? (
                   <LoadingSpinner size="sm" />

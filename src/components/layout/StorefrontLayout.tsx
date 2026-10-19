@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import FloatingSocialDock from '@/components/common/FloatingSocialDock';
+import CookieConsent from '@/components/common/CookieConsent';
 
 export default function StorefrontLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -20,6 +21,7 @@ export default function StorefrontLayout({ children }: { children: React.ReactNo
       <main className="flex-1">{children}</main>
       <Footer />
       <FloatingSocialDock />
+      <CookieConsent />
     </>
   );
 }

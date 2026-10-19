@@ -221,11 +221,23 @@ export default function RegisterPage() {
             </div>
           </div>
 
+          {/* Privacy & Terms Consent Notice */}
+          <div className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed px-1 text-center">
+            By creating an account, you agree to our{' '}
+            <Link href="/terms-and-conditions" className="text-brand-600 dark:text-brand-400 font-bold hover:underline" target="_blank">
+              Terms & Conditions
+            </Link>{' '}
+            and{' '}
+            <Link href="/privacy-policy" className="text-brand-600 dark:text-brand-400 font-bold hover:underline" target="_blank">
+              Privacy Policy
+            </Link>.
+          </div>
+
           {/* Submit Button */}
           <button
             type="submit"
             disabled={loading}
-            className="mt-2 w-full bg-brand-600 hover:bg-brand-700 disabled:opacity-75 text-white text-xs sm:text-sm font-bold py-3.5 rounded-2xl flex items-center justify-center gap-2 shadow-md shadow-brand-600/20 hover:scale-[1.01] active:scale-[0.98] transition-all cursor-pointer"
+            className="mt-1 w-full bg-brand-600 hover:bg-brand-700 disabled:opacity-75 text-white text-xs sm:text-sm font-bold py-3.5 rounded-2xl flex items-center justify-center gap-2 shadow-md shadow-brand-600/20 hover:scale-[1.01] active:scale-[0.98] transition-all cursor-pointer"
           >
             {loading ? (
               <LoadingSpinner size="sm" />

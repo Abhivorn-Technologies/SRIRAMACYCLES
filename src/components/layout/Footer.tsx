@@ -223,6 +223,26 @@ export default function Footer() {
                   {t('nav.about')}
                 </Link>
               </li>
+              <li className="pt-2 border-t border-slate-200/60 dark:border-slate-800">
+                <Link href="/privacy-policy" className="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/terms-and-conditions" className="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">
+                  Terms & Conditions
+                </Link>
+              </li>
+              <li>
+                <Link href="/refund-policy" className="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">
+                  Refund & Cancellation
+                </Link>
+              </li>
+              <li>
+                <Link href="/cookie-policy" className="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">
+                  Cookie Policy
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -262,6 +282,25 @@ export default function Footer() {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Legal & Compliance Links Bar */}
+        <div className="py-4 border-b border-slate-200/90 dark:border-slate-800 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs font-semibold text-slate-600 dark:text-slate-400">
+          <Link href="/privacy-policy" className="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">
+            Privacy Policy
+          </Link>
+          <span className="text-slate-300 dark:text-slate-700 hidden sm:inline">•</span>
+          <Link href="/terms-and-conditions" className="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">
+            Terms & Conditions
+          </Link>
+          <span className="text-slate-300 dark:text-slate-700 hidden sm:inline">•</span>
+          <Link href="/refund-policy" className="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">
+            Refund & Cancellation Policy
+          </Link>
+          <span className="text-slate-300 dark:text-slate-700 hidden sm:inline">•</span>
+          <Link href="/cookie-policy" className="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">
+            Cookie Policy
+          </Link>
         </div>
 
         {/* Bottom copyright & Developer Credit */}

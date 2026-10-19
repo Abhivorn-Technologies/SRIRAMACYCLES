@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import {
   MapPin,
   Phone,
@@ -308,11 +309,17 @@ export default function ContactPage() {
                     />
                   </div>
 
-                  <div className="pt-2">
+                  <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                      Your details will only be used to respond to your inquiry in line with our{' '}
+                      <Link href="/privacy-policy" target="_blank" className="text-brand-600 dark:text-brand-400 font-bold hover:underline">
+                        Privacy Policy
+                      </Link>.
+                    </p>
                     <button
                       type="submit"
                       disabled={loading}
-                      className="w-full sm:w-auto bg-brand-600 hover:bg-brand-500 disabled:bg-slate-300 text-white font-bold text-xs py-3.5 px-8 rounded-xl flex items-center justify-center gap-2 transition-colors shadow-sm active:scale-95 cursor-pointer"
+                      className="w-full sm:w-auto bg-brand-600 hover:bg-brand-500 disabled:bg-slate-300 text-white font-bold text-xs py-3.5 px-8 rounded-xl flex items-center justify-center gap-2 transition-colors shadow-sm active:scale-95 cursor-pointer shrink-0"
                     >
                       {loading ? (
                         <LoadingSpinner size="sm" />
