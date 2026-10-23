@@ -40,6 +40,18 @@ export interface ICategory {
   updatedAt: string;
 }
 
+export interface IBrand {
+  _id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  logo?: string;
+  isActive: boolean;
+  order?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface ISpecification {
   key: string;
   value: string;

@@ -20,6 +20,7 @@ export async function GET(req: NextRequest) {
 
     const search = searchParams.get('search')?.trim();
     const paymentMode = searchParams.get('paymentMode');
+    const brand = searchParams.get('brand')?.trim();
     const startDate = searchParams.get('startDate');
     const endDate = searchParams.get('endDate');
     const page = parseInt(searchParams.get('page') || '1', 10);
@@ -30,6 +31,10 @@ export async function GET(req: NextRequest) {
 
     if (paymentMode && paymentMode !== 'ALL') {
       query.paymentMode = paymentMode;
+    }
+
+    if (brand && brand !== 'ALL') {
+      query.brand = brand;
     }
 
     if (startDate || endDate) {
@@ -50,6 +55,7 @@ export async function GET(req: NextRequest) {
         { customerName: regex },
         { phone: regex },
         { cycleModel: regex },
+        { brand: regex },
         { cycleSize: regex },
         { srNo: regex },
         { feedback: regex },
@@ -151,6 +157,7 @@ export async function POST(req: NextRequest) {
           srNo: String(r.srNo || '').trim(),
           customerName: String(r.customerName || 'Walk-in Customer').trim(),
           phone: String(r.phone || '').trim(),
+          brand: String(r.brand || '').trim(),
           cycleModel: String(r.cycleModel || 'Unspecified').trim(),
           cycleSize: String(r.cycleSize || '').trim(),
           purchaseDate: parsedDate,
@@ -178,6 +185,7 @@ export async function POST(req: NextRequest) {
       srNo,
       customerName,
       phone,
+      brand,
       cycleModel,
       cycleSize,
       purchaseDate,
@@ -203,6 +211,7 @@ export async function POST(req: NextRequest) {
       srNo: String(srNo || '').trim(),
       customerName: customerName.trim(),
       phone: phone.trim(),
+      brand: String(brand || '').trim(),
       cycleModel: cycleModel.trim(),
       cycleSize: String(cycleSize || '').trim(),
       purchaseDate: parsedDate,

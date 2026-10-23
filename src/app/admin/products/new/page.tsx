@@ -56,6 +56,14 @@ export default function AddProductPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [categories, setCategories] = useState<ICategory[]>([]);
+  const [brands, setBrands] = useState<string[]>([
+    'Gang',
+    'Zeus',
+    'Ralco',
+    'Rajanik',
+    'Vallabha',
+    'Speed',
+  ]);
   const [loading, setLoading] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [imageInputMode, setImageInputMode] = useState<'upload' | 'url'>('upload');
@@ -63,7 +71,7 @@ export default function AddProductPage() {
 
   const [formData, setFormData] = useState({
     name: '',
-    brand: 'Srirama Pro',
+    brand: 'Gang',
     category: '',
     price: '',
     salePrice: '',
@@ -123,23 +131,38 @@ export default function AddProductPage() {
   };
 
   useEffect(() => {
-    async function loadCats() {
+    async function loadData() {
       try {
-        const res = await fetch('/api/categories');
-        const data = await res.json();
-        if (data.success && data.categories.length > 0) {
-          setCategories(data.categories);
+        const [catRes, brandRes] = await Promise.all([
+          fetch('/api/categories'),
+          fetch('/api/brands?all=true'),
+        ]);
+
+        const catData = await catRes.json();
+        const brandData = await brandRes.json();
+
+        if (catData.success && catData.categories.length > 0) {
+          setCategories(catData.categories);
           setFormData((p) => ({
             ...p,
-            category: data.categories[0]._id,
-            sku: p.sku && p.sku !== 'SRC-CYC-1000' ? p.sku : generateSku(data.categories[0].name),
+            category: catData.categories[0]._id,
+            sku: p.sku && p.sku !== 'SRC-CYC-1000' ? p.sku : generateSku(catData.categories[0].name),
+          }));
+        }
+
+        if (brandData.success && brandData.brands?.length > 0) {
+          const names: string[] = brandData.brands.map((b: any) => b.name);
+          setBrands(names);
+          setFormData((p) => ({
+            ...p,
+            brand: names[0] || 'Gang',
           }));
         }
       } catch (err) {
         console.error(err);
       }
     }
-    loadCats();
+    loadData();
   }, []);
 
   const handleInputChange = (
@@ -364,17 +387,33 @@ export default function AddProductPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                Brand / Manufacturer
-              </label>
-              <input
-                type="text"
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-xs font-bold text-slate-700">
+                  Brand / Manufacturer <span className="text-rose-500">*</span>
+                </label>
+                <a
+                  href="/admin/brands"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[11px] font-bold text-brand-600 hover:text-brand-700 hover:underline"
+                >
+                  + Add New Brand
+                </a>
+              </div>
+              <select
                 name="brand"
+                required
                 value={formData.brand}
                 onChange={handleInputChange}
-                placeholder="e.g. Srirama Pro / Shimano"
-                className="w-full bg-slate-50 border border-slate-200 focus:border-brand-500 focus:bg-white rounded-2xl py-3 px-4 text-xs sm:text-sm text-slate-900 focus:outline-none transition-all font-medium"
-              />
+                className="w-full bg-slate-50 border border-slate-200 focus:border-brand-500 focus:bg-white rounded-2xl py-3 px-4 text-xs sm:text-sm text-slate-900 focus:outline-none transition-all font-medium cursor-pointer"
+              >
+                <option value="" disabled>-- Select Brand --</option>
+                {brands.map((bName) => (
+                  <option key={bName} value={bName}>
+                    {bName}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div>

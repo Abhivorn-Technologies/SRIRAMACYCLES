@@ -700,6 +700,11 @@ function CheckoutContent() {
                           />
                         </div>
                         <div>
+                          {(item.product?.brand || item.brand) && (
+                            <span className="text-[10px] font-bold text-brand-600 uppercase tracking-wider block">
+                              {item.product?.brand || item.brand}
+                            </span>
+                          )}
                           <p className="font-bold text-slate-800 line-clamp-1">{item.product?.name || item.name}</p>
                           <div className="flex flex-wrap items-center gap-1 mt-0.5">
                             {color && (

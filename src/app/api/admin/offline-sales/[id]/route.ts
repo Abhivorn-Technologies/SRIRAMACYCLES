@@ -27,6 +27,7 @@ export async function PUT(
     if (body.customerName) updateData.customerName = body.customerName.trim();
     if (body.phone) updateData.phone = body.phone.trim();
     if (body.cycleModel) updateData.cycleModel = body.cycleModel.trim();
+    if (body.brand !== undefined) updateData.brand = String(body.brand).trim();
     if (body.cycleSize !== undefined) updateData.cycleSize = String(body.cycleSize).trim();
     if (body.price !== undefined) updateData.price = Number(body.price) || 0;
     if (body.paymentMode) updateData.paymentMode = body.paymentMode;

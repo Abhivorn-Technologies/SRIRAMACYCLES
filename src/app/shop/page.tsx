@@ -55,20 +55,30 @@ function ShopContent() {
     setIsBestSellerOnly(best);
   }, [searchParams]);
 
-  // Fetch Categories once
+  // Fetch Categories and Brands once
   useEffect(() => {
-    async function fetchCategories() {
+    async function fetchInitialData() {
       try {
-        const res = await fetch('/api/categories');
-        const data = await res.json();
-        if (data.success) {
-          setCategories(data.categories);
+        const [catRes, brandRes] = await Promise.all([
+          fetch('/api/categories'),
+          fetch('/api/brands'),
+        ]);
+        const catData = await catRes.json();
+        const brandData = await brandRes.json();
+
+        if (catData.success) {
+          setCategories(catData.categories);
+        }
+        if (brandData.success && brandData.brands?.length > 0) {
+          setAvailableBrands((prev) =>
+            Array.from(new Set([...prev, ...brandData.brands.map((b: any) => b.name)]))
+          );
         }
       } catch (err) {
-        console.error('Error loading categories:', err);
+        console.error('Error loading shop filters data:', err);
       }
     }
-    fetchCategories();
+    fetchInitialData();
   }, []);
 
   // Fetch Products based on active filters

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/mongodb';
 import Product from '@/models/Product';
 import Category from '@/models/Category';
+import Brand from '@/models/Brand';
 import { extractAuthUser } from '@/lib/auth';
 import { slugify } from '@/lib/utils';
 import { SAMPLE_PRODUCTS } from '@/lib/sample-data';
@@ -94,7 +95,17 @@ export async function GET(req: NextRequest) {
         Product.countDocuments(query),
       ]);
 
-      const brands = await Product.distinct('brand', { isActive: true });
+      const [distinctBrands, dbBrandDocs] = await Promise.all([
+        Product.distinct('brand', { isActive: true }),
+        Brand.find({ isActive: true }).select('name').lean(),
+      ]);
+      const brandNames = Array.from(
+        new Set([
+          ...dbBrandDocs.map((b) => b.name),
+          ...distinctBrands,
+        ])
+      ).filter(Boolean);
+
       return NextResponse.json({
         success: true,
         products,
@@ -104,7 +115,7 @@ export async function GET(req: NextRequest) {
           limit,
           pages: Math.max(1, Math.ceil(total / limit)),
         },
-        availableBrands: brands.filter(Boolean),
+        availableBrands: brandNames,
       });
     } catch (dbErr) {
       console.warn('Database query failed, returning rich fallback catalog:', dbErr);

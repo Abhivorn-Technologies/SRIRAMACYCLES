@@ -34,6 +34,7 @@ interface IOfflineSale {
   srNo?: string;
   customerName: string;
   phone: string;
+  brand?: string;
   cycleModel: string;
   cycleSize?: string;
   purchaseDate: string;
@@ -66,6 +67,17 @@ export default function OfflineSalesPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalRecords, setTotalRecords] = useState(0);
 
+  // Brands list
+  const [availableBrands, setAvailableBrands] = useState<string[]>([
+    'Gang',
+    'Zeus',
+    'Ralco',
+    'Rajanik',
+    'Vallabha',
+    'Speed',
+  ]);
+  const [brandFilter, setBrandFilter] = useState('ALL');
+
   // Filters
   const [searchTerm, setSearchTerm] = useState('');
   const [paymentModeFilter, setPaymentModeFilter] = useState('ALL');
@@ -86,6 +98,7 @@ export default function OfflineSalesPage() {
     srNo: '',
     customerName: '',
     phone: '',
+    brand: '',
     cycleModel: '',
     cycleSize: '',
     purchaseDate: new Date().toISOString().split('T')[0],
@@ -95,6 +108,23 @@ export default function OfflineSalesPage() {
     notes: '',
   });
   const [formSubmitting, setFormSubmitting] = useState(false);
+
+  // Fetch available brands from DB
+  useEffect(() => {
+    const fetchBrands = async () => {
+      try {
+        const res = await fetch('/api/brands?all=true');
+        const data = await res.json();
+        if (data.success && data.brands) {
+          const names: string[] = data.brands.map((b: any) => b.name);
+          setAvailableBrands(Array.from(new Set([...names, 'Gang', 'Zeus', 'Ralco', 'Rajanik', 'Vallabha', 'Speed'])));
+        }
+      } catch {
+        // keep defaults
+      }
+    };
+    fetchBrands();
+  }, []);
 
   // Bulk Upload State
   const [fileToUpload, setFileToUpload] = useState<File | null>(null);
@@ -113,6 +143,7 @@ export default function OfflineSalesPage() {
       });
 
       if (searchTerm) params.append('search', searchTerm);
+      if (brandFilter !== 'ALL') params.append('brand', brandFilter);
       if (paymentModeFilter !== 'ALL') params.append('paymentMode', paymentModeFilter);
       if (startDate) params.append('startDate', startDate);
       if (endDate) params.append('endDate', endDate);
@@ -136,7 +167,7 @@ export default function OfflineSalesPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, searchTerm, paymentModeFilter, startDate, endDate, error]);
+  }, [page, searchTerm, brandFilter, paymentModeFilter, startDate, endDate, error]);
 
   useEffect(() => {
     fetchRecords();
@@ -213,6 +244,7 @@ export default function OfflineSalesPage() {
         const mappedRows = rawJson.map((row) => {
           let srNo = '';
           let name = '';
+          let brand = '';
           let cycle = '';
           let dateVal: any = '';
           let size = '';
@@ -224,7 +256,9 @@ export default function OfflineSalesPage() {
           Object.keys(row).forEach((k) => {
             const cleanKey = k.toLowerCase().replace(/[^a-z0-9]/g, '');
 
-            if (cleanKey.includes('srno') || cleanKey.includes('sno') || cleanKey === 'slno' || cleanKey === 'id') {
+            if (cleanKey.includes('brand') || cleanKey.includes('company') || cleanKey === 'make') {
+              brand = String(row[k]);
+            } else if (cleanKey.includes('srno') || cleanKey.includes('sno') || cleanKey === 'slno' || cleanKey === 'id') {
               srNo = String(row[k]);
             } else if (cleanKey === 'name' || cleanKey.includes('customer')) {
               name = String(row[k]);
@@ -257,6 +291,7 @@ export default function OfflineSalesPage() {
             srNo: srNo || '',
             customerName: name || 'Walk-in Customer',
             phone: cleanPhone || phone || '',
+            brand: brand || '',
             cycleModel: cycle || 'Unspecified Cycle',
             cycleSize: size || '',
             purchaseDate: parseFlexibleDate(dateVal).toISOString(),
@@ -395,6 +430,7 @@ export default function OfflineSalesPage() {
       srNo: '',
       customerName: '',
       phone: '',
+      brand: '',
       cycleModel: '',
       cycleSize: '',
       purchaseDate: new Date().toISOString().split('T')[0],
@@ -411,6 +447,7 @@ export default function OfflineSalesPage() {
       srNo: rec.srNo || '',
       customerName: rec.customerName || '',
       phone: rec.phone || '',
+      brand: rec.brand || '',
       cycleModel: rec.cycleModel || '',
       cycleSize: rec.cycleSize || '',
       purchaseDate: rec.purchaseDate
@@ -430,7 +467,8 @@ export default function OfflineSalesPage() {
       {
         'SR.NO': 1,
         NAME: 'RAVULA.RAKESH',
-        CYCLE: 'GANG',
+        BRAND: 'Gang',
+        CYCLE: 'GANG ROCK',
         PURCHASED: '30-06-26',
         'CYCLE-SIZE': "20'CYCLE",
         'PHONE NUMBER': '7207653194',
@@ -441,7 +479,8 @@ export default function OfflineSalesPage() {
       {
         'SR.NO': 2,
         NAME: 'munny.sunil',
-        CYCLE: 'speed',
+        BRAND: 'Speed',
+        CYCLE: 'speed sprint',
         PURCHASED: '01-07-26',
         'CYCLE-SIZE': "20'",
         'PHONE NUMBER': '9848423678',
@@ -452,7 +491,8 @@ export default function OfflineSalesPage() {
       {
         'SR.NO': 3,
         NAME: 'E.Suresh',
-        CYCLE: 'hercules',
+        BRAND: 'Zeus',
+        CYCLE: 'zeus 26 mtb',
         PURCHASED: '04-07-26',
         'CYCLE-SIZE': '26*1.95 POWERBREAK',
         'PHONE NUMBER': '9849752718',
@@ -475,6 +515,7 @@ export default function OfflineSalesPage() {
       info('Preparing export...');
       const params = new URLSearchParams({ export: 'true' });
       if (searchTerm) params.append('search', searchTerm);
+      if (brandFilter !== 'ALL') params.append('brand', brandFilter);
       if (paymentModeFilter !== 'ALL') params.append('paymentMode', paymentModeFilter);
       if (startDate) params.append('startDate', startDate);
       if (endDate) params.append('endDate', endDate);
@@ -490,6 +531,7 @@ export default function OfflineSalesPage() {
       const rows = data.records.map((r: IOfflineSale, idx: number) => ({
         'SR.NO': r.srNo || idx + 1,
         NAME: r.customerName,
+        BRAND: r.brand || '',
         CYCLE: r.cycleModel,
         PURCHASED: formatDate(r.purchaseDate),
         'CYCLE-SIZE': r.cycleSize || '',
@@ -645,6 +687,23 @@ export default function OfflineSalesPage() {
 
         {/* Filter Controls */}
         <div className="flex flex-wrap items-center gap-2">
+          {/* Brand Filter Selector */}
+          <select
+            value={brandFilter}
+            onChange={(e) => {
+              setBrandFilter(e.target.value);
+              setPage(1);
+            }}
+            className="px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 font-semibold"
+          >
+            <option value="ALL">All Brands</option>
+            {availableBrands.map((b) => (
+              <option key={b} value={b}>
+                {b}
+              </option>
+            ))}
+          </select>
+
           {/* Payment Mode Selector */}
           <select
             value={paymentModeFilter}
@@ -765,6 +824,7 @@ export default function OfflineSalesPage() {
                   <th className="py-3 px-4 w-14">Sr. No</th>
                   <th className="py-3 px-4">Customer</th>
                   <th className="py-3 px-4">Phone Number</th>
+                  <th className="py-3 px-4">Brand</th>
                   <th className="py-3 px-4">Cycle Model</th>
                   <th className="py-3 px-4">Cycle Size</th>
                   <th className="py-3 px-4">Purchase Date</th>
@@ -809,6 +869,17 @@ export default function OfflineSalesPage() {
                         </a>
                       ) : (
                         <span className="text-slate-400 italic text-xs">No phone</span>
+                      )}
+                    </td>
+
+                    {/* Brand */}
+                    <td className="py-3.5 px-4">
+                      {r.brand ? (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold bg-amber-50 text-amber-900 border border-amber-200/70">
+                          {r.brand}
+                        </span>
+                      ) : (
+                        <span className="text-slate-400 text-xs italic">-</span>
                       )}
                     </td>
 
@@ -1025,6 +1096,7 @@ export default function OfflineSalesPage() {
                     <thead className="bg-slate-100 text-slate-600">
                       <tr>
                         <th className="p-2">Name</th>
+                        <th className="p-2">Brand</th>
                         <th className="p-2">Cycle</th>
                         <th className="p-2">Size</th>
                         <th className="p-2">Phone</th>
@@ -1037,6 +1109,7 @@ export default function OfflineSalesPage() {
                       {parsedPreview.slice(0, 5).map((row, idx) => (
                         <tr key={idx} className="hover:bg-slate-50">
                           <td className="p-2 font-medium">{row.customerName}</td>
+                          <td className="p-2 font-semibold text-amber-700">{row.brand || '-'}</td>
                           <td className="p-2">{row.cycleModel}</td>
                           <td className="p-2">{row.cycleSize || '-'}</td>
                           <td className="p-2 font-mono">{row.phone}</td>
@@ -1181,17 +1254,49 @@ export default function OfflineSalesPage() {
                   />
                 </div>
 
+                {/* Brand / Company */}
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-semibold text-slate-700">
+                      Brand / Company
+                    </label>
+                    <a
+                      href="/admin/brands"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[10px] font-bold text-amber-600 hover:text-amber-700 hover:underline"
+                    >
+                      + Manage Brands
+                    </a>
+                  </div>
+                  <select
+                    value={formData.brand}
+                    onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
+                    className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 font-medium cursor-pointer"
+                  >
+                    <option value="">-- Select Brand (Optional) --</option>
+                    {formData.brand && !availableBrands.includes(formData.brand) && (
+                      <option value={formData.brand}>{formData.brand}</option>
+                    )}
+                    {availableBrands.map((b) => (
+                      <option key={b} value={b}>
+                        {b}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
                 {/* Cycle Model */}
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Cycle Brand / Model <span className="text-red-500">*</span>
+                    Cycle Model <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     required
                     value={formData.cycleModel}
                     onChange={(e) => setFormData({ ...formData, cycleModel: e.target.value })}
-                    placeholder="e.g. GANG, speed, hercules"
+                    placeholder="e.g. Rock, Sprint, Falcon..."
                     className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
                   />
                 </div>

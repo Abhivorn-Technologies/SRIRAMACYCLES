@@ -59,6 +59,14 @@ export default function EditProductPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [categories, setCategories] = useState<ICategory[]>([]);
+  const [brands, setBrands] = useState<string[]>([
+    'Gang',
+    'Zeus',
+    'Ralco',
+    'Rajanik',
+    'Vallabha',
+    'Speed',
+  ]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -122,16 +130,22 @@ export default function EditProductPage() {
   useEffect(() => {
     async function loadData() {
       try {
-        const [catRes, prodRes] = await Promise.all([
+        const [catRes, brandRes, prodRes] = await Promise.all([
           fetch('/api/categories'),
+          fetch('/api/brands?all=true'),
           fetch(`/api/products/${id}`),
         ]);
 
         const catData = await catRes.json();
+        const brandData = await brandRes.json();
         const prodData = await prodRes.json();
 
         if (catData.success) {
           setCategories(catData.categories);
+        }
+
+        if (brandData.success && brandData.brands?.length > 0) {
+          setBrands(brandData.brands.map((b: any) => b.name));
         }
 
         if (prodData.success && prodData.product) {
@@ -409,16 +423,36 @@ export default function EditProductPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                Brand / Manufacturer
-              </label>
-              <input
-                type="text"
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-xs font-bold text-slate-700">
+                  Brand / Manufacturer <span className="text-rose-500">*</span>
+                </label>
+                <a
+                  href="/admin/brands"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[11px] font-bold text-brand-600 hover:text-brand-700 hover:underline"
+                >
+                  + Add New Brand
+                </a>
+              </div>
+              <select
                 name="brand"
+                required
                 value={formData.brand}
                 onChange={handleInputChange}
-                className="w-full bg-slate-50 border border-slate-200 focus:border-brand-500 focus:bg-white rounded-2xl py-3 px-4 text-xs sm:text-sm text-slate-900 focus:outline-none transition-all font-medium"
-              />
+                className="w-full bg-slate-50 border border-slate-200 focus:border-brand-500 focus:bg-white rounded-2xl py-3 px-4 text-xs sm:text-sm text-slate-900 focus:outline-none transition-all font-medium cursor-pointer"
+              >
+                <option value="" disabled>-- Select Brand --</option>
+                {formData.brand && !brands.includes(formData.brand) && (
+                  <option value={formData.brand}>{formData.brand}</option>
+                )}
+                {brands.map((bName) => (
+                  <option key={bName} value={bName}>
+                    {bName}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div>

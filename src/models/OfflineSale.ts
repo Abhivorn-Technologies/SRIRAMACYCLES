@@ -4,6 +4,7 @@ export interface IOfflineSaleDocument extends Document {
   srNo?: string;
   customerName: string;
   phone: string;
+  brand?: string;
   cycleModel: string;
   cycleSize?: string;
   purchaseDate: Date;
@@ -32,6 +33,12 @@ const OfflineSaleSchema = new Schema(
       type: String,
       required: true,
       trim: true,
+      index: true,
+    },
+    brand: {
+      type: String,
+      trim: true,
+      default: '',
       index: true,
     },
     cycleModel: {
@@ -85,6 +92,7 @@ OfflineSaleSchema.index({
   customerName: 'text',
   phone: 'text',
   cycleModel: 'text',
+  brand: 'text',
   srNo: 'text',
 });
 
