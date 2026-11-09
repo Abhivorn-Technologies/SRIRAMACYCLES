@@ -13,7 +13,8 @@
     "seed": "node scripts/seed.js",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:workflow": "node scripts/test-workflow.js"
+    "test:workflow": "node scripts/test-workflow.js",
+    "sync:images": "node --env-file=.env scripts/sync-uploads-to-db.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

@@ -9,6 +9,7 @@ import LoadingSpinner from '@/components/common/LoadingSpinner';
 import ConfirmModal from '@/components/common/ConfirmModal';
 import Pagination from '@/components/common/Pagination';
 import { slugify } from '@/lib/utils';
+import { compressImage } from '@/lib/image-compress';
 
 export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState<ICategory[]>([]);
@@ -133,8 +134,9 @@ export default function AdminCategoriesPage() {
 
     setUploadingImage(true);
     try {
+      const readyFile = await compressImage(file);
       const uploadData = new FormData();
-      uploadData.append('file', file);
+      uploadData.append('file', readyFile);
 
       const res = await fetch('/api/upload', {
         method: 'POST',

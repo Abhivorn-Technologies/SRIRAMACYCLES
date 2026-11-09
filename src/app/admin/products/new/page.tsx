@@ -25,6 +25,7 @@ import {
 import { ICategory, ISpecification, IVariant } from '@/types';
 import { useToast } from '@/context/ToastContext';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
+import { compressImage } from '@/lib/image-compress';
 
 const COMMON_CYCLE_SIZES = [
   '20T',
@@ -196,8 +197,9 @@ export default function AddProductPage() {
     try {
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
+        const readyFile = await compressImage(file);
         const uploadData = new FormData();
-        uploadData.append('file', file);
+        uploadData.append('file', readyFile);
 
         const res = await fetch('/api/upload', {
           method: 'POST',

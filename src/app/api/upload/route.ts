@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile, mkdir } from 'fs/promises';
+import connectToDatabase from '@/lib/mongodb';
+import Media from '@/models/Media';
 import path from 'path';
 import { existsSync } from 'fs';
+import { writeFile, mkdir } from 'fs/promises';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,30 +19,45 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Convert file to binary buffer & base64
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
+    const mimeType = file.type || 'image/jpeg';
+    const base64Data = buffer.toString('base64');
 
-    // Create public/uploads folder if it doesn't exist
-    const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
-    if (!existsSync(uploadsDir)) {
-      await mkdir(uploadsDir, { recursive: true });
+    // Connect to MongoDB Atlas (Cloud Database)
+    await connectToDatabase();
+
+    // Sanitize original filename
+    const sanitizedOriginalName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+
+    // Save image directly to MongoDB Atlas Media collection
+    const media = await Media.create({
+      filename: sanitizedOriginalName,
+      contentType: mimeType,
+      data: base64Data,
+      size: buffer.length,
+    });
+
+    // Optional local cache for development (silently ignored on Vercel read-only filesystem)
+    try {
+      const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
+      if (!existsSync(uploadsDir)) {
+        await mkdir(uploadsDir, { recursive: true });
+      }
+      const uniqueName = `${media._id}_${sanitizedOriginalName}`;
+      await writeFile(path.join(uploadsDir, uniqueName), buffer);
+    } catch {
+      // Intentionally ignore filesystem write errors on Vercel read-only environments
     }
 
-    // Sanitize filename and create unique timestamped name
-    const sanitizedOriginalName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-    const uniqueName = `${Date.now()}_${sanitizedOriginalName}`;
-    const filePath = path.join(uploadsDir, uniqueName);
-
-    // Write file to disk
-    await writeFile(filePath, buffer);
-
-    const publicUrl = `/uploads/${uniqueName}`;
+    const publicUrl = `/api/uploads/${media._id}`;
 
     return NextResponse.json({
       success: true,
       url: publicUrl,
       fileName: file.name,
-      message: 'Image uploaded successfully',
+      message: 'Image uploaded successfully to database',
     });
   } catch (error: any) {
     console.error('Image upload error:', error);

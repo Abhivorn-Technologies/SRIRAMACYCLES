@@ -8,6 +8,7 @@ import { useToast } from '@/context/ToastContext';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import ConfirmModal from '@/components/common/ConfirmModal';
 import Pagination from '@/components/common/Pagination';
+import { compressImage } from '@/lib/image-compress';
 
 interface ICategoryOption {
   _id: string;
@@ -148,8 +149,9 @@ export default function AdminBannersPage() {
 
     setUploadingImage(true);
     try {
+      const readyFile = await compressImage(file, 2000, 0.85);
       const uploadData = new FormData();
-      uploadData.append('file', file);
+      uploadData.append('file', readyFile);
 
       const res = await fetch('/api/upload', {
         method: 'POST',
