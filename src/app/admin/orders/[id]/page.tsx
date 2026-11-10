@@ -51,7 +51,7 @@ export default function AdminOrderDetailPage() {
         setOrder(data.order);
         setOrderStatus(data.order.orderStatus);
         setPaymentStatus(data.order.paymentStatus);
-        setCarrier(data.order.tracking?.carrier || 'Srirama Express Courier');
+        setCarrier(data.order.tracking?.carrier || '');
         setTrackingNumber(data.order.tracking?.trackingNumber || '');
         setNotes(data.order.notes || '');
       }

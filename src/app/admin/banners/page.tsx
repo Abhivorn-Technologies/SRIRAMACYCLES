@@ -14,6 +14,7 @@ interface ICategoryOption {
   _id: string;
   name: string;
   slug: string;
+  image?: string;
 }
 
 interface IProductOption {
@@ -21,15 +22,8 @@ interface IProductOption {
   name: string;
   slug: string;
   price: number;
+  images?: string[];
 }
-
-const IMAGE_PRESETS = [
-  { label: '🏔️ Mountain MTB', url: 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=1600&auto=format&fit=crop&q=80' },
-  { label: '⚡ Road Speed', url: 'https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=1600&auto=format&fit=crop&q=80' },
-  { label: '👧 Kids Cycling', url: 'https://images.unsplash.com/photo-1517649763962-0c623266ddc0?w=1600&auto=format&fit=crop&q=80' },
-  { label: '🏙️ City Commute', url: 'https://images.unsplash.com/photo-1507035895480-2b3156c31fc8?w=1600&auto=format&fit=crop&q=80' },
-  { label: '🛠️ Workshop', url: 'https://images.unsplash.com/photo-1508974239320-0a029497e820?w=1600&auto=format&fit=crop&q=80' },
-];
 
 export default function AdminBannersPage() {
   const [banners, setBanners] = useState<IBanner[]>([]);
@@ -98,6 +92,30 @@ export default function AdminBannersPage() {
     fetchStoreOptions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const catalogImages = React.useMemo(() => {
+    const list: Array<{ label: string; url: string; link?: string }> = [];
+    categories.forEach((cat) => {
+      if (cat.image) {
+        list.push({
+          label: `📁 ${cat.name}`,
+          url: cat.image,
+          link: `/shop?category=${cat.slug}`,
+        });
+      }
+    });
+    products.forEach((prod) => {
+      const img = prod.images?.[0];
+      if (img) {
+        list.push({
+          label: `🚴 ${prod.name}`,
+          url: img,
+          link: `/product/${prod.slug}`,
+        });
+      }
+    });
+    return list;
+  }, [categories, products]);
 
   const openAddModal = () => {
     setEditingBanner(null);
@@ -466,24 +484,32 @@ export default function AdminBannersPage() {
                   </div>
                 )}
 
-                {/* Quick Unsplash Presets */}
-                <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                  <span className="text-[10px] text-slate-400 font-semibold mr-0.5">Quick Photos:</span>
-                  {IMAGE_PRESETS.map((preset) => (
-                    <button
-                      key={preset.label}
-                      type="button"
-                      onClick={() => setFormData((p) => ({ ...p, image: preset.url }))}
-                      className={`text-[10px] px-2 py-0.5 rounded-lg font-semibold border transition-all ${
-                        formData.image === preset.url
-                          ? 'bg-brand-50 border-brand-500 text-brand-700 shadow-xs'
-                          : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-300'
-                      }`}
-                    >
-                      {preset.label}
-                    </button>
-                  ))}
-                </div>
+                {/* Quick Photos from Store Catalog */}
+                {catalogImages.length > 0 && (
+                  <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                    <span className="text-[10px] text-slate-400 font-semibold mr-0.5">From Catalog:</span>
+                    {catalogImages.slice(0, 8).map((item) => (
+                      <button
+                        key={item.url}
+                        type="button"
+                        onClick={() => {
+                          setFormData((p) => ({
+                            ...p,
+                            image: item.url,
+                            ctaLink: item.link || p.ctaLink,
+                          }));
+                        }}
+                        className={`text-[10px] px-2 py-0.5 rounded-lg font-semibold border transition-all truncate max-w-[140px] ${
+                          formData.image === item.url
+                            ? 'bg-brand-50 border-brand-500 text-brand-700 shadow-xs'
+                            : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-300'
+                        }`}
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
 
                 {/* Preview Thumbnail */}
                 {formData.image && (

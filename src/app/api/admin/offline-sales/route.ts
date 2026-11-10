@@ -73,7 +73,7 @@ export async function GET(req: NextRequest) {
 
     const skip = (page - 1) * limit;
 
-    const [records, total, statsAggregation] = await Promise.all([
+    const [records, total, statsAggregation, distinctBrands] = await Promise.all([
       OfflineSale.find(query).sort({ purchaseDate: -1, createdAt: -1 }).skip(skip).limit(limit).lean(),
       OfflineSale.countDocuments(query),
       OfflineSale.aggregate([
@@ -93,6 +93,7 @@ export async function GET(req: NextRequest) {
           },
         },
       ]),
+      OfflineSale.distinct('brand'),
     ]);
 
     const stats = statsAggregation[0] || {
@@ -105,6 +106,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       success: true,
       records,
+      brands: (distinctBrands || []).filter(Boolean),
       pagination: {
         page,
         limit,

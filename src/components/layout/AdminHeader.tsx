@@ -116,7 +116,7 @@ export default function AdminHeader({
                 {adminUser?.name || 'Administrator'}
               </p>
               <p className="text-[11px] text-slate-500 truncate">
-                {adminUser?.email || 'admin@sriramacycles.com'}
+                {adminUser?.email || adminUser?.phone || 'Store Administrator'}
               </p>
             </div>
 

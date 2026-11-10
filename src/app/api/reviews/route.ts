@@ -41,63 +41,22 @@ export async function GET(req: NextRequest) {
         ];
       }
 
-      let reviews = await Review.find(query).sort({ createdAt: -1 }).lean();
+      const reviews = await Review.find(query).sort({ createdAt: -1 }).lean();
 
-      if (reviews.length === 0 && !search && ratingFilter === 'all') {
-        const count = await Review.countDocuments();
-        if (count === 0) {
-          await Review.insertMany([
-            {
-              orderNumber: 'SRC-100823',
-              name: 'Rajesh Kumar',
-              phone: '9849023451',
-              email: 'rajesh.kumar@gmail.com',
-              rating: 5,
-              comment:
-                'Received my Gang Linear cycle in 3 days! The pre-assembly and gear tuning was flawless. Doorstep delivery guy was very polite.',
-              reviewContext: 'order_received',
-              productName: 'Gang Linear IBC 26T',
-              isApproved: true,
-            },
-            {
-              orderNumber: 'SRC-100824',
-              name: 'Sneha Murthy',
-              phone: '9703412890',
-              email: 'sneha.m@outlook.com',
-              rating: 5,
-              comment:
-                'Smooth online booking experience! The checkout with UPI was instant and I received SMS updates promptly.',
-              reviewContext: 'order_placed',
-              productName: 'Leader Beast 26T MTB',
-              isApproved: true,
-            },
-            {
-              orderNumber: 'SRC-100825',
-              name: 'Venkat Rao',
-              phone: '9948211023',
-              email: 'venkat.rao@yahoo.com',
-              rating: 4,
-              comment:
-                'Solid build quality and genuine Shimano gears. Very happy with Sri Rama Cycles showroom support in Vijayawada.',
-              reviewContext: 'order_received',
-              productName: 'Urban Commuter Pro',
-              isApproved: true,
-            },
-          ]);
-          reviews = await Review.find(query).sort({ createdAt: -1 }).lean();
-        }
-      }
-
-      // Compute statistics for admin dashboard
+      // Compute statistics dynamically for admin dashboard
       const allReviews = await Review.find().lean();
       const totalReviews = allReviews.length;
       const averageRating =
         totalReviews > 0
           ? Number((allReviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews).toFixed(1))
-          : 5.0;
+          : 0;
       const fiveStarCount = allReviews.filter((r) => r.rating === 5).length;
       const satisfactionRate =
-        totalReviews > 0 ? Math.round((fiveStarCount / totalReviews) * 100) : 100;
+        totalReviews > 0 ? Math.round((fiveStarCount / totalReviews) * 100) : 0;
+      const verifiedCount = allReviews.filter((r) => r.orderNumber || r.order).length;
+      const verifiedRate =
+        totalReviews > 0 ? Math.round((verifiedCount / totalReviews) * 100) : 0;
+      const pendingReviewsCount = allReviews.filter((r) => !r.isApproved).length;
 
       return NextResponse.json({
         success: true,
@@ -107,6 +66,9 @@ export async function GET(req: NextRequest) {
           averageRating,
           fiveStarCount,
           satisfactionRate,
+          verifiedRate,
+          verifiedCount,
+          pendingReviewsCount,
         },
       });
     }

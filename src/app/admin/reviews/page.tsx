@@ -33,15 +33,21 @@ interface IReviewStats {
   averageRating: number;
   fiveStarCount: number;
   satisfactionRate: number;
+  verifiedRate?: number;
+  verifiedCount?: number;
+  pendingReviewsCount?: number;
 }
 
 export default function AdminReviewsPage() {
   const [reviews, setReviews] = useState<IReview[]>([]);
   const [stats, setStats] = useState<IReviewStats>({
     totalReviews: 0,
-    averageRating: 5.0,
+    averageRating: 0,
     fiveStarCount: 0,
-    satisfactionRate: 100,
+    satisfactionRate: 0,
+    verifiedRate: 0,
+    verifiedCount: 0,
+    pendingReviewsCount: 0,
   });
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -238,10 +244,10 @@ export default function AdminReviewsPage() {
             </div>
           </div>
           <span className="text-2xl sm:text-3xl font-black text-slate-900 mt-1">
-            100%
+            {stats.verifiedRate ?? 0}%
           </span>
           <span className="text-[11px] text-slate-400 font-medium mt-1">
-            Verified buyer order linkage
+            {stats.verifiedCount ?? 0} verified orders linked
           </span>
         </div>
       </div>

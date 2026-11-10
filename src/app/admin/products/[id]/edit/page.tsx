@@ -60,14 +60,8 @@ export default function EditProductPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [categories, setCategories] = useState<ICategory[]>([]);
-  const [brands, setBrands] = useState<string[]>([
-    'Gang',
-    'Zeus',
-    'Ralco',
-    'Rajanik',
-    'Vallabha',
-    'Speed',
-  ]);
+  const [brands, setBrands] = useState<string[]>([]);
+  const [availableSizes, setAvailableSizes] = useState<string[]>(COMMON_CYCLE_SIZES);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -169,15 +163,18 @@ export default function EditProductPage() {
           });
 
           if (p.variants && p.variants.length > 0) {
-            setVariants(
-              p.variants
-                .filter((v) => v.size)
-                .map((v) => ({
-                  size: v.size || '',
-                  stock: v.stock !== undefined ? v.stock : parseInt(p.stock?.toString() || '10', 10),
-                  color: v.color,
-                }))
-            );
+            const validVariants = p.variants
+              .filter((v) => v.size)
+              .map((v) => ({
+                size: v.size || '',
+                stock: v.stock !== undefined ? v.stock : parseInt(p.stock?.toString() || '0', 10),
+                color: v.color,
+              }));
+            setVariants(validVariants);
+            const prodSizes = validVariants.map((v) => v.size).filter(Boolean);
+            if (prodSizes.length > 0) {
+              setAvailableSizes((prev) => Array.from(new Set([...prev, ...prodSizes])));
+            }
           } else {
             setVariants([]);
           }
@@ -185,10 +182,7 @@ export default function EditProductPage() {
           if (p.specifications && p.specifications.length > 0) {
             setSpecs(p.specifications);
           } else {
-            setSpecs([
-              { key: 'Frame', value: 'Aluminium Alloy' },
-              { key: 'Gears', value: 'Shimano' },
-            ]);
+            setSpecs([]);
           }
         } else {
           error('Failed to load product details');
@@ -594,10 +588,10 @@ export default function EditProductPage() {
           {/* Quick Selection Presets */}
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-2">
-              Quick Click to Add Common Cycle Sizes:
+              Select Available Cycle Sizes:
             </label>
             <div className="flex flex-wrap gap-2">
-              {COMMON_CYCLE_SIZES.map((size) => {
+              {availableSizes.map((size) => {
                 const isSelected = variants.some((v) => v.size.toLowerCase() === size.toLowerCase());
                 return (
                   <button

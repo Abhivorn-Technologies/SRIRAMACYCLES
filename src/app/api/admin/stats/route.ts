@@ -5,6 +5,7 @@ import Product from '@/models/Product';
 import User from '@/models/User';
 import Enquiry from '@/models/Enquiry';
 import OfflineSale from '@/models/OfflineSale';
+import Review from '@/models/Review';
 import { extractAuthUser } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
@@ -121,6 +122,8 @@ export async function GET(req: NextRequest) {
       deliveredOrders,
       unreadEnquiries,
       totalEnquiries,
+      pendingReviews,
+      totalReviews,
       recentOrders,
       lowStockProducts,
       recentEnquiries,
@@ -140,6 +143,8 @@ export async function GET(req: NextRequest) {
       Order.countDocuments({ orderStatus: 'Delivered' }),
       Enquiry.countDocuments({ status: 'unread' }),
       Enquiry.countDocuments(),
+      Review.countDocuments({ isApproved: false }),
+      Review.countDocuments(),
       Order.find().sort({ createdAt: -1 }).limit(6).lean(),
       Product.find({ stock: { $lte: 3 }, isActive: true })
         .select('name sku stock price images')
@@ -222,9 +227,19 @@ export async function GET(req: NextRequest) {
                 $cond: [{ $eq: ['$paymentMode', 'Cash'] }, '$price', 0],
               },
             },
+            upiAmount: {
+              $sum: {
+                $cond: [{ $eq: ['$paymentMode', 'UPI'] }, '$price', 0],
+              },
+            },
+            cardAmount: {
+              $sum: {
+                $cond: [{ $eq: ['$paymentMode', 'Card'] }, '$price', 0],
+              },
+            },
             onlineAmount: {
               $sum: {
-                $cond: [{ $in: ['$paymentMode', ['Online', 'UPI', 'Card']] }, '$price', 0],
+                $cond: [{ $in: ['$paymentMode', ['Online', 'Netbanking']] }, '$price', 0],
               },
             },
           },
@@ -294,6 +309,8 @@ export async function GET(req: NextRequest) {
       totalAmount: 0,
       totalCount: 0,
       cashAmount: 0,
+      upiAmount: 0,
+      cardAmount: 0,
       onlineAmount: 0,
     };
 
@@ -403,9 +420,9 @@ export async function GET(req: NextRequest) {
         offlineOrders: offlineStats.totalCount || 0,
         paymentBreakdown: {
           cash: (orderStats.cashRevenue || 0) + (offlineStats.cashAmount || 0),
-          upi: orderStats.upiRevenue || 0,
-          card: orderStats.cardRevenue || 0,
-          netbanking: orderStats.netbankingRevenue || 0,
+          upi: (orderStats.upiRevenue || 0) + (offlineStats.upiAmount || 0),
+          card: (orderStats.cardRevenue || 0) + (offlineStats.cardAmount || 0),
+          netbanking: (orderStats.netbankingRevenue || 0) + (offlineStats.onlineAmount || 0),
         },
         trend,
       },
@@ -420,6 +437,8 @@ export async function GET(req: NextRequest) {
         deliveredOrders,
         unreadEnquiries,
         totalEnquiries,
+        pendingReviews,
+        totalReviews,
       },
       recentOrders: period !== 'all' && periodRecentOrders.length > 0 ? periodRecentOrders : recentOrders,
       periodOrdersCount: periodRecentOrders.length,
@@ -468,6 +487,8 @@ export async function GET(req: NextRequest) {
         deliveredOrders: 0,
         unreadEnquiries: 0,
         totalEnquiries: 0,
+        pendingReviews: 0,
+        totalReviews: 0,
       },
       recentOrders: [],
       periodOrdersCount: 0,

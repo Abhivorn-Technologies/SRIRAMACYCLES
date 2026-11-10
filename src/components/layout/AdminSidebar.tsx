@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
@@ -35,20 +35,78 @@ export default function AdminSidebar({
 }: IAdminSidebarProps) {
   const pathname = usePathname();
 
-  const menuItems = [
-    { label: 'Overview', href: '/admin', icon: LayoutDashboard },
-    { label: 'In-Store Billing', href: '/admin/pos', icon: Receipt, badge: 'Counter' },
-    { label: 'Products', href: '/admin/products', icon: Package },
-    { label: 'Categories', href: '/admin/categories', icon: FolderTree },
-    { label: 'Brands', href: '/admin/brands', icon: Award },
-    { label: 'Orders', href: '/admin/orders', icon: ShoppingBag },
-    { label: 'Offline Records', href: '/admin/offline-sales', icon: History, badge: 'Offline' },
-    { label: 'Customer Reviews', href: '/admin/reviews', icon: Star, badge: 'Reviews' },
-    { label: 'Customers', href: '/admin/customers', icon: Users },
-    { label: 'Coupons', href: '/admin/coupons', icon: Tag },
-    { label: 'Banners & Hero', href: '/admin/banners', icon: ImageIcon },
-    { label: 'Enquiries', href: '/admin/enquiries', icon: MessageSquare },
-  ];
+  const [counts, setCounts] = useState<{
+    pendingOrders?: number;
+    unreadEnquiries?: number;
+    pendingReviews?: number;
+    lowStock?: number;
+  }>({});
+
+  useEffect(() => {
+    let isMounted = true;
+    async function loadBadgeCounts() {
+      try {
+        const res = await fetch('/api/admin/stats?period=today');
+        const data = await res.json();
+        if (isMounted && data.success && data.stats) {
+          setCounts({
+            pendingOrders: data.stats.pendingOrders || 0,
+            unreadEnquiries: data.stats.unreadEnquiries || 0,
+            pendingReviews: data.stats.pendingReviews || 0,
+            lowStock: data.lowStockProducts?.length || 0,
+          });
+        }
+      } catch {
+        // silent fail
+      }
+    }
+    loadBadgeCounts();
+    return () => {
+      isMounted = false;
+    };
+  }, [pathname]);
+
+  const menuItems = useMemo(
+    () => [
+      { label: 'Overview', href: '/admin', icon: LayoutDashboard },
+      { label: 'In-Store Billing', href: '/admin/pos', icon: Receipt },
+      {
+        label: 'Products',
+        href: '/admin/products',
+        icon: Package,
+        badge: counts.lowStock && counts.lowStock > 0 ? `${counts.lowStock} low` : undefined,
+        badgeColor: 'bg-amber-500 text-white',
+      },
+      { label: 'Categories', href: '/admin/categories', icon: FolderTree },
+      { label: 'Brands', href: '/admin/brands', icon: Award },
+      {
+        label: 'Orders',
+        href: '/admin/orders',
+        icon: ShoppingBag,
+        badge: counts.pendingOrders && counts.pendingOrders > 0 ? `${counts.pendingOrders} new` : undefined,
+        badgeColor: 'bg-emerald-600 text-white',
+      },
+      { label: 'Offline Records', href: '/admin/offline-sales', icon: History },
+      {
+        label: 'Customer Reviews',
+        href: '/admin/reviews',
+        icon: Star,
+        badge: counts.pendingReviews && counts.pendingReviews > 0 ? `${counts.pendingReviews} new` : undefined,
+        badgeColor: 'bg-purple-600 text-white',
+      },
+      { label: 'Customers', href: '/admin/customers', icon: Users },
+      { label: 'Coupons', href: '/admin/coupons', icon: Tag },
+      { label: 'Banners & Hero', href: '/admin/banners', icon: ImageIcon },
+      {
+        label: 'Enquiries',
+        href: '/admin/enquiries',
+        icon: MessageSquare,
+        badge: counts.unreadEnquiries && counts.unreadEnquiries > 0 ? `${counts.unreadEnquiries} new` : undefined,
+        badgeColor: 'bg-rose-500 text-white animate-pulse',
+      },
+    ],
+    [counts]
+  );
 
   const content = (
     <div
@@ -127,12 +185,12 @@ export default function AdminSidebar({
                 {!isCollapsed && <span className="truncate">{item.label}</span>}
               </div>
               {!isCollapsed && item.badge && (
-                <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-brand-600 text-white shadow-2xs">
+                <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full shadow-2xs ${item.badgeColor || 'bg-brand-600 text-white'}`}>
                   {item.badge}
                 </span>
               )}
               {isCollapsed && item.badge && (
-                <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-brand-600 ring-2 ring-white"></span>
+                <span className={`absolute top-2 right-2 w-2 h-2 rounded-full ring-2 ring-white ${item.badgeColor?.includes('rose') ? 'bg-rose-500' : item.badgeColor?.includes('amber') ? 'bg-amber-500' : 'bg-brand-600'}`}></span>
               )}
             </Link>
           );

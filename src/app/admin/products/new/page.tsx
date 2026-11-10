@@ -57,14 +57,8 @@ export default function AddProductPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [categories, setCategories] = useState<ICategory[]>([]);
-  const [brands, setBrands] = useState<string[]>([
-    'Gang',
-    'Zeus',
-    'Ralco',
-    'Rajanik',
-    'Vallabha',
-    'Speed',
-  ]);
+  const [brands, setBrands] = useState<string[]>([]);
+  const [availableSizes, setAvailableSizes] = useState<string[]>(COMMON_CYCLE_SIZES);
   const [loading, setLoading] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [imageInputMode, setImageInputMode] = useState<'upload' | 'url'>('upload');
@@ -72,11 +66,11 @@ export default function AddProductPage() {
 
   const [formData, setFormData] = useState({
     name: '',
-    brand: 'Gang',
+    brand: '',
     category: '',
     price: '',
     salePrice: '',
-    stock: '10',
+    stock: '',
     sku: generateSku(),
     shortDescription: '',
     description: '',
@@ -86,18 +80,10 @@ export default function AddProductPage() {
     isNewArrival: true,
   });
 
-  const [variants, setVariants] = useState<Array<{ size: string; stock: number; color?: string }>>([
-    { size: '26T', stock: 10 },
-    { size: '27.5T', stock: 10 },
-  ]);
+  const [variants, setVariants] = useState<Array<{ size: string; stock: number; color?: string }>>([]);
   const [customSizeInput, setCustomSizeInput] = useState('');
 
-  const [specs, setSpecs] = useState<ISpecification[]>([
-    { key: 'Frame', value: '6061 Double Butted Aluminium Alloy' },
-    { key: 'Gears', value: 'Shimano 21-Speed' },
-    { key: 'Brakes', value: 'Dual Mechanical Disc Brakes 160mm' },
-    { key: 'Weight', value: '11.5 kg' },
-  ]);
+  const [specs, setSpecs] = useState<ISpecification[]>([]);
 
   const handleToggleSize = (sizeName: string) => {
     const exists = variants.some((v) => v.size.toLowerCase() === sizeName.toLowerCase());
@@ -134,13 +120,15 @@ export default function AddProductPage() {
   useEffect(() => {
     async function loadData() {
       try {
-        const [catRes, brandRes] = await Promise.all([
+        const [catRes, brandRes, prodRes] = await Promise.all([
           fetch('/api/categories'),
           fetch('/api/brands?all=true'),
+          fetch('/api/products?limit=100'),
         ]);
 
         const catData = await catRes.json();
         const brandData = await brandRes.json();
+        const prodData = await prodRes.json();
 
         if (catData.success && catData.categories.length > 0) {
           setCategories(catData.categories);
@@ -156,8 +144,21 @@ export default function AddProductPage() {
           setBrands(names);
           setFormData((p) => ({
             ...p,
-            brand: names[0] || 'Gang',
+            brand: p.brand || names[0] || '',
           }));
+        }
+
+        if (prodData.success && Array.isArray(prodData.products)) {
+          const dynamicSizes = Array.from(
+            new Set(
+              prodData.products
+                .flatMap((p: any) => (p.variants || []).map((v: any) => v.size))
+                .filter(Boolean)
+            )
+          ) as string[];
+          if (dynamicSizes.length > 0) {
+            setAvailableSizes(Array.from(new Set([...COMMON_CYCLE_SIZES, ...dynamicSizes])));
+          }
         }
       } catch (err) {
         console.error(err);
@@ -560,10 +561,10 @@ export default function AddProductPage() {
           {/* Quick Selection Presets */}
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-2">
-              Quick Click to Add Common Cycle Sizes:
+              Select Available Cycle Sizes:
             </label>
             <div className="flex flex-wrap gap-2">
-              {COMMON_CYCLE_SIZES.map((size) => {
+              {availableSizes.map((size) => {
                 const isSelected = variants.some((v) => v.size.toLowerCase() === size.toLowerCase());
                 return (
                   <button

@@ -67,15 +67,8 @@ export default function OfflineSalesPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalRecords, setTotalRecords] = useState(0);
 
-  // Brands list
-  const [availableBrands, setAvailableBrands] = useState<string[]>([
-    'Gang',
-    'Zeus',
-    'Ralco',
-    'Rajanik',
-    'Vallabha',
-    'Speed',
-  ]);
+  // Brands list (dynamically populated from store catalog & offline sales records)
+  const [availableBrands, setAvailableBrands] = useState<string[]>([]);
   const [brandFilter, setBrandFilter] = useState('ALL');
 
   // Filters
@@ -109,18 +102,24 @@ export default function OfflineSalesPage() {
   });
   const [formSubmitting, setFormSubmitting] = useState(false);
 
-  // Fetch available brands from DB
+  // Fetch available brands dynamically from DB and sales records
   useEffect(() => {
     const fetchBrands = async () => {
       try {
-        const res = await fetch('/api/brands?all=true');
-        const data = await res.json();
-        if (data.success && data.brands) {
-          const names: string[] = data.brands.map((b: any) => b.name);
-          setAvailableBrands(Array.from(new Set([...names, 'Gang', 'Zeus', 'Ralco', 'Rajanik', 'Vallabha', 'Speed'])));
-        }
+        const [brandRes, salesRes] = await Promise.all([
+          fetch('/api/brands?all=true'),
+          fetch('/api/admin/offline-sales?limit=1'),
+        ]);
+        const brandData = await brandRes.json();
+        const salesData = await salesRes.json();
+        const brandNames: string[] =
+          brandData.success && brandData.brands ? brandData.brands.map((b: any) => b.name) : [];
+        const salesBrands: string[] =
+          salesData.success && salesData.brands ? salesData.brands : [];
+        const combined = Array.from(new Set([...brandNames, ...salesBrands])).filter(Boolean);
+        setAvailableBrands(combined);
       } catch {
-        // keep defaults
+        // network error
       }
     };
     fetchBrands();
@@ -157,6 +156,9 @@ export default function OfflineSalesPage() {
         setTotalRecords(data.pagination?.total || 0);
         if (data.stats) {
           setStats(data.stats);
+        }
+        if (data.brands && data.brands.length > 0) {
+          setAvailableBrands((prev) => Array.from(new Set([...prev, ...data.brands])));
         }
       } else {
         error(data.message || 'Failed to load records');
