@@ -75,7 +75,7 @@ export default function TaxInvoiceModal({ order, isOpen, onClose }: ITaxInvoiceM
                 Phone: <strong>{STORE_CONTACT.phone}</strong> | Email: <strong>{STORE_CONTACT.supportEmail}</strong>
               </p>
               <p className="text-xs text-slate-500 mt-0.5 font-mono">
-                GSTIN: <strong>36AAAAA0000A1Z5</strong> (Telangana)
+                GSTIN: <strong className="text-brand-700">{STORE_CONTACT.gstin}</strong> (Telangana)
               </p>
             </div>
 
@@ -195,6 +195,13 @@ export default function TaxInvoiceModal({ order, isOpen, onClose }: ITaxInvoiceM
                 <span className="text-brand-700">{formatPrice(order.pricing.total)}</span>
               </div>
             </div>
+          </div>
+
+          {/* Terms & Conditions Note */}
+          <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/80 text-[11px] text-slate-600 flex flex-col gap-0.5">
+            <span className="font-bold text-slate-800 uppercase tracking-tight text-[10px]">Terms & Conditions:</span>
+            <p className="font-bold text-slate-900">• Goods once sold will not be taken back.</p>
+            <p className="text-slate-500">• Warranty claims are subject to original manufacturer guidelines.</p>
           </div>
 
           {/* Authorised Signature & Stamp */}

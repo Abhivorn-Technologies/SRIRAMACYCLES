@@ -62,6 +62,7 @@ export default function POSReceiptModal({
 
   const waMessage = encodeURIComponent(
     `*SRI RAMA CYCLE & AUTO SPARE PARTS*\n` +
+    `*GSTIN: ${STORE_CONTACT.gstin}*\n` +
     `*In-Store Cash Bill / Tax Receipt*\n` +
     `================================\n` +
     `Invoice: *${invoiceNumber}*\n` +
@@ -75,6 +76,8 @@ export default function POSReceiptModal({
     (pricing.discount > 0 ? `Discount: -₹${pricing.discount}\n` : '') +
     (pricing.tax > 0 ? `GST / Tax: ₹${pricing.tax}\n` : '') +
     `*TOTAL PAID: ₹${pricing.total}* (${posDetails?.paymentMode || 'Cash'})\n` +
+    `================================\n` +
+    `*Note: Goods once sold will not be taken back.*\n` +
     `================================\n` +
     `Prop. ${STORE_CONTACT.proprietor}\n` +
     `📍 ${STORE_CONTACT.address}\n` +
@@ -204,6 +207,9 @@ export default function POSReceiptModal({
                 <p className="text-[11px] text-slate-700 font-bold uppercase mt-0.5">
                   Prop. {STORE_CONTACT.proprietor}
                 </p>
+                <p className="text-[11px] text-slate-950 font-black tracking-wider mt-0.5 font-mono">
+                  GSTIN: {STORE_CONTACT.gstin}
+                </p>
                 <p className="text-[10px] text-slate-600 mt-1 max-w-[280px] mx-auto leading-tight">
                   {STORE_CONTACT.address}
                 </p>
@@ -303,8 +309,10 @@ export default function POSReceiptModal({
               {/* Footer */}
               <div className="pt-3 text-center flex flex-col gap-1 text-[10px] text-slate-600">
                 <p className="font-bold text-slate-950">*** THANK YOU FOR YOUR BUSINESS! ***</p>
-                <p>Goods once sold can be exchanged within 7 days with this bill.</p>
-                <p className="text-[9px] text-slate-400 mt-1">Computer Generated POS Receipt</p>
+                <p className="font-extrabold text-slate-950 uppercase tracking-tight py-1 border-y border-dashed border-slate-300">
+                  Note: Goods once sold will not be taken back
+                </p>
+                <p className="text-[9px] text-slate-400 mt-0.5">Computer Generated POS Receipt</p>
               </div>
             </div>
           ) : (
@@ -322,6 +330,9 @@ export default function POSReceiptModal({
                   </h1>
                   <p className="text-xs text-brand-700 font-bold uppercase mt-0.5">
                     Proprietor: {STORE_CONTACT.proprietor}
+                  </p>
+                  <p className="text-xs font-black text-slate-900 tracking-wider mt-1">
+                    GSTIN: <span className="font-mono text-brand-700">{STORE_CONTACT.gstin}</span> (Telangana)
                   </p>
                   <p className="text-xs text-slate-600 mt-1 max-w-sm">
                     {STORE_CONTACT.address}
@@ -449,8 +460,8 @@ export default function POSReceiptModal({
               <div className="grid grid-cols-2 gap-6 pt-6 border-t border-slate-200 text-[11px] text-slate-500">
                 <div>
                   <strong className="text-slate-800 block mb-1">Terms & Conditions:</strong>
-                  <p>1. Goods once sold can be exchanged within 7 days with this original invoice.</p>
-                  <p>2. Warranty claims are subject to manufacturer terms.</p>
+                  <p className="font-bold text-slate-900">1. Goods once sold will not be taken back.</p>
+                  <p>2. Warranty claims are subject to manufacturer terms & conditions.</p>
                 </div>
                 <div className="text-right flex flex-col justify-end items-end">
                   <div className="w-44 border-b border-slate-400 pb-8 text-center text-slate-400 text-[10px]">

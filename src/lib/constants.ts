@@ -45,6 +45,8 @@ export const PAYMENT_METHODS = [
 export const STORE_CONTACT = {
   businessName: 'SRI RAMA CYCLE AND AUTO SPARE PARTS',
   proprietor: 'Ravula. Rakesh Kumar',
+  gstin: '36APXPR1494P1ZM',
+  invoiceNote: 'Goods once sold will not be taken back',
   phone: '+91 95736 53194',
   rawPhone: '9573653194',
   whatsapp: '+91 95736 53194',
